@@ -1,6 +1,6 @@
 <?php
 
-namespace Markup\Bundle\JobQueueBundle\Job\Test;
+namespace Markup\JobQueueBundle\Job\Test;
 
 use BCC\ResqueBundle\Job;
 

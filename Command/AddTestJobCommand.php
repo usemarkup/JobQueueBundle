@@ -1,11 +1,11 @@
 <?php
 
-namespace Markup\Bundle\JobQueueBundle\Command;
+namespace Markup\JobQueueBundle\Command;
 
-use Markup\Bundle\JobQueueBundle\Job\Test\BadJob;
-use Markup\Bundle\JobQueueBundle\Job\Test\ErrorJob;
-use Markup\Bundle\JobQueueBundle\Job\Test\ExceptionJob;
-use Markup\Bundle\JobQueueBundle\Job\Test\SleepJob;
+use Markup\JobQueueBundle\Job\Test\BadJob;
+use Markup\JobQueueBundle\Job\Test\ErrorJob;
+use Markup\JobQueueBundle\Job\Test\ExceptionJob;
+use Markup\JobQueueBundle\Job\Test\SleepJob;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;

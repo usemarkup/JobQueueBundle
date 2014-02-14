@@ -1,6 +1,6 @@
 <?php
 
-namespace Markup\Bundle\JobQueueBundle\Controller;
+namespace Markup\JobQueueBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 

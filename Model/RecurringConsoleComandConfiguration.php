@@ -1,6 +1,6 @@
 <?php
 
-namespace Markup\Bundle\JobQueueBundle\Model;
+namespace Markup\JobQueueBundle\Model;
 
 use Cron;
 

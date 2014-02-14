@@ -1,6 +1,6 @@
 <?php
 
-namespace Markup\Bundle\JobQueueBundle;
+namespace Markup\JobQueueBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 

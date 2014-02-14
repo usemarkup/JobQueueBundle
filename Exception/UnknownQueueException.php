@@ -1,6 +1,6 @@
 <?php
 
-namespace Markup\Bundle\JobQueueBundle\Exception;
+namespace Markup\JobQueueBundle\Exception;
 
 class UnknownQueueException extends \Exception
 {

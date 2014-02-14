@@ -17,7 +17,8 @@
     "require": {
         "symfony/framework-bundle": "~2.1",
         "twig/twig": ">=1.12",
-        "php": ">=5.4.0"
+        "php": ">=5.4.0",
+        "mtdowling/cron-expression": "1.0.*"
     },
     "require-dev": {
         "bcc/resque-bundle": "dev-master#a310623938071f0d59941ce7509cd1155a9a8f18",

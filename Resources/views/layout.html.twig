@@ -3,8 +3,8 @@
 {% block stylesheets %}
 
     {% stylesheets filter="compass"
-        '@PhoenixJobQueueBundle/Resources/sass/admin/job_queue.scss'
-            output='admin/css/compiled/gracilariidae/job_queue.css'
+        '@MarkupJobQueueBundle/Resources/sass/admin/job_queue.scss'
+            output='admin/css/compiled/job_queue.css'
         %}
         <link rel="stylesheet" href="{{ asset_url }}" type="text/css" media="screen" charset="utf-8" />
     {% endstylesheets %}
@@ -15,7 +15,7 @@
 	<div id="heading-and-toolbar">
 	<h1>Job Queue</h1>
 	<div id="toolbar">
-		{% include 'PhoenixJobQueueBundle:View:toolbar.html.twig' %}
+		{% include 'MarkupJobQueueBundle:View:toolbar.html.twig' %}
 	</div>
 </div>
 

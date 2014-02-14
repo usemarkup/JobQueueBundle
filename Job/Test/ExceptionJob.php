@@ -1,9 +1,9 @@
 <?php
 
-namespace Phoenix\Bundle\JobQueueBundle\Job\Test;
+namespace Markup\Bundle\JobQueueBundle\Job\Test;
 
 use BCC\ResqueBundle\Job;
-use Phoenix\Bundle\JobQueueBundle\Exception\JobFailedException;
+use Markup\Bundle\JobQueueBundle\Exception\JobFailedException;
 
 class ExceptionJob extends Job
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace Phoenix\Bundle\JobQueueBundle\Exception;
+namespace Markup\Bundle\JobQueueBundle\Exception;
 
 class InvalidConfigurationException extends \Exception
 {

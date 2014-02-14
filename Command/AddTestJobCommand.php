@@ -1,11 +1,11 @@
 <?php
 
-namespace Phoenix\Bundle\JobQueueBundle\Command;
+namespace Markup\Bundle\JobQueueBundle\Command;
 
-use Phoenix\Bundle\JobQueueBundle\Job\Test\BadJob;
-use Phoenix\Bundle\JobQueueBundle\Job\Test\ErrorJob;
-use Phoenix\Bundle\JobQueueBundle\Job\Test\ExceptionJob;
-use Phoenix\Bundle\JobQueueBundle\Job\Test\SleepJob;
+use Markup\Bundle\JobQueueBundle\Job\Test\BadJob;
+use Markup\Bundle\JobQueueBundle\Job\Test\ErrorJob;
+use Markup\Bundle\JobQueueBundle\Job\Test\ExceptionJob;
+use Markup\Bundle\JobQueueBundle\Job\Test\SleepJob;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -29,7 +29,7 @@ class AddTestJobCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setName('phoenix:job_queue:add:test')
+            ->setName('markup:job_queue:add:test')
             ->setDescription('Adds a single job that sleeps for a period of time (required) to allow testing of the job queue')
             ->addArgument(
                 'type',

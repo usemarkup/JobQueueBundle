@@ -1,6 +1,6 @@
 <?php
 
-namespace Phoenix\Bundle\JobQueueBundle\DependencyInjection;
+namespace Markup\Bundle\JobQueueBundle\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
@@ -18,7 +18,7 @@ class Configuration implements ConfigurationInterface
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('phoenix_job_queue');
+        $rootNode = $treeBuilder->root('markup_job_queue');
 
         // can specify a list of allowed queues
         // can specify a configuration file (.yml) that can be evaluated using cron syntax

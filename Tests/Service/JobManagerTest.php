@@ -1,10 +1,10 @@
 <?php
 
-namespace Phoenix\Bundle\JobQueueBundle\Tests\Service;
+namespace Markup\Bundle\JobQueueBundle\Tests\Service;
 
 use Mockery as m;
-use Phoenix\Bundle\JobQueueBundle\Job\Test\SleepJob;
-use Phoenix\Bundle\JobQueueBundle\Service\JobManager;
+use Markup\Bundle\JobQueueBundle\Job\Test\SleepJob;
+use Markup\Bundle\JobQueueBundle\Service\JobManager;
 
 class PromotionTest extends \PHPUnit_Framework_TestCase
 {
@@ -36,7 +36,7 @@ class PromotionTest extends \PHPUnit_Framework_TestCase
 
     public function testCannotAddCommandJobToInvalidQueue()
     {
-        $this->setExpectedException('Phoenix\Bundle\JobQueueBundle\Exception\UnknownQueueException');
+        $this->setExpectedException('Markup\Bundle\JobQueueBundle\Exception\UnknownQueueException');
         $this->jobManager->addCommandJob('console:herp:derp', 'default', 60, 60);
     }
 

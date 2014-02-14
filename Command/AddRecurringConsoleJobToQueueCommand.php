@@ -1,6 +1,6 @@
 <?php
 
-namespace Phoenix\Bundle\JobQueueBundle\Command;
+namespace Markup\Bundle\JobQueueBundle\Command;
 
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
@@ -21,7 +21,7 @@ class AddRecurringConsoleJobToQueueCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setName('phoenix:job_queue:recurring:add')
+            ->setName('markup:job_queue:recurring:add')
             ->setDescription('Adds any configured recurring jobs, which are due NOW, to the specified job queue');
     }
 
@@ -39,7 +39,7 @@ class AddRecurringConsoleJobToQueueCommand extends ContainerAwareCommand
             }
         }
 
-        $recurringConsoleCommandReader = $this->getContainer()->get('phoenix_admin_job_queue_recurring_console_command_reader');
+        $recurringConsoleCommandReader = $this->getContainer()->get('markup_admin_job_queue_recurring_console_command_reader');
 
         $due = $recurringConsoleCommandReader->getDue();
 

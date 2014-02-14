@@ -1,6 +1,6 @@
 <?php
 
-namespace Phoenix\Bundle\JobQueueBundle\Command;
+namespace Markup\Bundle\JobQueueBundle\Command;
 
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
@@ -21,7 +21,7 @@ class ReadRecurringConsoleJobConfigurationCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setName('phoenix:job_queue:recurring:view')
+            ->setName('markup:job_queue:recurring:view')
             ->setDescription('Views the current application configuration for recurring console jobs, showing the next run time')
             ->addOption(
                 'time',
@@ -45,7 +45,7 @@ class ReadRecurringConsoleJobConfigurationCommand extends ContainerAwareCommand
             }
         }
 
-        $recurringConsoleCommandReader = $this->getContainer()->get('phoenix_admin_job_queue_recurring_console_command_reader');
+        $recurringConsoleCommandReader = $this->getContainer()->get('markup_admin_job_queue_recurring_console_command_reader');
 
         $output->writeLn(sprintf('<info>Treating current time as %s</info>', $time->format('r')));
         $table = $this->getHelperSet()->get('table');

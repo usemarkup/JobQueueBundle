@@ -1,6 +1,6 @@
 <?php
 
-namespace Phoenix\Bundle\JobQueueBundle\Controller;
+namespace Markup\Bundle\JobQueueBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
@@ -15,7 +15,7 @@ class QueueViewController extends Controller
         $this->getResque()->pruneDeadWorkers();
 
         return $this->render(
-            'PhoenixJobQueueBundle:View:index.html.twig',
+            'MarkupJobQueueBundle:View:index.html.twig',
             array(
                 'resque' => $this->getResque(),
             )
@@ -34,7 +34,7 @@ class QueueViewController extends Controller
         }
 
         return $this->render(
-            'PhoenixJobQueueBundle:View:queue_show.html.twig',
+            'MarkupJobQueueBundle:View:queue_show.html.twig',
             array(
                 'queue' => $queue,
                 'jobs' => $jobs,
@@ -55,7 +55,7 @@ class QueueViewController extends Controller
         }
 
         return $this->render(
-            'PhoenixJobQueueBundle:View:failed_list.html.twig',
+            'MarkupJobQueueBundle:View:failed_list.html.twig',
             array(
                 'jobs' => $jobs,
                 'showingAll' => $showingAll,
@@ -67,7 +67,7 @@ class QueueViewController extends Controller
     public function listScheduledAction()
     {
         return $this->render(
-            'PhoenixJobQueueBundle:View:scheduled_list.html.twig',
+            'MarkupJobQueueBundle:View:scheduled_list.html.twig',
             array(
                 'timestamps' => $this->getResque()->getDelayedJobTimestamps(),
                 'resque' => $this->getResque()
@@ -85,7 +85,7 @@ class QueueViewController extends Controller
         }
 
         return $this->render(
-            'PhoenixJobQueueBundle:View:scheduled_timestamp.html.twig',
+            'MarkupJobQueueBundle:View:scheduled_timestamp.html.twig',
             array(
                 'timestamp' => $timestamp,
                 'jobs' => $jobs,

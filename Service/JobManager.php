@@ -1,10 +1,10 @@
 <?php
 
-namespace Phoenix\Bundle\JobQueueBundle\Service;
+namespace Markup\Bundle\JobQueueBundle\Service;
 
 use BCC\ResqueBundle\Job;
-use Phoenix\Bundle\JobQueueBundle\Exception\UnknownQueueException;
-use Phoenix\Bundle\JobQueueBundle\Job\ConsoleCommandJob;
+use Markup\Bundle\JobQueueBundle\Exception\UnknownQueueException;
+use Markup\Bundle\JobQueueBundle\Job\ConsoleCommandJob;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 
 /**

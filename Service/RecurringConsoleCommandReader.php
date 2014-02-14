@@ -1,10 +1,10 @@
 <?php
 
-namespace Phoenix\Bundle\JobQueueBundle\Service;
+namespace Markup\Bundle\JobQueueBundle\Service;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Phoenix\Bundle\JobQueueBundle\Exception\InvalidConfigurationException;
-use Phoenix\Bundle\JobQueueBundle\Model\RecurringConsoleComandConfiguration;
+use Markup\Bundle\JobQueueBundle\Exception\InvalidConfigurationException;
+use Markup\Bundle\JobQueueBundle\Model\RecurringConsoleComandConfiguration;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Yaml\Parser;
 

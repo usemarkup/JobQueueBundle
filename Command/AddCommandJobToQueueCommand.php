@@ -1,6 +1,6 @@
 <?php
 
-namespace Phoenix\Bundle\JobQueueBundle\Command;
+namespace Markup\Bundle\JobQueueBundle\Command;
 
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
@@ -20,7 +20,7 @@ class AddCommandJobToQueueCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setName('phoenix:job_queue:add:command')
+            ->setName('markup:job_queue:add:command')
             ->setDescription('Adds a single job that executes a command via the job queue')
             ->addArgument(
                 'cmd',

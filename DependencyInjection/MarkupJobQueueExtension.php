@@ -1,6 +1,6 @@
 <?php
 
-namespace Phoenix\Bundle\JobQueueBundle\DependencyInjection;
+namespace Markup\Bundle\JobQueueBundle\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Config\FileLocator;
@@ -12,7 +12,7 @@ use Symfony\Component\DependencyInjection\Loader;
  *
  * To learn more see {@link http://symfony.com/doc/current/cookbook/bundles/extension.html}
  */
-class PhoenixJobQueueExtension extends Extension
+class MarkupJobQueueExtension extends Extension
 {
     /**
      * {@inheritDoc}
@@ -37,7 +37,7 @@ class PhoenixJobQueueExtension extends Extension
     private function registerAndValidateRecurringConfigurationFile(array $config, ContainerBuilder $container)
     {
         if ($config['recurring'] !== false) {
-            $recurringConsoleCommandReader = $container->getDefinition('phoenix_admin_job_queue_recurring_console_command_reader');
+            $recurringConsoleCommandReader = $container->getDefinition('markup_admin_job_queue_recurring_console_command_reader');
             $recurringConsoleCommandReader->addMethodCall('setConfigurationFileName', [$config['recurring']]);
         }
     }
@@ -50,7 +50,7 @@ class PhoenixJobQueueExtension extends Extension
     private function addQueuesToJobManager(array $config, ContainerBuilder $container)
     {
         $queues = $config['queues'];
-        $jobManager = $container->getDefinition('phoenix_admin_job_queue_manager');
+        $jobManager = $container->getDefinition('markup_admin_job_queue_manager');
         $jobManager->addMethodCall('setQueues', [$queues]);
     }
 }

@@ -1,6 +1,6 @@
 {% set sectionName = 'index' %}
 
-{% extends 'PhoenixJobQueueBundle::layout.html.twig' %}
+{% extends 'MarkupJobQueueBundle::layout.html.twig' %}
 
 {% block content %}
 
@@ -17,7 +17,7 @@
         {% for queue in resque.queues %}
             <tr>
                 <td>{{ queue.name }}</td>
-                <td><a href="{{ path('phoenix_admin_job_queue_show', { queue: queue.name }) }}">{{ queue.size }}</a></td>
+                <td><a href="{{ path('markup_admin_job_queue_show', { queue: queue.name }) }}">{{ queue.size }}</a></td>
             </tr>
         {% endfor %}
     </table>

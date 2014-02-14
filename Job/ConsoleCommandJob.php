@@ -1,9 +1,9 @@
 <?php
 
-namespace Phoenix\Bundle\JobQueueBundle\Job;
+namespace Markup\Bundle\JobQueueBundle\Job;
 
 use BCC\ResqueBundle\ContainerAwareJob;
-use Phoenix\Bundle\JobQueueBundle\Exception\JobFailedException;
+use Markup\Bundle\JobQueueBundle\Exception\JobFailedException;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Process\Process;
 

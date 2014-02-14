@@ -1,18 +1,18 @@
-phoenix_admin_job_queue_index:
+markup_admin_job_queue_index:
     pattern:  /
-    defaults: { _controller: PhoenixJobQueueBundle:QueueView:index }
-phoenix_admin_job_queue_show:
+    defaults: { _controller: MarkupJobQueueBundle:QueueView:index }
+markup_admin_job_queue_show:
     pattern:  /queue/{queue}/
-    defaults: { _controller: PhoenixJobQueueBundle:QueueView:showQueue }
-phoenix_admin_job_queue_failed_list:
+    defaults: { _controller: MarkupJobQueueBundle:QueueView:showQueue }
+markup_admin_job_queue_failed_list:
     pattern:  /failed/list/
-    defaults: { _controller: PhoenixJobQueueBundle:QueueView:listFailed }
-phoenix_admin_job_queue_scheduled_list:
+    defaults: { _controller: MarkupJobQueueBundle:QueueView:listFailed }
+markup_admin_job_queue_scheduled_list:
     pattern:  /scheduled/list/
-    defaults: { _controller: PhoenixJobQueueBundle:QueueView:listScheduled }
-phoenix_admin_job_queue_scheduled_timestamp:
+    defaults: { _controller: MarkupJobQueueBundle:QueueView:listScheduled }
+markup_admin_job_queue_scheduled_timestamp:
     pattern:  /scheduled/{timestamp}/
-    defaults: { _controller: PhoenixJobQueueBundle:QueueView:showTimestamp }
-phoenix_admin_job_queue_recurring:
+    defaults: { _controller: MarkupJobQueueBundle:QueueView:showTimestamp }
+markup_admin_job_queue_recurring:
     pattern:  /recurring/
-    defaults: { _controller: PhoenixJobQueueBundle:RecurringView:view }
+    defaults: { _controller: MarkupJobQueueBundle:RecurringView:view }

@@ -1,6 +1,6 @@
 {% set sectionName = 'scheduled' %}
 
-{% extends 'PhoenixJobQueueBundle::layout.html.twig' %}
+{% extends 'MarkupJobQueueBundle::layout.html.twig' %}
 
 {% block content %}
 {{ parent() }}
@@ -17,7 +17,7 @@
     {% for timestamp in timestamps %}
         <tr>
             <th class="span2">
-                <a href="{{ path('phoenix_admin_job_queue_scheduled_timestamp', {timestamp: timestamp[0]}) }}">
+                <a href="{{ path('markup_admin_job_queue_scheduled_timestamp', {timestamp: timestamp[0]}) }}">
                     {{ timestamp[0]|date('Y-m-d H:i:s') }}</a>
             </th>
             <td class="span1">{{ timestamp[1] }}</td>

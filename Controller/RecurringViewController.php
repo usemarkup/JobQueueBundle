@@ -1,6 +1,6 @@
 <?php
 
-namespace Phoenix\Bundle\JobQueueBundle\Controller;
+namespace Markup\Bundle\JobQueueBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
@@ -13,9 +13,9 @@ class RecurringViewController extends Controller
     public function viewAction()
     {
         return $this->render(
-            'PhoenixJobQueueBundle:View:recurring.html.twig',
+            'MarkupJobQueueBundle:View:recurring.html.twig',
             array(
-                'recurringReader' => $this->get('phoenix_admin_job_queue_recurring_console_command_reader'),
+                'recurringReader' => $this->get('markup_admin_job_queue_recurring_console_command_reader'),
                 'resque' => $this->get('bcc_resque.resque'),
             )
         );

@@ -1,6 +1,6 @@
 <?php
 
-namespace Phoenix\Bundle\JobQueueBundle\Job\Test;
+namespace Markup\Bundle\JobQueueBundle\Job\Test;
 
 use BCC\ResqueBundle\Job;
 use Symfony\Component\Process\Process;

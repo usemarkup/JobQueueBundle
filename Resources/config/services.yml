@@ -1,14 +1,14 @@
 parameters:
-#    phoenix_job_queue.example.class: Phoenix\Bundle\JobQueueBundle\Example
+#    markup_job_queue.example.class: Markup\Bundle\JobQueueBundle\Example
 
 services:
-    phoenix_admin_job_queue_manager:
-        class: Phoenix\Bundle\JobQueueBundle\Service\JobManager
+    markup_admin_job_queue_manager:
+        class: Markup\Bundle\JobQueueBundle\Service\JobManager
         arguments:
             - @bcc_resque.resque
     jobby:
-        alias: phoenix_admin_job_queue_manager
-    phoenix_admin_job_queue_recurring_console_command_reader:
-        class: Phoenix\Bundle\JobQueueBundle\Service\RecurringConsoleCommandReader
+        alias: markup_admin_job_queue_manager
+    markup_admin_job_queue_recurring_console_command_reader:
+        class: Markup\Bundle\JobQueueBundle\Service\RecurringConsoleCommandReader
         arguments:
             - %kernel.root_dir%

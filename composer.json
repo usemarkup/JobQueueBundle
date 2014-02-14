@@ -26,7 +26,7 @@
         "chrisboulton/php-resque-scheduler": "dev-master#ab8bd52949cac1f815bbb97aa39f51c7b5766a86"
     },
     "suggests": {
-        "symfony/console": "To use add Jobs via the CLI",
+        "symfony/console": "To use add Jobs via the CLI"
     },
     "autoload": {
         "psr-0": { "Markup\\JobQueueBundle": "" }

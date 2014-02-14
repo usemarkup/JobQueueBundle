@@ -34,6 +34,22 @@ Rather than scheduling jobs using the crontab, all tasks should be managed in en
 
 Configuration
 ===============
+This bundle can be configured by adding a list of allowed 'queues' to which jobs can be added. This list of queues is later used to instigate discreete workers when deploying the application (1 worker per queue).
+
+Additionally a 'recurring' job configuration can be added on a per environment basis, to allow for control of various recurring jobs within different environments.
+
+```yml
+	markup_job_queue:
+	    queues:
+	        - named-queue
+	        - feeds
+	        - system
+	        - mail
+	        - dataexchange
+	        - web-service-outbound
+	        - etcetcetc
+	    recurring: recurring_jobs.yml # name of file within app/config/
+```
 
 Enabling and Montoring Workers
 ================

@@ -1,14 +1,14 @@
 Introduction
 ============
 
-The Job Queue Bundle is responsible for managing Recurring, and non recurring jobs.
+The Job Queue Bundle is responsible for managing recurring, and non recurring jobs.
 
-It uses php-resque to manage a job queue, which is stored in redis, and for which various workers process tasks.
+It uses php-resque to manage a job queue, (for which various workers process tasks).
 These workers should be maintained by supervisord to ensure they don't fail.
 
 This bundle utilizes the BCCResqueBundle, which provides glue code between phpr-esque and Symfony2.
 
-Certain parts of the BCCResque Bundle, have been reimplemented in this Bundle to allow more control, particularly templates/controllers and styling used to view the job queue.
+Certain parts of the BCCResque Bundle, have been reimplemented in this Bundle to allow more control, particularly templates/controllers and styling used to view the job queue, and support for viewing the recurring job configuration.
 
 Adding Jobs
 ============
@@ -24,13 +24,19 @@ The majority of jobs that will be added using this bundle, are console commands 
 			600, # allowed idle timeout for command (see symfony process component documentation)
 		)
 ```
+
 Scheduling Jobs
 ===============
 
-Rather than scheduling jobs using the crontab, all tasks should be managed in environment specific configuration files (using crontab syntax) which add commands to the job queue on the same schedule as present in the crontab.
-TODO: Include sample 'recurring.yml'
+Rather than scheduling jobs using the crontab, all tasks should be managed in environment specific configuration files (using crontab syntax) which add commands to the job queue on the same schedule as present in the crontab. This allows the addition of new recurring jobs, or changing of timings, without having to modify crontab in multiple environments. It also has the advantage of forcing a common logging/exception notification strategy for all system tasks.
 
-Enabling Workers
+[Sample Recurring Job Configuration](Resources/docs/sample_recurring.yml)
+
+Configuration
+===============
+
+Enabling and Montoring Workers
 ================
-A sample supervisord configuration should be included in the app folder, and this configuration should be added as part of the deployment process to ensure that jobs are executed automatically.
+A sample supervisord configuration should be included in the app folder, and this configuration should be added as part of the deployment process to ensure that jobs are executed automatically. The basics of the approach are documented in the BCCEResqueBundle.
+
 TODO: Include sample supervisord config and sample capistrano task for deploying supervisord configurations.

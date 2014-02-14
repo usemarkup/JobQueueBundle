@@ -1,0 +1,7 @@
+- command: your:console:command --and --any --options and arguments
+  schedule: 1-59/2 * * * *
+  queue: name-of-a-valid-queue
+#process newly uploaded generic attribute data every two minutes
+- command: another:console:command --and --any --options and arguments
+  schedule: * * * * *
+  queue: name-of-a-valid-queue

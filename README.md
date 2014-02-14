@@ -1,3 +1,6 @@
+Introduction
+============
+
 The Job Queue Bundle is responsible for managing Recurring, and non recurring jobs.
 
 It uses php-resque to manage a job queue, which is stored in redis, and for which various workers process tasks.
@@ -12,14 +15,15 @@ Adding Jobs
 
 The majority of jobs that will be added using this bundle, are console commands which are added to the queue to be processed at a later date. There is a genric CommandJob, which is used for adding these jobs. Adding a 'Command Job' can be achieved using the 'jobby' service as follows:
 
-$container->get('jobby')
-	->addCommandJob(
-		'your:console:command --plus=any --options or arguments', #this needs to be a valid command
-		'nameofqueue', #should be a valid queue name (see 'Named Queues')
-		600, # allowed timeout for command (see symfony process component documentation)
-		600, # allowed idle timeout for command (see symfony process component documentation)
-	)
-
+```php
+	$container->get('jobby')
+		->addCommandJob(
+			'your:console:command --plus=any --options or arguments', #this needs to be a valid command
+			'nameofqueue', #should be a valid queue name (see 'Named Queues')
+			600, # allowed timeout for command (see symfony process component documentation)
+			600, # allowed idle timeout for command (see symfony process component documentation)
+		)
+```
 Scheduling Jobs
 ===============
 

@@ -1,5 +1,5 @@
 {
-    "name": "markup/jobqueuebundle",
+    "name": "markup/job-queue-bundle",
     "description": "The Markup Job Queue bundle integrates with php-resque and BCCResqueBundle to provide automatic scheduling of recurring console command jobs",
     "keywords": ["resque", "php-resque", "job", "queue", "cron"],
     "type": "symfony-bundle",

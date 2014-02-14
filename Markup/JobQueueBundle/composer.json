@@ -1,0 +1,39 @@
+{
+    "name": "markup/jobqueuebundle",
+    "description": "The Markup Job Queue bundle integrates with php-resque and BCCResqueBundle to provide automatic scheduling of recurring console command jobs",
+    "keywords": ["resque", "php-resque", "job", "queue", "cron"],
+    "type": "symfony-bundle",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Calum Brodie",
+            "email": "calum@usemarkup.com"
+        },
+        {
+            "name": "Markup",
+            "homepage": "http://www.usemarkup.com/"
+        }
+    ],
+    "require": {
+        "symfony/framework-bundle": "~2.1",
+        "twig/twig": ">=1.12",
+        "php": ">=5.4.0"
+    },
+    "require-dev": {
+        "bcc/resque-bundle": "dev-master#a310623938071f0d59941ce7509cd1155a9a8f18",
+        "chrisboulton/php-resque": "dev-master#610c4dcdbf3e7e5856f694384f3160db94850d1f",
+        "chrisboulton/php-resque-scheduler": "dev-master#ab8bd52949cac1f815bbb97aa39f51c7b5766a86"
+    },
+    "suggests": {
+        "symfony/console": "To use add Jobs via the CLI",
+    },
+    "autoload": {
+        "psr-0": { "Markup\\JobQueueBundle": "" }
+    },
+    "target-dir": "Markup/JobQueueBundle",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0-dev"
+        }
+    }
+}

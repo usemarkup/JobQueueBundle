@@ -1,0 +1,35 @@
+{% set sectionName = 'recurring' %}
+
+{% extends 'PhoenixJobQueueBundle::layout.html.twig' %}
+
+{% block content %}
+{{ parent() }}
+
+<h2>Recurring Jobs</h2>
+<table class="table table-striped table-bordered">
+    <thead>
+        <tr>
+            <th>Command</th>
+            <th>Queue</th>
+            <th>Schedule</th>
+            <th>Due?</th>
+            <th>Previously Run</th>
+            <th>Next Run</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for configuration in recurringReader.configurations %}
+        <tr>
+            <td>{{ configuration.command }}</td>
+            <td>{{ configuration.queue }}</td>
+            <td>{{ configuration.schedule }}</td>
+            <td>{% if configuration.due %}✓{% else %}✗{% endif %}</td>
+            <td class="date">{{ configuration.previousRun|localizeddate('short', 'short') }}<br>( {{ human_datetime(configuration.previousRun) }} )</td>
+            <td class="date">{{ configuration.nextRun|localizeddate('short', 'short') }}<br>( {{ human_datetime(configuration.nextRun) }} )</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}
+

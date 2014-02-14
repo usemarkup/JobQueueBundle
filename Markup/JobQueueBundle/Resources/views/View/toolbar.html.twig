@@ -1,0 +1,71 @@
+{% if sectionName is not defined %}
+    {% set sectionName = 'none' %}
+{% endif %}
+
+<div class="btn-group queue">
+
+    {% if sectionName == 'index' %}
+        <span class="btn disabled">
+            <i class="icon-home "></i> Dashboard
+        </span>
+    {% else %}
+        <a href="{{ path('phoenix_admin_job_queue_index') }}" class="btn">
+            <i class="icon-home "></i> Dashboard
+        </a>
+    {% endif %}
+
+    {% if sectionName == 'failed' %}
+        <span class="btn disabled">
+            <i class="icon-exclamation "></i> Failed Jobs
+            {% if resque.failedJobs|length > 0 %}
+                <span class="badge badge-info">
+                    {{ resque.failedJobs|length }}
+                </span>
+            {% endif %}
+        </span>
+    {% else %}
+        <a href="{{ path('phoenix_admin_job_queue_failed_list') }}" class="btn">
+            <i class="icon-exclamation "></i> Failed Jobs
+            {% if resque.failedJobs|length > 0 %}
+                <span class="badge badge-info">
+                    {{ resque.failedJobs|length }}
+                </span>
+            {% endif %}
+        </a>
+    {% endif %}
+
+    {% if sectionName == 'scheduled' %}
+        <span class="btn disabled">
+            <i class="icon-time "></i> Scheduled Jobs
+            {% if resque.numberOfDelayedJobs > 0 %}
+                <span class="badge badge-info">
+                    {{ resque.numberOfDelayedJobs }}
+                </span>
+            {% endif %}
+        </span>
+    {% else %}
+        <a href="{{ path('phoenix_admin_job_queue_scheduled_list') }}" class="btn">
+            <i class="icon-time "></i> Scheduled Jobs
+            {% if resque.numberOfDelayedJobs > 0 %}
+                <span class="badge badge-info">
+                    {{ resque.numberOfDelayedJobs }}
+                </span>
+            {% endif %}
+        </a>
+    {% endif %}
+
+</div>
+
+<div class="btn-group recurring">
+
+    {% if sectionName == 'recurring' %}
+        <span class="btn disabled">
+            <i class="icon-ellipsis-horizontal"></i> Recurring Jobs
+        </span>
+    {% else %}
+        <a href="{{ path('phoenix_admin_job_queue_recurring') }}" class="btn">
+            <i class="icon-ellipsis-horizontal"></i> Recurring Jobs
+        </a>
+    {% endif %}
+
+</div>

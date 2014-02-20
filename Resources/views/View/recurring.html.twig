@@ -24,8 +24,8 @@
             <td>{{ configuration.queue }}</td>
             <td>{{ configuration.schedule }}</td>
             <td>{% if configuration.due %}✓{% else %}✗{% endif %}</td>
-            <td class="date">{{ configuration.previousRun|localizeddate('short', 'short') }}<br>( {{ human_datetime(configuration.previousRun) }} )</td>
-            <td class="date">{{ configuration.nextRun|localizeddate('short', 'short') }}<br>( {{ human_datetime(configuration.nextRun) }} )</td>
+            <td class="date">{{ configuration.previousRun|localizeddate('short', 'short') }}</td>
+            <td class="date">{{ configuration.nextRun|localizeddate('short', 'short') }}</td>
         </tr>
     {% endfor %}
     </tbody>

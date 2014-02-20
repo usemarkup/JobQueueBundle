@@ -5,18 +5,18 @@
 <div class="btn-group queue">
 
     {% if sectionName == 'index' %}
-        <span class="btn disabled">
-            <i class="icon-home "></i> Dashboard
+        <span class="btn disabled btn-default" disabled="disabled">
+            <i class="icon-home fa fa-home"></i> Dashboard
         </span>
     {% else %}
-        <a href="{{ path('markup_admin_job_queue_index') }}" class="btn">
-            <i class="icon-home "></i> Dashboard
+        <a href="{{ path('markup_admin_job_queue_index') }}" class="btn btn-default">
+            <i class="icon-home fa fa-home"></i> Dashboard
         </a>
     {% endif %}
 
     {% if sectionName == 'failed' %}
-        <span class="btn disabled">
-            <i class="icon-exclamation "></i> Failed Jobs
+        <span class="btn disabled btn-default" disabled="disabled">
+            <i class="icon-exclamation fa fa-exclamation"></i> Failed Jobs
             {% if resque.failedJobs|length > 0 %}
                 <span class="badge badge-info">
                     {{ resque.failedJobs|length }}
@@ -24,8 +24,8 @@
             {% endif %}
         </span>
     {% else %}
-        <a href="{{ path('markup_admin_job_queue_failed_list') }}" class="btn">
-            <i class="icon-exclamation "></i> Failed Jobs
+        <a href="{{ path('markup_admin_job_queue_failed_list') }}" class="btn btn-default">
+            <i class="icon-exclamation fa fa-exclamation"></i> Failed Jobs
             {% if resque.failedJobs|length > 0 %}
                 <span class="badge badge-info">
                     {{ resque.failedJobs|length }}
@@ -35,8 +35,8 @@
     {% endif %}
 
     {% if sectionName == 'scheduled' %}
-        <span class="btn disabled">
-            <i class="icon-time "></i> Scheduled Jobs
+        <span class="btn disabled btn-default" disabled="disabled">
+            <i class="icon-time fa fa-clock-o"></i> Scheduled Jobs
             {% if resque.numberOfDelayedJobs > 0 %}
                 <span class="badge badge-info">
                     {{ resque.numberOfDelayedJobs }}
@@ -44,8 +44,8 @@
             {% endif %}
         </span>
     {% else %}
-        <a href="{{ path('markup_admin_job_queue_scheduled_list') }}" class="btn">
-            <i class="icon-time "></i> Scheduled Jobs
+        <a href="{{ path('markup_admin_job_queue_scheduled_list') }}" class="btn btn-default">
+            <i class="icon-time fa fa-clock-o"></i> Scheduled Jobs
             {% if resque.numberOfDelayedJobs > 0 %}
                 <span class="badge badge-info">
                     {{ resque.numberOfDelayedJobs }}
@@ -59,12 +59,12 @@
 <div class="btn-group recurring">
 
     {% if sectionName == 'recurring' %}
-        <span class="btn disabled">
-            <i class="icon-ellipsis-horizontal"></i> Recurring Jobs
+        <span class="btn disabled btn-default" disabled="disabled">
+            <i class="icon-ellipsis-horizontal fa fa-ellipsis-h"></i> Recurring Jobs
         </span>
     {% else %}
-        <a href="{{ path('markup_admin_job_queue_recurring') }}" class="btn">
-            <i class="icon-ellipsis-horizontal"></i> Recurring Jobs
+        <a href="{{ path('markup_admin_job_queue_recurring') }}" class="btn btn-default">
+            <i class="icon-ellipsis-horizontal fa fa-ellipsis-h"></i> Recurring Jobs
         </a>
     {% endif %}
 

@@ -32,13 +32,22 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode('recurring')
                     ->validate()
                         ->ifTrue(function ($v) {
+                            if ($v == false) {
+                                return false;
+                            }
                             //check that the file has a .yml extension
                             return (strpos($v, '.yml') === false);
                         })->thenInvalid('Recurring Console Command configuration must be in .yml format')->end()
                     ->defaultFalse()
-                    ->end()
                 ->end()
-            ->end();
+                ->scalarNode('supervisor_user')
+                    ->defaultNull()
+                ->end()
+                ->scalarNode('supervisor_config_path')
+                    ->defaultNull()
+                ->end()
+            ->end()
+        ->end();
 
         return $treeBuilder;
     }

@@ -12,3 +12,13 @@ services:
         class: Markup\JobQueueBundle\Service\RecurringConsoleCommandReader
         arguments:
             - %kernel.root_dir%
+    markup_admin_job_queue.supervisord_config_file.writer:
+        class: Markup\JobQueueBundle\Service\SupervisordConfigFileWriter
+        arguments:
+            - @logger
+            - @jobby
+            - %kernel.root_dir%
+            - %bcc_resque.prefix%
+            - %redis_host%
+            - %redis_port%
+            - %redis_db%

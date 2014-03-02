@@ -27,6 +27,7 @@ class MarkupJobQueueExtension extends Extension
 
         $this->registerAndValidateRecurringConfigurationFile($config, $container);
         $this->addQueuesToJobManager($config, $container);
+        $this->addSupervisordConfig($config, $container);
     }
 
     /**
@@ -52,5 +53,21 @@ class MarkupJobQueueExtension extends Extension
         $queues = $config['queues'];
         $jobManager = $container->getDefinition('markup_admin_job_queue_manager');
         $jobManager->addMethodCall('setQueues', [$queues]);
+    }
+
+    /**
+     * If Supervisord config variables have been set then set them against the container as parameters
+     * @param array            $config
+     * @param ContainerBuilder $container
+     */
+    private function addSupervisordConfig(array $config, ContainerBuilder $container)
+    {
+        $configFileWriter = $container->getDefinition('markup_admin_job_queue.supervisord_config_file.writer');
+        if ($config['supervisor_user']) {
+            $configFileWriter->addMethodCall('setSupervisordUser', [$config['supervisor_user']]);
+        }
+        if ($config['supervisor_config_path']) {
+            $configFileWriter->addMethodCall('setSupervisordConfigPath', [$config['supervisor_config_path']]);
+        }
     }
 }

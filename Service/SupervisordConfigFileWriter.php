@@ -96,14 +96,14 @@ class SupervisordConfigFileWriter
             $queueGroup = sprintf("phoenix_job_queue_%s_%s_%s", $resquePrefix, $uniqueEnvironment, $queueName);
             $queueGroups[] = $queueGroup;
             file_put_contents($supervisordConfigFilePath, "\n", FILE_APPEND);
-            file_put_contents($supervisordConfigFilePath, sprintf("[program:%s]\r", $queueGroup), FILE_APPEND);
-            file_put_contents($supervisordConfigFilePath, sprintf("command=%s %s/vendor/bcc/resque-bundle/BCC/ResqueBundle/bin/resque\r", $phpBin, $absoluteReleasePath), FILE_APPEND);
-            file_put_contents($supervisordConfigFilePath, sprintf("user=%s\r", $supervisorUser), FILE_APPEND);
-            file_put_contents($supervisordConfigFilePath, "autostart=false\r", FILE_APPEND);
-            file_put_contents($supervisordConfigFilePath, "autorestart=true\r", FILE_APPEND);
-            file_put_contents($supervisordConfigFilePath, sprintf("directory=%s\r", $absoluteReleasePath), FILE_APPEND);
-            file_put_contents($supervisordConfigFilePath, "stopsignal=QUIT\r", FILE_APPEND);
-            file_put_contents($supervisordConfigFilePath, sprintf("stderr_logfile=%s/logs/resque-worker.error.log\r", $kernelPath), FILE_APPEND);
+            file_put_contents($supervisordConfigFilePath, sprintf("[program:%s]\n", $queueGroup), FILE_APPEND);
+            file_put_contents($supervisordConfigFilePath, sprintf("command=%s %s/vendor/bcc/resque-bundle/BCC/ResqueBundle/bin/resque\n", $phpBin, $absoluteReleasePath), FILE_APPEND);
+            file_put_contents($supervisordConfigFilePath, sprintf("user=%s\n", $supervisorUser), FILE_APPEND);
+            file_put_contents($supervisordConfigFilePath, "autostart=false\n", FILE_APPEND);
+            file_put_contents($supervisordConfigFilePath, "autorestart=true\n", FILE_APPEND);
+            file_put_contents($supervisordConfigFilePath, sprintf("directory=%s\n", $absoluteReleasePath), FILE_APPEND);
+            file_put_contents($supervisordConfigFilePath, "stopsignal=QUIT\n", FILE_APPEND);
+            file_put_contents($supervisordConfigFilePath, sprintf("stderr_logfile=%s/logs/resque-worker.error.log\n", $kernelPath), FILE_APPEND);
             $envConfig = sprintf(
                 "environment = APP_INCLUDE='%s/vendor/autoload.php',VERBOSE='1',QUEUE='%s',PREFIX='%s',COUNT='1',INTERVAL='5',REDIS_BACKEND='%s:%s',REDIS_BACKEND_DB='%s'",
                 $absoluteReleasePath,
@@ -122,7 +122,7 @@ class SupervisordConfigFileWriter
         file_put_contents($supervisordConfigFilePath, sprintf("[group:phoenix_%s_%s]\nprograms=%s", $resquePrefix, $uniqueEnvironment, implode(',', $queueGroups)), FILE_APPEND);
 
         // replace placeholders...
-        $fileContents = implode("\r", file($supervisordConfigFilePath));
+        $fileContents = implode("\n", file($supervisordConfigFilePath));
         $filePointer = fopen($supervisordConfigFilePath, 'w');
         $fileContents = str_replace('PHP_BIN_PLACEHOLDER', $phpBin, $fileContents);
         $fileContents = str_replace('RELEASE_PATH_PLACEHOLDER', $absoluteReleasePath, $fileContents);

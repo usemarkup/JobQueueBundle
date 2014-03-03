@@ -128,6 +128,7 @@ class SupervisordConfigFileWriter
         $fileContents = str_replace('RELEASE_PATH_PLACEHOLDER', $absoluteReleasePath, $fileContents);
         $fileContents = str_replace('USERNAME_PLACEHOLDER', $supervisorUser, $fileContents);
         $fileContents = str_replace('KERNEL_PATH_PLACEHOLDER', $kernelPath, $fileContents);
+        $fileContents = str_replace('SCHEDULED_QUEUE_NAME_PLACEHOLDER', sprintf('program:phoenix_job_queue_%s_%s_scheduled', $resquePrefix, $uniqueEnvironment), $fileContents);
         fwrite($filePointer, $fileContents);
     }
 }

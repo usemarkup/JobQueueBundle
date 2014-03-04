@@ -64,4 +64,13 @@ class JobManager
     {
         $this->queues = $queues;
     }
+
+    public function getCountOfJobsInQueue($queueName)
+    {
+        if (!$this->isValidQueue($queueName)) {
+            throw new UnknownQueueException(sprintf('Attempted to add get count for queue `%s` which is not defined by the application, valid queues are %s', $queue, implode(',', $this->queues)));
+        }
+
+        return $this->resque->getQueue($queueName)->getSize();
+    }
 }

@@ -83,6 +83,10 @@ class SupervisordConfigFileWriter
         $finder->name($defaultConfigFile)->in($kernelPath)->path('config')->depth(1);
         $results = iterator_to_array($finder);
         $file = current($results);
+
+        if (!$file) {
+            throw new \Exception('Default config file %s not present in project, cannot write config file', $defaultConfigFile);
+        }
         copy($file->getRealPath(), $supervisordConfigFilePath);
 
         //stream "#{try_sudo} chmod 777 #{supervisor_config_file_path}"

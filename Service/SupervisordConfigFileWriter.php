@@ -83,7 +83,7 @@ class SupervisordConfigFileWriter
         $finder->name($defaultConfigFile)->in($kernelPath)->path('config')->depth(1);
         $results = iterator_to_array($finder);
         if (count($results) == 0) {
-            throw new \Exception('Default config file %s not present in project, cannot write config file', $defaultConfigFile);
+            throw new \Exception(sprintf('Default config file %s not present in project, cannot write config file', $defaultConfigFile));
         }
         $file = current($results);
 

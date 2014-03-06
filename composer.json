@@ -16,6 +16,7 @@
     ],
     "require": {
         "symfony/framework-bundle": "~2.1",
+        "symfony/finder": "~2.1",
         "twig/twig": ">=1.12",
         "php": ">=5.4.0",
         "mtdowling/cron-expression": "1.0.*"

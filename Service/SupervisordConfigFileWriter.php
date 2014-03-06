@@ -97,7 +97,7 @@ class SupervisordConfigFileWriter
         // write a configuration entry for each queue
         $queueGroups = [];
         foreach ($queues as $queueName) {
-            $queueGroup = sprintf("phoenix_job_queue_%s_%s_%s", $resquePrefix, $uniqueEnvironment, $queueName);
+            $queueGroup = sprintf("markup_job_queue_%s_%s_%s", $resquePrefix, $uniqueEnvironment, $queueName);
             $queueGroups[] = $queueGroup;
             file_put_contents($supervisordConfigFilePath, "\n", FILE_APPEND);
             file_put_contents($supervisordConfigFilePath, sprintf("[program:%s]\n", $queueGroup), FILE_APPEND);
@@ -123,7 +123,7 @@ class SupervisordConfigFileWriter
 
         // append queue groups
         file_put_contents($supervisordConfigFilePath, "\n", FILE_APPEND);
-        file_put_contents($supervisordConfigFilePath, sprintf("[group:phoenix_%s_%s]\nprograms=%s", $resquePrefix, $uniqueEnvironment, implode(',', $queueGroups)), FILE_APPEND);
+        file_put_contents($supervisordConfigFilePath, sprintf("[group:markup_%s_%s]\nprograms=%s", $resquePrefix, $uniqueEnvironment, implode(',', $queueGroups)), FILE_APPEND);
 
         // replace placeholders...
         $fileContents = implode("\n", file($supervisordConfigFilePath));
@@ -132,7 +132,7 @@ class SupervisordConfigFileWriter
         $fileContents = str_replace('RELEASE_PATH_PLACEHOLDER', $absoluteReleasePath, $fileContents);
         $fileContents = str_replace('USERNAME_PLACEHOLDER', $supervisorUser, $fileContents);
         $fileContents = str_replace('KERNEL_PATH_PLACEHOLDER', $kernelPath, $fileContents);
-        $fileContents = str_replace('SCHEDULED_QUEUE_NAME_PLACEHOLDER', sprintf('program:phoenix_job_queue_%s_%s_scheduled', $resquePrefix, $uniqueEnvironment), $fileContents);
+        $fileContents = str_replace('SCHEDULED_QUEUE_NAME_PLACEHOLDER', sprintf('program:markup_job_queue_%s_%s_scheduled', $resquePrefix, $uniqueEnvironment), $fileContents);
         fwrite($filePointer, $fileContents);
     }
 }

@@ -58,7 +58,7 @@ class ConsoleCommandJob extends ContainerAwareJob
             $logger = $this->getContainer()->get('logger');
 
             if (!$process->isSuccessful()) {
-                $message = sprintf('A job failed on the queue `%s` with output: and the error output: %s', $this->queue, $process->getOutput(), $process->getErrorOutput());
+                $message = sprintf('A job failed on the queue `%s` with output:%s and the error output: %s', $this->queue, $process->getOutput(), $process->getErrorOutput());
                 $logger->error($message);
                 throw new JobFailedException($message);
             }

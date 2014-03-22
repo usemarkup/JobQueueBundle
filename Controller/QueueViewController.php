@@ -12,8 +12,8 @@ class QueueViewController extends Controller
 {
     public function indexAction()
     {
-        $this->getResque()->pruneDeadWorkers();
-
+        // this causes an error
+        //$this->getResque()->pruneDeadWorkers();
         return $this->render(
             'MarkupJobQueueBundle:View:index.html.twig',
             array(

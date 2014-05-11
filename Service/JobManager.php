@@ -25,9 +25,14 @@ class JobManager
      * Adds a job to the resque queue
      * @param Job $job
      */
-    public function addJob(Job $job)
+    public function addJob(Job $job, $dateTime = null)
     {
-        $this->resque->enqueue($job);
+        if ($dateTime === null) {
+            $this->resque->enqueue($job);
+
+            return;
+        }
+        $this->resque->enqueueAt($dateTime, $job);
     }
 
     /**
@@ -48,6 +53,32 @@ class JobManager
         $job->setTimeout($timeout);
         $job->setIdleTimeout($idleTimeout);
         $this->addJob($job);
+    }
+
+    /**
+     * Adds a named command to the job queue at a specific datetime
+     * @param string  $command     A valid command for this application
+     * @param string  $dateTime    The DateTime to execute the command
+     * @param string  $queue       The name of a valid queue
+     * @param integer $timeout     The amount of time to allow the command to run
+     * @param integer $idleTimeout The amount of idle time to allow the command to run
+     */
+    public function addScheduledCommandJob(
+        $command,
+        \DateTime $dateTime,
+        $queue = 'default',
+        $timeout = 60,
+        $idleTimeout = 60
+    ) {
+        if ($this->isValidQueue($queue) === false) {
+            throw new UnknownQueueException(sprintf('Attempted to add to queue `%s` which is not defined by the application, valid queues are %s', $queue, implode(',', $this->queues)));
+        }
+        $job = new ConsoleCommandJob();
+        $job->setCommand($command);
+        $job->setQueue($queue);
+        $job->setTimeout($timeout);
+        $job->setIdleTimeout($idleTimeout);
+        $this->addJob($job, $dateTime);
     }
 
     public function isValidQueue($queue)

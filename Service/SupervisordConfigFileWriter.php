@@ -98,7 +98,8 @@ class SupervisordConfigFileWriter
         $conf[] = "autorestart=true";
         $conf[] = sprintf("directory=%s", $absoluteReleasePath);
         $conf[] = "stopsignal=QUIT";
-        $conf[] = sprintf("%s/logs/resque-scheduledworker.error.log", $supervisorUser);
+        $conf[] = sprintf("stderr_logfile=%s/logs/resque-scheduledworker.error.log", $kernelPath);
+
         $envConfig = sprintf(
             "environment = APP_INCLUDE='%s/vendor/autoload.php',VERBOSE='1',PREFIX='%s',REDIS_BACKEND='%s:%s',REDIS_BACKEND_DB='%s',RESQUE_PHP='%s/vendor/chrisboulton/php-resque/lib/Resque.php'",
             $absoluteReleasePath,

@@ -76,18 +76,40 @@ class SupervisordConfigFileWriter
 
         $supervisordConfigFilePath = sprintf('%s/queue_%s_%s_generated.conf', $supervisordConfigPath, $resquePrefix, $uniqueEnvironment);
 
-        $logger->info(sprintf('moving queue configuration to %s', $supervisordConfigFilePath));
+        $logger->info(sprintf('writing queue configuration to %s, clearing previous file', $supervisordConfigFilePath));
+        file_put_contents($supervisordConfigFilePath, '');
 
         //copy the default supervisord_queues.conf.dist file to the destination path
-        $finder = new Finder();
-        $finder->name($defaultConfigFile)->in($kernelPath)->path('config')->depth(1);
-        $results = iterator_to_array($finder);
-        if (count($results) == 0) {
-            throw new \Exception(sprintf('Default config file %s not present in project, cannot write config file', $defaultConfigFile));
-        }
-        $file = current($results);
+        // $finder = new Finder();
+        // $finder->name($defaultConfigFile)->in($kernelPath)->path('config')->depth(1);
+        // $results = iterator_to_array($finder);
+        // if (count($results) == 0) {
+        //     throw new \Exception(sprintf('Default config file %s not present in project, cannot write config file', $defaultConfigFile));
+        // }
+        // $file = current($results);
 
-        copy($file->getRealPath(), $supervisordConfigFilePath);
+        // copy($file->getRealPath(), $supervisordConfigFilePath);
+        // write the default sceduled worker config:
+        $conf = [];
+        $conf[] = sprintf("[program:markup_job_queue_%s_%s_scheduled]", $resquePrefix, $uniqueEnvironment);
+        $conf[] = sprintf("command=%s %s/vendor/bcc/resque-bundle/BCC/ResqueBundle/bin/resque-scheduler", $phpBin, $absoluteReleasePath);
+        $conf[] = sprintf("user=", $supervisorUser);
+        $conf[] = "autostart=false";
+        $conf[] = "autorestart=true";
+        $conf[] = sprintf("directory=%s", $absoluteReleasePath);
+        $conf[] = "stopsignal=QUIT";
+        $conf[] = sprintf("%s/logs/resque-scheduledworker.error.log", $supervisorUser);
+        $envConfig = sprintf(
+            "environment = APP_INCLUDE='%s/vendor/autoload.php',VERBOSE='1',PREFIX='%s',REDIS_BACKEND='%s:%s',REDIS_BACKEND_DB='%s',RESQUE_PHP='%s/vendor/chrisboulton/php-resque/lib/Resque.php'",
+            $absoluteReleasePath,
+            $resquePrefix,
+            $redisHost,
+            $redisPort,
+            $redisDB,
+            $absoluteReleasePath
+        );
+        $conf[] = $envConfig;
+        file_put_contents($supervisordConfigFilePath, implode("\n", $conf), FILE_APPEND);
 
         //stream "#{try_sudo} chmod 777 #{supervisor_config_file_path}"
         $logger->info('amending supervisor queue config');
@@ -99,15 +121,16 @@ class SupervisordConfigFileWriter
         foreach ($queues as $queueName) {
             $queueGroup = sprintf("markup_job_queue_%s_%s_%s", $resquePrefix, $uniqueEnvironment, $queueName);
             $queueGroups[] = $queueGroup;
-            file_put_contents($supervisordConfigFilePath, "\n", FILE_APPEND);
-            file_put_contents($supervisordConfigFilePath, sprintf("[program:%s]\n", $queueGroup), FILE_APPEND);
-            file_put_contents($supervisordConfigFilePath, sprintf("command=%s %s/vendor/bcc/resque-bundle/BCC/ResqueBundle/bin/resque\n", $phpBin, $absoluteReleasePath), FILE_APPEND);
-            file_put_contents($supervisordConfigFilePath, sprintf("user=%s\n", $supervisorUser), FILE_APPEND);
-            file_put_contents($supervisordConfigFilePath, "autostart=false\n", FILE_APPEND);
-            file_put_contents($supervisordConfigFilePath, "autorestart=true\n", FILE_APPEND);
-            file_put_contents($supervisordConfigFilePath, sprintf("directory=%s\n", $absoluteReleasePath), FILE_APPEND);
-            file_put_contents($supervisordConfigFilePath, "stopsignal=QUIT\n", FILE_APPEND);
-            file_put_contents($supervisordConfigFilePath, sprintf("stderr_logfile=%s/logs/resque-worker.error.log\n", $kernelPath), FILE_APPEND);
+            $conf = [];
+            $conf[] = "\n";
+            $conf[] = sprintf("[program:%s]", $queueGroup);
+            $conf[] = sprintf("command=%s %s/vendor/bcc/resque-bundle/BCC/ResqueBundle/bin/resque", $phpBin, $absoluteReleasePath);
+            $conf[] = sprintf("user=%s", $supervisorUser);
+            $conf[] = "autostart=false";
+            $conf[] = "autorestart=true";
+            $conf[] = sprintf("directory=%s", $absoluteReleasePath);
+            $conf[] = "stopsignal=QUIT";
+            $conf[] = sprintf("stderr_logfile=%s/logs/resque-worker.error.log", $kernelPath);
             $envConfig = sprintf(
                 "environment = APP_INCLUDE='%s/vendor/autoload.php',VERBOSE='1',QUEUE='%s',PREFIX='%s',COUNT='1',INTERVAL='5',REDIS_BACKEND='%s:%s',REDIS_BACKEND_DB='%s'",
                 $absoluteReleasePath,
@@ -117,22 +140,13 @@ class SupervisordConfigFileWriter
                 $redisPort,
                 $redisDB
             );
-            file_put_contents($supervisordConfigFilePath, $envConfig, FILE_APPEND);
-            file_put_contents($supervisordConfigFilePath, "\n", FILE_APPEND);
+            $conf[] = $envConfig;
+            $conf[] = "\n";
+            file_put_contents($supervisordConfigFilePath, implode("\n", $conf), FILE_APPEND);
         }
 
         // append queue groups
         file_put_contents($supervisordConfigFilePath, "\n", FILE_APPEND);
         file_put_contents($supervisordConfigFilePath, sprintf("[group:markup_%s_%s]\nprograms=%s", $resquePrefix, $uniqueEnvironment, implode(',', $queueGroups)), FILE_APPEND);
-
-        // replace placeholders...
-        $fileContents = implode("\n", file($supervisordConfigFilePath));
-        $filePointer = fopen($supervisordConfigFilePath, 'w');
-        $fileContents = str_replace('PHP_BIN_PLACEHOLDER', $phpBin, $fileContents);
-        $fileContents = str_replace('RELEASE_PATH_PLACEHOLDER', $absoluteReleasePath, $fileContents);
-        $fileContents = str_replace('USERNAME_PLACEHOLDER', $supervisorUser, $fileContents);
-        $fileContents = str_replace('KERNEL_PATH_PLACEHOLDER', $kernelPath, $fileContents);
-        $fileContents = str_replace('SCHEDULED_QUEUE_NAME_PLACEHOLDER', sprintf('program:markup_job_queue_%s_%s_scheduled', $resquePrefix, $uniqueEnvironment), $fileContents);
-        fwrite($filePointer, $fileContents);
     }
 }

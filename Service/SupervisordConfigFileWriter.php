@@ -2,7 +2,6 @@
 
 namespace Markup\JobQueueBundle\Service;
 
-use Markup\JobQueueBundle\Service\JobManager;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Finder\Finder;
 
@@ -98,7 +97,8 @@ class SupervisordConfigFileWriter
         $conf[] = "autorestart=true";
         $conf[] = sprintf("directory=%s", $absoluteReleasePath);
         $conf[] = "stopsignal=QUIT";
-        $conf[] = sprintf("stderr_logfile=%s/logs/resque-scheduledworker.error.log", $kernelPath);
+        $conf[] = sprintf("stderr_logfile=%s/logs/resque-scheduledworker.stderror.log", $kernelPath);
+        $conf[] = sprintf("stdout_logfile=%s/logs/resque-scheduledworker.stdout.log", $kernelPath);
 
         $envConfig = sprintf(
             "environment = APP_INCLUDE='%s/vendor/autoload.php',VERBOSE='1',PREFIX='%s',REDIS_BACKEND='%s:%s',REDIS_BACKEND_DB='%s',RESQUE_PHP='%s/vendor/chrisboulton/php-resque/lib/Resque.php'",

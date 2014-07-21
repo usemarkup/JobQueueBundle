@@ -22,7 +22,7 @@
         "mtdowling/cron-expression": "1.0.*"
     },
     "require-dev": {
-        "bcc/resque-bundle": "dev-master#a310623938071f0d59941ce7509cd1155a9a8f18",
+        "bcc/resque-bundle": "dev-master#ee5b3b5f6d7718f7dab1aeba5dd955479e7534b0",
         "chrisboulton/php-resque": "dev-master#610c4dcdbf3e7e5856f694384f3160db94850d1f",
         "chrisboulton/php-resque-scheduler": "dev-master#ab8bd52949cac1f815bbb97aa39f51c7b5766a86"
     },

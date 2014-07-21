@@ -44,16 +44,16 @@ class ConsoleCommandJob extends ContainerAwareJob
         $idleTimeout = 60;
 
         if (isset($args['timeout'])) {
-            $timeout = $args['timeout'];
+            $this->timeout = $args['timeout'];
         }
 
         if (isset($args['idleTimeout'])) {
-            $idleTimeout = $args['idleTimeout'];
+            $this->idleTimeout = $args['idleTimeout'];
         }
 
         try {
-            $process->setTimeout((int) $timeout);
-            $process->setIdleTimeout((int) $idleTimeout);
+            $process->setTimeout((int) $this->timeout);
+            $process->setIdleTimeout((int) $this->idleTimeout);
             $process->run();
 
             $logger = $this->getContainer()->get('logger');

@@ -26,7 +26,6 @@ class ConsoleCommandJob extends ContainerAwareJob
 
     public function run($args)
     {
-        ini_set('max_execution_time', 3600);
         $env = $args['kernel.environment'];
         $debug = $args['kernel.debug'];
         $command = $args['command'];
@@ -52,8 +51,8 @@ class ConsoleCommandJob extends ContainerAwareJob
         }
 
         try {
-            $process->setTimeout($this->timeout);
-            $process->setIdleTimeout($this->idleTimeout);
+            $process->setTimeout((int) $timeout);
+            $process->setIdleTimeout((int) $idleTimeout);
             $process->run();
 
             $logger = $this->getContainer()->get('logger');
@@ -61,6 +60,7 @@ class ConsoleCommandJob extends ContainerAwareJob
             if (!$process->isSuccessful()) {
                 $message = sprintf('A job failed on the queue `%s` with output:%s and the error output: %s', $this->queue, $process->getOutput(), $process->getErrorOutput());
                 $logger->error($message);
+                $logger->error('Timeout values for this job are `%s` and `%s` seconds', , );
                 throw new JobFailedException($message);
             }
 

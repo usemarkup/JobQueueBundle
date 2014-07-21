@@ -26,6 +26,7 @@ class ConsoleCommandJob extends ContainerAwareJob
 
     public function run($args)
     {
+        ini_set('max_execution_time', 7200);
         $env = $args['kernel.environment'];
         $debug = $args['kernel.debug'];
         $command = $args['command'];

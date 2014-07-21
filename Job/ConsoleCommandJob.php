@@ -60,7 +60,6 @@ class ConsoleCommandJob extends ContainerAwareJob
             if (!$process->isSuccessful()) {
                 $message = sprintf('A job failed on the queue `%s` with output:%s and the error output: %s', $this->queue, $process->getOutput(), $process->getErrorOutput());
                 $logger->error($message);
-                $logger->error('Timeout values for this job are `%s` and `%s` seconds', , );
                 throw new JobFailedException($message);
             }
 

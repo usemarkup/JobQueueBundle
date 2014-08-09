@@ -53,8 +53,7 @@ Additionally a 'recurring' job configuration can be added on a per environment b
 
 Enabling and Montoring Workers
 ================
-A supervisord configuration should be included in the app folder, and this configuration should be added as part of the deployment process to ensure that jobs are executed automatically. The basics of the approach are documented in the BCCEResqueBundle.
 
-You may find it useful to tie supervisor and resque into your deployment process. In order to do this you need to write a custom capistrano task similar to the following. This will generate a supervisord config file, using your configured queues. And set up one worker for each queue defined in the application. If you execute these capistrano tasks after deploying your application, supervisor will read the updated config and apply any changes, before restarting all workers.
+You may find it useful to tie supervisor and resque into your deployment process.
 
-A command has been written for the purposes of generating these confiuration files. See 'WriteSupervisordConfigFileCommand' for more details
+A command has been written for the purposes of generating these configuration files and copying them to a location where they will be re-read by supervisord. See the command 'WriteSupervisordConfigFileCommand' for more details

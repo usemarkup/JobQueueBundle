@@ -132,6 +132,7 @@ class SupervisordConfigFileWriter
             $conf[] = sprintf("directory=%s", $absoluteReleasePath);
             $conf[] = "stopsignal=QUIT";
             $conf[] = sprintf("stderr_logfile=%s/logs/resque-worker.error.log", $kernelPath);
+            $conf[] = sprintf("stdout_logfile=%s/logs/resque-worker.out.log", $kernelPath);
             $envConfig = sprintf(
                 "environment = APP_INCLUDE='%s/vendor/autoload.php',VERBOSE='1',QUEUE='%s',PREFIX='%s',COUNT='1',INTERVAL='20',REDIS_BACKEND='%s:%s',REDIS_BACKEND_DB='%s'",
                 $absoluteReleasePath,

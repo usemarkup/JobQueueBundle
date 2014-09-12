@@ -15,7 +15,7 @@ class ViewConfiguredQueuesCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setName('markup:job_queue:queue:view_all')
+        ->setName('markup:job_queue:queue:view_all')
             ->setDescription('Outputs a list of available job queues that have been configured');
     }
 
@@ -23,6 +23,10 @@ class ViewConfiguredQueuesCommand extends ContainerAwareCommand
     {
         $queues = $this->getContainer()->get('jobby')->getQueues();
 
-        $output->writeln(implode(',', $queues));
+        foreach ($queues as $server => $qs) {
+            $output->writeln(sprintf('Server: %s', $server));
+            $output->writeln(implode(',', $qs));
+            $output->writeln('');
+        }
     }
 }

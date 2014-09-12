@@ -11,6 +11,7 @@
         <tr>
             <th>Command</th>
             <th>Queue</th>
+            <th>Server</th>
             <th>Schedule</th>
             <th>Due?</th>
             <th>Previously Run</th>
@@ -22,6 +23,7 @@
         <tr>
             <td>{{ configuration.command }}</td>
             <td>{{ configuration.queue }}</td>
+            <td>{{ configuration.server }}</td>
             <td>{{ configuration.schedule }}</td>
             <td>{% if configuration.due %}✓{% else %}✗{% endif %}</td>
             <td class="date">{{ configuration.previousRun|localizeddate('short', 'short') }}</td>

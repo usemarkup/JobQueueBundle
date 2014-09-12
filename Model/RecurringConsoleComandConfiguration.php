@@ -11,12 +11,16 @@ class RecurringConsoleComandConfiguration
 {
     private $command;
     private $schedule;
+    private $queue;
+    private $server;
+    private $timeout;
 
-    public function __construct($command, $queue, $schedule, $timeout = 60)
+    public function __construct($command, $queue, $schedule, $server, $timeout = 60)
     {
         $this->command = $command;
         $this->schedule = $schedule;
         $this->queue = $queue;
+        $this->server = $server;
         $this->timeout = $timeout;
     }
 
@@ -55,6 +59,14 @@ class RecurringConsoleComandConfiguration
     public function setTimeout($timeout)
     {
         $this->timeout = $timeout;
+    }
+
+    /**
+     * @return string
+     */
+    public function getServer()
+    {
+        return $this->server;
     }
 
     /**

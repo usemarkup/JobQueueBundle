@@ -22,6 +22,11 @@ class WriteSupervisordConfigFileCommand extends ContainerAwareCommand
             ->setName('markup:job_queue:supervisord_config:write')
             ->setDescription('Writes a supervisord config file to the control the job queue, based on the queue config')
             ->addArgument(
+                'server',
+                InputArgument::REQUIRED,
+                'The server for which this file is being generated. Should correspond to the configuration of queues'
+            )
+            ->addArgument(
                 'unique_environment',
                 InputArgument::REQUIRED,
                 'A string representing the unique environment. E.G pre-staging'
@@ -32,9 +37,10 @@ class WriteSupervisordConfigFileCommand extends ContainerAwareCommand
     {
         $writer = $this->getContainer()->get('markup_admin_job_queue.supervisord_config_file.writer');
         $env = $input->getArgument('unique_environment');
+        $server = $input->getArgument('server');
 
         $output->writeln('Started writing queue configuration');
-        $writer->writeConfig($env);
+        $writer->writeConfig($env, $server);
         $output->writeln('Finished writing queue configuration');
     }
 }

@@ -29,17 +29,21 @@ class StartConfiguredQueuesCommand extends ContainerAwareCommand
         $queues = $this->getContainer()->get('jobby')->getQueues();
 
         $i = 0;
-        foreach ($queues as $queue) {
-            $command = $this->getApplication()->find('bcc:resque:worker-start');
+        foreach ($queues as $server => $qs) {
+            foreach ($qs as $queue) {
+                $queueServer = sprintf('%s-%s', $queue, $server);
 
-            $arguments = array(
-                'command' => 'bcc:resque:worker-start',
-                'queues'    => $queue
-            );
+                $command = $this->getApplication()->find('bcc:resque:worker-start');
 
-            $input = new ArrayInput($arguments);
-            $command->run($input, $output);
-            $i++;
+                $arguments = array(
+                    'command' => 'bcc:resque:worker-start',
+                    'queues'    => $queueServer
+                );
+
+                $input = new ArrayInput($arguments);
+                $command->run($input, $output);
+                $i++;
+            }
         }
 
         $output->writeln(sprintf('<info>Started %s queues</info>', $i));

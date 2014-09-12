@@ -53,7 +53,7 @@ class SupervisordConfigFileWriter
     /**
      * Writes the supervisord config file
      */
-    public function writeConfig($uniqueEnvironment)
+    public function writeConfig($uniqueEnvironment, $server)
     {
         if (!$this->supervisordUser || !$this->supervisordConfigPath) {
             throw new \Exception('You must configure the supervisord config writer before writing a configuration file');
@@ -73,7 +73,7 @@ class SupervisordConfigFileWriter
         $redisPort = $this->redisPort;
         $redisDB = $this->redisDB;
 
-        $supervisordConfigFilePath = sprintf('%s/queue_%s_%s_generated.conf', $supervisordConfigPath, $resquePrefix, $uniqueEnvironment);
+        $supervisordConfigFilePath = sprintf('%s/queue_%s_%s_%s_generated.conf', $supervisordConfigPath, $resquePrefix, $uniqueEnvironment, $server);
 
         $logger->info(sprintf('writing queue configuration to %s, clearing previous file', $supervisordConfigFilePath));
         file_put_contents($supervisordConfigFilePath, '');
@@ -115,11 +115,12 @@ class SupervisordConfigFileWriter
         //stream "#{try_sudo} chmod 777 #{supervisor_config_file_path}"
         $logger->info('amending supervisor queue config');
 
-        $queues = $this->jobby->getQueues();
+        $queues = $this->jobby->getQueues($server);
 
         // write a configuration entry for each queue
         $queueGroups = [];
         foreach ($queues as $queueName) {
+            $queueName = sprintf('%s-%s', $queueName, $server);
             $queueGroup = sprintf("markup_job_queue_%s_%s_%s", $resquePrefix, $uniqueEnvironment, $queueName);
             $queueGroups[] = $queueGroup;
             $conf = [];
@@ -149,6 +150,6 @@ class SupervisordConfigFileWriter
 
         // append queue groups
         file_put_contents($supervisordConfigFilePath, "\n", FILE_APPEND);
-        file_put_contents($supervisordConfigFilePath, sprintf("[group:markup_%s_%s]\nprograms=%s", $resquePrefix, $uniqueEnvironment, implode(',', $queueGroups)), FILE_APPEND);
+        file_put_contents($supervisordConfigFilePath, sprintf("[group:markup_%s_%s_%s]\nprograms=%s", $resquePrefix, $uniqueEnvironment, $server, implode(',', $queueGroups)), FILE_APPEND);
     }
 }

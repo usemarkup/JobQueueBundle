@@ -55,13 +55,17 @@ class RecurringConsoleCommandReader
 
     /**
      * Gets any configurations which are due NOW and returns a collection of them
+     * @param  string                                               $server
      * @return ArrayCollection<RecurringConsoleComandConfiguration>
      */
-    public function getDue()
+    public function getDue($server)
     {
         $configurations = $this->getConfigurations();
         $due = new ArrayCollection();
         foreach ($configurations as $configuration) {
+            if ($configuration->getServer() !== $server) {
+                continue;
+            }
             if ($configuration->isDue()) {
                 $due->add($configuration);
             }
@@ -79,12 +83,18 @@ class RecurringConsoleCommandReader
     {
         $configurations = new ArrayCollection();
         foreach ($config as $pair) {
-            if (!isset($pair['command']) || !isset($pair['schedule']) || !isset($pair['queue'])) {
-                throw new InvalidConfigurationException('Every job schedule should have a `command`, `queue` and a `schedule` component');
+            if (!isset($pair['command']) || !isset($pair['schedule']) || !isset($pair['queue']) || !isset($pair['server'])) {
+                throw new InvalidConfigurationException('Every job schedule should have a `command`, `queue`, `schedule` and a `server` component');
             }
             //validate that the 'schedule' component is correct?
 
-            $recurringConsoleComandConfiguration = new RecurringConsoleComandConfiguration($pair['command'], $pair['queue'], $pair['schedule']);
+            $servers = $pair['server'];
+            if (!is_array($servers)) {
+                $servers = [$servers];
+            }
+            foreach ($servers as $server) {
+                $recurringConsoleComandConfiguration = new RecurringConsoleComandConfiguration($pair['command'], $pair['queue'], $pair['schedule'], $server);
+            }
 
             if (isset($pair['timeout'])) {
                 $recurringConsoleComandConfiguration->setTimeout($pair['timeout']);

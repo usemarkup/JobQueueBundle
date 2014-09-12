@@ -44,17 +44,7 @@ class JobManager
      */
     public function addCommandJob($command, $queue = 'default', $timeout = 60, $idleTimeout = 60)
     {
-        if ($this->isValidQueue($queue) === false) {
-            $valid = [];
-            foreach ($this->queues as $server => $queues) {
-                foreach ($queues as $q) {
-                    $valid[] = sprintf('%s-%s', $q, $server);
-                }
-            }
-            throw new UnknownQueueException(
-                sprintf('Attempted to add to queue `%s` which is not defined by the application, valid queues are %s', $queue, implode(',', $valid))
-            );
-        }
+        $queue = $this->getValidQueueName($queue);
         $job = new ConsoleCommandJob();
         $job->setCommand($command);
         $job->setQueue($queue);
@@ -78,9 +68,7 @@ class JobManager
         $timeout = 60,
         $idleTimeout = 60
     ) {
-        if ($this->isValidQueue($queue) === false) {
-            throw new UnknownQueueException(sprintf('Attempted to add to queue `%s` which is not defined by the application, valid queues are %s', $queue, implode(',', $this->queues)));
-        }
+        $queue = $this->getValidQueueName($queue);
         $job = new ConsoleCommandJob();
         $job->setCommand($command);
         $job->setQueue($queue);
@@ -89,7 +77,7 @@ class JobManager
         $this->addJob($job, $dateTime);
     }
 
-    public function isValidQueue($queue)
+    public function getValidQueueName($queue)
     {
         $valid = [];
         foreach ($this->queues as $server => $queues) {
@@ -98,7 +86,27 @@ class JobManager
             }
         }
 
-        return in_array($queue, $valid);
+        if (in_array($queue, $valid)) {
+            // is already valid... just return it
+            return $queue;
+        }
+
+        // try to fetch a valid queue name from the defined queues for each server
+        // will just search until it finds one that matches
+        foreach ($this->queues as $server => $queues) {
+            foreach ($queues as $q) {
+                if ($queue === $q) {
+                    sprintf('%s-%s', $queue, $server)
+                }
+            }
+        }
+
+        throw new UnknownQueueException(sprintf('Attempted access queue `%s` which is not defined by the application, valid queues are %s', $queue, implode(',', $valid)));
+    }
+
+    public function isValidQueue()
+    {
+        throw new \Exception('function removed');
     }
 
     public function getQueues($server = null)
@@ -118,12 +126,10 @@ class JobManager
         $this->queues = $queues;
     }
 
-    public function getCountOfJobsInQueue($queueName)
+    public function getCountOfJobsInQueue($queue)
     {
-        if (!$this->isValidQueue($queueName)) {
-            throw new UnknownQueueException(sprintf('Attempted to add get count for queue `%s` which is not defined by the application, valid queues are %s', $queue, implode(',', $this->queues)));
-        }
+        $queue = $this->getValidQueueName($queue);
 
-        return $this->resque->getQueue($queueName)->getSize();
+        return $this->resque->getQueue($queue)->getSize();
     }
 }

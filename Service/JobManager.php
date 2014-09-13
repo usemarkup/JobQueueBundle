@@ -96,7 +96,7 @@ class JobManager
         foreach ($this->queues as $server => $queues) {
             foreach ($queues as $q) {
                 if ($queue === $q) {
-                    sprintf('%s-%s', $queue, $server);
+                    return sprintf('%s-%s', $queue, $server);
                 }
             }
         }

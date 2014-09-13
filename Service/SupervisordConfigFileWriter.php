@@ -89,8 +89,9 @@ class SupervisordConfigFileWriter
 
         // copy($file->getRealPath(), $supervisordConfigFilePath);
         // write the default sceduled worker config:
+
         $conf = [];
-        $conf[] = sprintf("[program:markup_job_queue_%s_%s_scheduled]", $resquePrefix, $uniqueEnvironment);
+        $conf[] = sprintf("[program:markup_job_queue_%s_%s_%s_scheduled]", $resquePrefix, $uniqueEnvironment, $server);
         $conf[] = sprintf("command=%s %s/vendor/bcc/resque-bundle/BCC/ResqueBundle/bin/resque-scheduler", $phpBin, $absoluteReleasePath);
         $conf[] = sprintf("user=%s", $supervisorUser);
         $conf[] = "autostart=false";

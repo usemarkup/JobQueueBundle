@@ -41,13 +41,14 @@ Additionally a 'recurring' job configuration can be added on a per environment b
 ```yml
 	markup_job_queue:
 	    queues:
-	        - named-queue
-	        - feeds
-	        - system
-	        - mail
-	        - dataexchange
-	        - web-service-outbound
-	        - etcetcetc
+	        serverA
+                  - named-queue
+	          - feeds
+	          - system
+	          - mail
+	          - dataexchange
+	          - web-service-outbound
+	          - etcetcetc
 	    recurring: recurring_jobs.yml # name of file within app/config/
 ```
 

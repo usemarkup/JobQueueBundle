@@ -3,8 +3,11 @@
 namespace Markup\JobQueueBundle\Service;
 
 use BCC\ResqueBundle\Job;
+use Doctrine\Common\Collections\ArrayCollection;
 use Markup\JobQueueBundle\Exception\UnknownQueueException;
+use Markup\JobQueueBundle\Exception\UnknownServerException;
 use Markup\JobQueueBundle\Job\ConsoleCommandJob;
+use Markup\JobQueueBundle\Model\QueueConfiguration;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 
 /**
@@ -79,11 +82,11 @@ class JobManager
 
     public function getValidQueueName($queue)
     {
+
         $valid = [];
-        foreach ($this->queues as $server => $queues) {
-            foreach ($queues as $q) {
-                $valid[] = sprintf('%s-%s', $q, $server);
-            }
+
+        foreach ($this->getQueueConfigurations() as $configuration) {
+                $valid[] = sprintf('%s-%s', $configuration->getName(), $configuration->getServer());
         }
 
         if (in_array($queue, $valid)) {
@@ -93,32 +96,39 @@ class JobManager
 
         // try to fetch a valid queue name from the defined queues for each server
         // will just search until it finds one that matches
-        foreach ($this->queues as $server => $queues) {
-            foreach ($queues as $q) {
-                if ($queue === $q) {
-                    return sprintf('%s-%s', $queue, $server);
-                }
+        foreach ($this->getQueueConfigurations() as $configuration) {
+            if ($queue === $configuration->getName()) {
+                return sprintf('%s-%s', $configuration->getName(), $configuration->getServer());
             }
         }
 
         throw new UnknownQueueException(sprintf('Attempted access queue `%s` which is not defined by the application, valid queues are %s', $queue, implode(',', $valid)));
     }
 
-    public function isValidQueue()
+    public function getQueueConfigurations($server = null)
     {
-        throw new \Exception('function removed');
-    }
+        $queueConfigurations = new ArrayCollection();
 
-    public function getQueues($server = null)
-    {
+        foreach ($this->queues as $s => $queues) {
+            foreach ($queues as $config) {
+                $q = new QueueConfiguration($s, $config);
+                $queueConfigurations->add($q);
+            }
+        }
+
         if (!$server) {
-            return $this->queues;
-        }
-        if (!array_key_exists($server, $this->queues)) {
-            throw new \Exception(sprintf('Queues for server %s do not exist', $server));
+            return $queueConfigurations;
         }
 
-        return $this->queues[$server];
+        $filtered = $queueConfigurations->filter(function ($configuration) use ($server) {
+            return $configuration->getServer() === $server;
+        });
+
+        if (count($filtered) === 0) {
+            throw new UnknownServerException(sprintf('Queues for server %s do not exist', $server));
+        }
+
+        return $filtered;
     }
 
     public function setQueues($queues)

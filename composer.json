@@ -19,7 +19,9 @@
         "symfony/finder": "~2.1",
         "twig/twig": ">=1.12",
         "php": ">=5.4.0",
-        "mtdowling/cron-expression": "1.0.*"
+        "mtdowling/cron-expression": "1.0.*",
+        "mockery/mockery": "~0.9",
+        "doctrine/collections": "1.2"
     },
     "require-dev": {
         "bcc/resque-bundle": "dev-master#ee5b3b5f6d7718f7dab1aeba5dd955479e7534b0",

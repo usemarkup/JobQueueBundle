@@ -116,19 +116,20 @@ class SupervisordConfigFileWriter
         //stream "#{try_sudo} chmod 777 #{supervisor_config_file_path}"
         $logger->info('amending supervisor queue config');
 
-        $queues = $this->jobby->getQueues($server);
+        $queues = $this->jobby->getQueueConfigurations($server);
 
         // write a configuration entry for each queue
         $queueGroups = [];
-        foreach ($queues as $queueName) {
-            $queueName = sprintf('%s-%s', $queueName, $server);
-            $queueGroup = sprintf("markup_job_queue_%s_%s_%s", $resquePrefix, $uniqueEnvironment, $queueName);
+        foreach ($queues as $queue) {
+            $queueName = sprintf('%s-%s', $queue->getName(), $server);
+            $queueGroup = sprintf("markup_job_queue_%s_%s_%s", $resquePrefix, $uniqueEnvironment, $queue->getName());
             $queueGroups[] = $queueGroup;
             $conf = [];
             $conf[] = "\n";
             $conf[] = sprintf("[program:%s]", $queueGroup);
             $conf[] = sprintf("command=%s %s/vendor/bcc/resque-bundle/BCC/ResqueBundle/bin/resque", $phpBin, $absoluteReleasePath);
             $conf[] = sprintf("user=%s", $supervisorUser);
+            $conf[] = sprintf("numprocs=%s", $queue->getCount());
             $conf[] = "autostart=false";
             $conf[] = "autorestart=true";
             $conf[] = sprintf("directory=%s", $absoluteReleasePath);

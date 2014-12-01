@@ -1,19 +1,37 @@
 <?php
 
 namespace Markup\Bundle\JobQueueBundle\Tests\Service;
-
+use Markup\JobQueueBundle\Exception\UnknownServerException;
+use Markup\JobQueueBundle\Job\Test\SleepJob;
+use Markup\JobQueueBundle\Service\JobManager;
 use Mockery as m;
-use Markup\Bundle\JobQueueBundle\Job\Test\SleepJob;
-use Markup\Bundle\JobQueueBundle\Service\JobManager;
 
-class PromotionTest extends \PHPUnit_Framework_TestCase
+class JobManagerTest extends \PHPUnit_Framework_TestCase
 {
     public function setUp()
     {
         $resque = m::mock('BCC\ResqueBundle\Resque');
         $resque->shouldReceive('enqueue')->with(\Mockery::type('BCC\ResqueBundle\Job'))->andReturn(null);
         $this->jobManager = new JobManager($resque);
-        $this->jobManager->setQueues(['test', 'validqueue2']);
+        $master = [
+            [
+                'name' => 'feeds',
+                'count' => 1
+            ],
+            [
+                'name' => 'system',
+                'count' => 5
+            ],
+        ];
+        $slave = [
+            [
+                'name' => 'email',
+                'count' => 1
+            ]
+        ];
+        $this->jobManager->setQueues(
+            ['master' => $master, 'slave' => $slave]
+        );
     }
 
     public function testCanAddJob()
@@ -31,23 +49,43 @@ class PromotionTest extends \PHPUnit_Framework_TestCase
 
     public function testCanAddCommandJob()
     {
-        $this->assertNull($this->jobManager->addCommandJob('console:herp:derp', 'validqueue2', 60, 60));
+        $this->assertNull($this->jobManager->addCommandJob('console:herp:derp', 'system', 60, 60));
     }
 
     public function testCannotAddCommandJobToInvalidQueue()
     {
-        $this->setExpectedException('Markup\Bundle\JobQueueBundle\Exception\UnknownQueueException');
+        $this->setExpectedException('Markup\JobQueueBundle\Exception\UnknownQueueException');
         $this->jobManager->addCommandJob('console:herp:derp', 'default', 60, 60);
     }
 
-    public function testValidQueue()
+    public function testCanGetValidQueue()
     {
-        $this->assertTrue($this->jobManager->isValidQueue('test'));
+        $this->assertSame($this->jobManager->getValidQueueName('feeds'), 'feeds-master');
+        $this->assertSame($this->jobManager->getValidQueueName('email-slave'), 'email-slave');
+
     }
 
-    public function testInvalidQueue()
+    public function testGetUnknownQueueThrowsException()
     {
-        $this->assertFalse($this->jobManager->isValidQueue('invalidqueue'));
+        $this->setExpectedException('Markup\JobQueueBundle\Exception\UnknownQueueException');
+        $this->assertFalse($this->jobManager->getValidQueueName('invalidqueue'));
+    }
+
+    public function testReturnsAllQueuesWhenNoServerSpecified()
+    {
+        $this->assertSame($this->jobManager->getQueueConfigurations()->count(), 3);
+    }
+
+    public function testReturnsFilteredQueuesWhenServerSpecified()
+    {
+        $this->assertSame($this->jobManager->getQueueConfigurations('master')->count(), 2);
+
+    }
+
+    public function testFilteredByUnknownServerThrowsException()
+    {
+        $this->setExpectedException('Markup\JobQueueBundle\Exception\UnknownServerException');
+        $this->assertSame($this->jobManager->getQueueConfigurations('testy')->count(), 2);
     }
 
     public function tearDown()

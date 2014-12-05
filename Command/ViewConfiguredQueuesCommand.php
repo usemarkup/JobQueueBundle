@@ -21,12 +21,20 @@ class ViewConfiguredQueuesCommand extends ContainerAwareCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $queues = $this->getContainer()->get('jobby')->getQueues();
+        $configurations = $this->getContainer()->get('jobby')->getQueueConfigurations();
 
-        foreach ($queues as $server => $qs) {
-            $output->writeln(sprintf('Server: %s', $server));
-            $output->writeln(implode(',', $qs));
-            $output->writeln('');
+        $table = $this->getHelperSet()->get('table');
+        $table->setHeaders(['server', 'name', 'count']);
+
+        foreach ($configurations as $configuration) {
+            $row = [];
+            $row[] = $configuration->getServer();
+            $row[] = $configuration->getName();
+            $row[] = $configuration->getCount();
+            $table->addRow(
+                $row
+            );
         }
+        $table->render($output);
     }
 }

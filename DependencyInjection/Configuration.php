@@ -22,17 +22,23 @@ class Configuration implements ConfigurationInterface
 
         // can specify a list of allowed queues
         // can specify a configuration file (.yml) that can be evaluated using cron syntax
-        //
-        $rootNode
+
+       $rootNode
             ->children()
                 ->arrayNode('queues')
                     ->prototype('array')
-                        // ->children()
-                        //     ->arrayNode()
-                                ->isRequired()
-                                ->prototype('scalar')->end()
-                    //         ->end()
-                    //     ->end()
+                        ->prototype('array')
+                            ->addDefaultsIfNotSet()
+                            ->children()
+                                ->scalarNode('name')
+                                    ->isRequired()
+                                ->end()
+                                ->integerNode('count')
+                                    ->defaultValue(1)
+                                    ->min(1)
+                                ->end()
+                            ->end()
+                        ->end()
                     ->end()
                 ->end()
                 ->scalarNode('recurring')

@@ -26,6 +26,7 @@ class Configuration implements ConfigurationInterface
        $rootNode
             ->children()
                 ->arrayNode('queues')
+                    ->useAttributeAsKey('server')
                     ->prototype('array')
                         ->prototype('array')
                             ->addDefaultsIfNotSet()

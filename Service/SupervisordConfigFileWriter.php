@@ -122,7 +122,7 @@ class SupervisordConfigFileWriter
         $queueGroups = [];
         foreach ($queues as $queue) {
             $queueName = sprintf('%s-%s', $queue->getName(), $server);
-            $queueGroup = sprintf("markup_job_queue_%s_%s_%s", $resquePrefix, $uniqueEnvironment, $queue->getName());
+            $queueGroup = sprintf("markup_job_queue_%s_%s_%s", $resquePrefix, $uniqueEnvironment, $queueName);
             $queueGroups[] = $queueGroup;
             $conf = [];
             $conf[] = "\n";

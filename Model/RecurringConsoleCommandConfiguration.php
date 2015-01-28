@@ -7,7 +7,7 @@ use Cron;
 /**
  * A configuration object that indicates a console command, and the cron systax for when it should be run
  */
-class RecurringConsoleComandConfiguration
+class RecurringConsoleCommandConfiguration
 {
     private $command;
     private $schedule;

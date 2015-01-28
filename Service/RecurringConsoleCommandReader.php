@@ -4,7 +4,7 @@ namespace Markup\JobQueueBundle\Service;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Markup\JobQueueBundle\Exception\InvalidConfigurationException;
-use Markup\JobQueueBundle\Model\RecurringConsoleComandConfiguration;
+use Markup\JobQueueBundle\Model\RecurringConsoleCommandConfiguration;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Yaml\Parser;
 
@@ -36,7 +36,7 @@ class RecurringConsoleCommandReader
     }
 
     /**
-     * @return ArrayCollection<RecurringConsoleComandConfiguration>
+     * @return ArrayCollection<RecurringConsoleCommandConfiguration>
      */
     public function getConfigurations()
     {
@@ -56,7 +56,7 @@ class RecurringConsoleCommandReader
     /**
      * Gets any configurations which are due NOW and returns a collection of them
      * @param  string                                               $server
-     * @return ArrayCollection<RecurringConsoleComandConfiguration>
+     * @return ArrayCollection<RecurringConsoleCommandConfiguration>
      */
     public function getDue($server)
     {
@@ -93,13 +93,13 @@ class RecurringConsoleCommandReader
                 $servers = [$servers];
             }
             foreach ($servers as $server) {
-                $recurringConsoleComandConfiguration = new RecurringConsoleComandConfiguration($pair['command'], $pair['queue'], $pair['schedule'], $server);
+                $recurringConsoleCommandConfiguration = new RecurringConsoleCommandConfiguration($pair['command'], $pair['queue'], $pair['schedule'], $server);
             }
 
             if (isset($pair['timeout'])) {
-                $recurringConsoleComandConfiguration->setTimeout($pair['timeout']);
+                $recurringConsoleCommandConfiguration->setTimeout($pair['timeout']);
             }
-            $configurations->add($recurringConsoleComandConfiguration);
+            $configurations->add($recurringConsoleCommandConfiguration);
         }
 
         return $configurations;

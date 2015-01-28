@@ -46,7 +46,7 @@ class ReadRecurringConsoleJobConfigurationCommand extends ContainerAwareCommand
 
         $recurringConsoleCommandReader = $this->getContainer()->get('markup_admin_job_queue_recurring_console_command_reader');
 
-        $output->writeLn(sprintf('<info>Treating current time as %s</info>', $time->format('r')));
+        $output->writeln(sprintf('<info>Treating current time as %s</info>', $time->format('r')));
         $table = $this->getHelperSet()->get('table');
         $table->setHeaders(['command', 'queue', 'server', 'schedule', 'valid command?', 'due?', 'next run?']);
         foreach ($recurringConsoleCommandReader->getConfigurations() as $configuration) {

@@ -89,14 +89,4 @@ class ReadRecurringConsoleJobConfigurationCommand extends ContainerAwareCommand
             return false;
         }
     }
-
-    private function getConsolePath()
-    {
-        $finder = new Finder();
-        $finder->name('console')->depth(0)->in($this->getContainer()->getParameter('kernel.root_dir'));
-        $results = iterator_to_array($finder);
-        $file = current($results);
-
-        return sprintf('%s/%s', $file->getPath(), $file->getBasename());
-    }
 }

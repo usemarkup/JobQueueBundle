@@ -6,6 +6,8 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Markup\JobQueueBundle\Exception\InvalidConfigurationException;
 use Markup\JobQueueBundle\Model\RecurringConsoleCommandConfiguration;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Finder\SplFileInfo;
+use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Parser;
 
 /**
@@ -37,6 +39,7 @@ class RecurringConsoleCommandReader
 
     /**
      * @return ArrayCollection<RecurringConsoleCommandConfiguration>
+     * @throws InvalidConfigurationException
      */
     public function getConfigurations()
     {
@@ -118,9 +121,16 @@ class RecurringConsoleCommandReader
         $results = iterator_to_array($finder);
 
         $file = current($results);
+        /**
+         * @var SplFileInfo $file
+         */
         $contents = $file->getContents();
 
-        $config = $yamlParser->parse($contents);
+        try {
+            $config = $yamlParser->parse($contents);
+        } catch (ParseException $e) {
+            throw new InvalidConfigurationException(sprintf('The job configuration file "%s" cannot be parsed.', $file->getRealPath()));
+        }
 
         return $config;
     }

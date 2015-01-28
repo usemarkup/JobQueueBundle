@@ -18,6 +18,8 @@
         "symfony/framework-bundle": "~2.1",
         "symfony/finder": "~2.1",
         "symfony/yaml": "~2.3",
+        "symfony/console": "~2.3",
+        "symfony/process": "~2.3",
         "twig/twig": ">=1.12",
         "php": ">=5.4.0",
         "mtdowling/cron-expression": "1.0.*",

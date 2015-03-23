@@ -1,3 +1,5 @@
+NOTICE: As of version 2.0-dev of this bundle support for php-resque has been dropped in favor of RabbitMQ. There are numerous reasons for this, however the last working version of this bundle that worked with resque is tagged at 0.1. I strongly discourage its use.
+
 Introduction
 ============
 

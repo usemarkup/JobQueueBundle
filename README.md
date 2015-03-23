@@ -55,10 +55,12 @@ $container->get('jobby')
 For the value of 'topic' a valid consumer and producer need to be set up in the oldsound/rabbiitmq-bundle configuration as follows, without a configuration of this type, processing of the job will fail (this is currently a convention but would be better enforced by allowing this bundle to configure the oldsound bundle directly - PR's welcome):
 
 ```yml
+
 producers:
-        a_valid_topic:
-                connection:       default
-                exchange_options: { name: 'a_valid_topic', type: topic }
+    a_valid_topic:
+        connection:       default
+        exchange_options: { name: 'a_valid_topic', type: topic }
+                
 consumers:
 	a_valid_topic:
 		connection:       default
@@ -73,7 +75,7 @@ Enabling and Monitoring Workers (via supervisord)
 To aid with deployment this bundle, a console command has been provided which can be run as part of a deployment. This console command will generate a supervisord file for the purpose of including within your main supervisord.conf file. This will produce a configuration that initiates and watches php 'consumers', providing one consumer per topic:
 
 
-This console command requires a minimal configuration (one block for each consumer you want to start. By convention these must match the consumers you have already defined (as seen above):
+This console command requires a minimal configuration (one block for each consumer you want to start). By convention these must match the consumers you have already defined (as seen above):
 
 ```yml
 markup_job_queue:

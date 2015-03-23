@@ -1,4 +1,4 @@
-NOTICE: As of version 2.0-dev of this bundle support for php-resque has been dropped in favor of RabbitMQ. There are numerous reasons for this, namely performance and reliability. The last working version of this bundle that worked with resque is tagged at 0.1, however I strongly discourage its us (it may be useful to extract functionality for use in https://github.com/michelsalib/BCCResqueBundle).
+NOTICE: As of version 2.0-dev of this bundle support for php-resque has been dropped in favor of RabbitMQ. There are numerous reasons for this, namely performance and reliability. The last working version of this bundle that worked with resque is tagged at 0.1, however I strongly discourage its use (it may be useful to extract functionality for use in https://github.com/michelsalib/BCCResqueBundle).
 
 Introduction
 ============

@@ -40,13 +40,86 @@ Jobs are added using a single service. There is a utility method for adding 'com
 	$container->get('jobby')
 		->addCommandJob(
 			'your:console:command --plus=any --options or arguments', #this needs to be a valid command
-			'topic', # should be a valid topic name
+			'a_valid_topic', # should be a valid topic name
 			600, # allowed timeout for command (see symfony process component documentation)
 			600, # allowed idle timeout for command (see symfony process component documentation)
 		)
 ```
 
-Deployment / Enabling and Montoring Workers
+For the value of 'topic' a valid consumer and producer need to be set up in the oldsound/rabbiitmq-bundle configuration as follows, without a configuration of this type, processing of the job will fail (this is currently a convention but would be better enforced by allowing this bundle to configure the oldsound bundle directly - PR's welcome):
+
+```yml
+	producers:
+	        a_valid_topic:
+                        connection:       default
+                        exchange_options: { name: 'a_valid_topic', type: topic }
+	consumers:
+		a_valid_topic:
+			connection:       default
+			exchange_options: { name: 'a_valid_topic', type: topic }
+			queue_options:    { name: 'a_valid_topic' }
+			callback:         markup_job_queue.consumer
+```
+
+Deployment / Enabling and Montoring Workers (via supervisord)
 ================
 
-WIP
+To aid with deployment this bundle, a console command has been provided which can be run as part of a deployment. This console command will generate a supervisord file for the purpose of including within your main supervisord.conf file. This will produce a configuration that initiates and watches php 'consumers', providing one consumer per topic:
+
+
+This console command requires a minimal configuration (one block for each consumer you want to start. By convention these must match the consumers you have already defined (as seen above):
+
+```yml
+	markup_job_queue:
+		topics:
+			test:
+				consumption_quantity: 10
+			a_valid_topic:
+				consumption_quantity: 20
+```
+
+To write the configuration file:
+
+```bash
+	app/console markup:job_queue:supervisord_config:write disambiguator
+```
+
+The file will be written to /etc/supervisord/conf.d/ by default. This can be amended:
+```yml
+	supervisor_config_path: /path/to/conf file
+```
+This path needs to be included in your main /etc/supervisord.conf thus:
+```conf
+	[include]
+	files=/path/to/conf/file/*.conf
+```
+
+To use this as part of a capistrano deployment for example you can write some custom tasks that:
+- Stop consumers
+- Rewrite the configuration
+- Restart the consumers
+
+The following assumes use of capistrano multistage under capifony 2.X YMMV
+```ruby
+	namespace :supervisor do
+    		desc "Supervisor Tasks"
+	    	task :check_config, :roles => :app do
+			stream "cd #{latest_release} && #{php_bin} #{symfony_console} markup:job_queue:recurring:check --env=#{symfony_env}"
+		end
+		task :write_config, :roles => :worker, :except => { :no_release => true } do
+		        stream("cd #{latest_release} && #{php_bin} #{symfony_console} markup:job_queue:supervisord_config:write #{fetch(:stage)} --env=#{symfony_env_prod};")
+		end
+		task :restart_all, :roles => :app, :except => { :no_release => true } do
+			stream "#{try_sudo} supervisorctl stop all #{fetch(:stage)}:*"
+			stream "#{try_sudo} supervisorctl update"
+			stream "#{try_sudo} supervisorctl start all #{fetch(:stage)}:*"
+			capifony_puts_ok
+		end
+		task :stop_all, :roles => :app, :except => { :no_release => true } do
+			# stops all consumers in this group
+			stream "#{try_sudo} supervisorctl stop all #{fetch(:stage)}:*"
+			capifony_puts_ok
+		end
+	end
+	
+```

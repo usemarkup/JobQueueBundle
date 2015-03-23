@@ -33,8 +33,8 @@ Configuration
 
 Once you have configured your recurring schedule you need to add only one console command to your live crontab. This will run a single console command every minute adding any 'due' jobs to RabbitMQ for processing:
 
-```crontab
-        * * * * * /usr/bin/php /your/app/location/current/app/console markup:job_queue:recurring:add --no-debug -e=prod >> /var/log/recurring_jobs.log
+```vim
+* * * * * /usr/bin/php /your/app/location/current/app/console markup:job_queue:recurring:add --no-debug -e=prod >> /var/log/recurring_jobs.log
 ```
 
 Adding Jobs

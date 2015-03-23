@@ -94,7 +94,8 @@ app/console markup:job_queue:supervisord_config:write disambiguator
 
 The file will be written to /etc/supervisord/conf.d/ by default. This can be amended:
 ```yml
-supervisor_config_path: /path/to/conf file
+markup_job_queue:
+	supervisor_config_path: /path/to/conf/file/
 ```
 This path needs to be included in your main /etc/supervisord.conf thus:
 ```conf

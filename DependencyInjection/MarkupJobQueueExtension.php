@@ -2,10 +2,11 @@
 
 namespace Markup\JobQueueBundle\DependencyInjection;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Markup\JobQueueBundle\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\FileLocator;
-use Symfony\Component\HttpKernel\DependencyInjection\Extension;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader;
+use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 /**
  * This is the class that loads and manages your bundle configuration
@@ -25,8 +26,7 @@ class MarkupJobQueueExtension extends Extension
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.yml');
 
-        $this->registerAndValidateRecurringConfigurationFile($config, $container);
-        $this->addQueuesToJobManager($config, $container);
+        $this->registerRecurringConfigurationFile($config, $container);
         $this->addSupervisordConfig($config, $container);
     }
 
@@ -35,24 +35,12 @@ class MarkupJobQueueExtension extends Extension
      * @param array            $config
      * @param ContainerBuilder $container
      */
-    private function registerAndValidateRecurringConfigurationFile(array $config, ContainerBuilder $container)
+    private function registerRecurringConfigurationFile(array $config, ContainerBuilder $container)
     {
         if ($config['recurring'] !== false) {
             $recurringConsoleCommandReader = $container->getDefinition('markup_admin_job_queue_recurring_console_command_reader');
             $recurringConsoleCommandReader->addMethodCall('setConfigurationFileName', [$config['recurring']]);
         }
-    }
-
-    /**
-     * Adds a list of allowed queues to the application - this should corespond to the workers that are processing jobs for those queues
-     * @param array            $config
-     * @param ContainerBuilder $container
-     */
-    private function addQueuesToJobManager(array $config, ContainerBuilder $container)
-    {
-        $queues = $config['queues'];
-        $jobManager = $container->getDefinition('markup_admin_job_queue_manager');
-        $jobManager->addMethodCall('setQueues', [$queues]);
     }
 
     /**
@@ -62,12 +50,11 @@ class MarkupJobQueueExtension extends Extension
      */
     private function addSupervisordConfig(array $config, ContainerBuilder $container)
     {
-        $configFileWriter = $container->getDefinition('markup_admin_job_queue.supervisord_config_file.writer');
-        if ($config['supervisor_user']) {
-            $configFileWriter->addMethodCall('setSupervisordUser', [$config['supervisor_user']]);
+        $configFileWriter = $container->getDefinition('markup_job_queue.writer.supervisord_config_file');
+        if (!$config['topics']) {
+            throw new InvalidConfigurationException('markup_top_queue requirea that at least 1 `topic` is configured');
         }
-        if ($config['supervisor_config_path']) {
-            $configFileWriter->addMethodCall('setSupervisordConfigPath', [$config['supervisor_config_path']]);
-        }
+        $configFileWriter->addMethodCall('setSupervisordConfigPath', [$config['supervisor_config_path']]);
+        $configFileWriter->addMethodCall('setTopicsConfiguration', [$config['topics']]);
     }
 }

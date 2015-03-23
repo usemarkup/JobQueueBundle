@@ -2,97 +2,61 @@
 
 namespace Markup\JobQueueBundle\Job;
 
-use BCC\ResqueBundle\ContainerAwareJob;
 use Markup\JobQueueBundle\Exception\JobFailedException;
+use Markup\JobQueueBundle\Model\Job;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Process\Process;
 
 /**
- * This job adds a console command to the queue
+ * This job runs a console command
  */
-class ConsoleCommandJob extends ContainerAwareJob
+class ConsoleCommandJob extends Job
 {
-    /**
-     * The time before the process component times out
-     * @var integer
-     */
-    private $timeout;
-
-    /**
-     * The time before the process component times out (if idle)
-     * @var integer
-     */
-    private $idleTimeout;
-
-    public function run($args)
+    public function run(ContainerInterface $container)
     {
         ini_set('max_execution_time', 7200);
-        $env = $args['kernel.environment'];
-        $debug = $args['kernel.debug'];
-        $command = $args['command'];
+        $command = $this->args['command'];
 
         // get the absolute path of the console and the environment
-        $command = sprintf('%s %s --env=%s', $this->getConsolePath(), $command, $env);
-
-        if ($debug !== true) {
+        $command = sprintf('%s %s --env=%s', $this->getConsolePath($container->get('kernel')->getRootdir()), $command, $container->get('kernel')->getEnvironment());
+        if ($container->get('kernel')->isDebug() !== true) {
             $command = sprintf('%s --no-debug', $command);
         }
 
         $process = new Process($command);
-
-        $timeout = 60;
-        $idleTimeout = 60;
-
-        if (isset($args['timeout'])) {
-            $this->timeout = $args['timeout'];
+        if (!isset($this->args['timeout'])) {
+            $this->args['timeout'] = 60;
         }
-
-        if (isset($args['idleTimeout'])) {
-            $this->idleTimeout = $args['idleTimeout'];
+        $process->setTimeout((int) $this->args['timeout']);
+        if (!isset($this->args['idleTimeout'])) {
+            $this->idleTimeout = $this->args['idleTimeout'];
         }
+        $process->setIdleTimeout((int) $this->args['idleTimeout']);
 
         try {
-            $process->setTimeout((int) $this->timeout);
-            $process->setIdleTimeout((int) $this->idleTimeout);
             $process->run();
 
-            $logger = $this->getContainer()->get('logger');
-
             if (!$process->isSuccessful()) {
-                $message = sprintf('A job failed on the queue `%s` with output:%s and the error output: %s', $this->queue, $process->getOutput(), $process->getErrorOutput());
-                $logger->error($message);
+                $message = sprintf('A job `%s` failed with topic `%s` with output:%s and the error output: %s', $command, $this->topic, $process->getOutput(), $process->getErrorOutput());
                 throw new JobFailedException($message);
             }
-
         } catch (\Exception $e) {
             throw new JobFailedException($e->getMessage());
         }
     }
 
-    public function setCommand($command)
+    public function validate()
     {
-        $this->args['command'] = $command;
+        if (!isset($this->args['command'])) {
+            throw new InvalidJobArgumentException('`command` must be set');
+        }
     }
 
-    public function setQueue($queue)
-    {
-        $this->queue = $queue;
-    }
-
-    public function setTimeout($time)
-    {
-        $this->args['timeout'] = $time;
-    }
-
-    public function setIdleTimeout($time)
-    {
-        $this->args['idleTimeout']  = $time;
-    }
-
-    private function getConsolePath()
+    private function getConsolePath($kernelDir)
     {
         $finder = new Finder();
-        $finder->name('console')->depth(0)->in($this->args['kernel.root_dir']);
+        $finder->name('console')->depth(0)->in($kernelDir);
         $results = iterator_to_array($finder);
         $file = current($results);
 

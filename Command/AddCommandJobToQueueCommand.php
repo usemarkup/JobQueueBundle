@@ -28,14 +28,9 @@ class AddCommandJobToQueueCommand extends ContainerAwareCommand
                 'The command to add'
             )
             ->addArgument(
-                'queue',
+                'topic',
                 InputArgument::REQUIRED,
-                'The queue to add the command to'
-            )
-            ->addArgument(
-                'server',
-                InputArgument::REQUIRED,
-                'The server for which the job is being added'
+                'The topic to add the command to'
             )
             ->addOption(
                 'timeout',
@@ -56,14 +51,11 @@ class AddCommandJobToQueueCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $command = $input->getArgument('cmd');
-        $queue = $input->getArgument('queue');
-        $server = $input->getArgument('server');
+        $topic = $input->getArgument('topic');
         $timeout = $input->getOption('timeout');
         $idleTimeout = $input->getOption('idle_timeout');
 
-        $queueServer = sprintf('%s-%s', $queue, $server);
-
-        $jobby = $this->getContainer()->get('jobby')->addCommandJob($command, $queueServer, $timeout, $idleTimeout);
+        $jobby = $this->getContainer()->get('jobby')->addCommandJob($command, $topic, $timeout, $idleTimeout);
 
         $output->writeln('<info>Added command to job queue</info>');
     }

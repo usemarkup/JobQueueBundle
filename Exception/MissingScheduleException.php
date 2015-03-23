@@ -2,7 +2,6 @@
 
 namespace Markup\JobQueueBundle\Exception;
 
-class UnknownServerException extends \Exception
+class MissingScheduleException extends \Exception
 {
-
 }

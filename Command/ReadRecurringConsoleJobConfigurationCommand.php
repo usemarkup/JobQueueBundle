@@ -6,7 +6,6 @@ use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Finder\Finder;
 
 /**
  * This command reads the recurring job configuration and displays a table showing information about scheduled jobs
@@ -32,7 +31,6 @@ class ReadRecurringConsoleJobConfigurationCommand extends ContainerAwareCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-
         $time = new \DateTime('now');
         if ($input->hasOption('time')) {
             $selectedTime = $input->getOption('time');
@@ -48,15 +46,14 @@ class ReadRecurringConsoleJobConfigurationCommand extends ContainerAwareCommand
 
         $output->writeln(sprintf('<info>Treating current time as %s</info>', $time->format('r')));
         $table = $this->getHelperSet()->get('table');
-        $table->setHeaders(['command', 'queue', 'server', 'schedule', 'valid command?', 'due?', 'next run?']);
+        $table->setHeaders(['command', 'topic', 'schedule', 'valid command?', 'due?', 'next run?']);
         foreach ($recurringConsoleCommandReader->getConfigurations() as $configuration) {
             $row = [];
             $row[] = $configuration->getCommand();
-            $row[] = $configuration->getQueue();
-            $row[] = $configuration->getServer();
+            $row[] = $configuration->getTopic();
             $row[] = $configuration->getSchedule();
-            $row[] = $this->isCommandValid($configuration->getCommand()) ? '✓' : '✗' ;
-            $row[] = $configuration->isDue() ? '✓' : '✗' ;
+            $row[] = $this->isCommandValid($configuration->getCommand()) ? '✓' : '✗';
+            $row[] = $configuration->isDue() ? '✓' : '✗';
             if ($configuration->nextRun()) {
                 $row[] = $configuration->nextRun()->format('r');
             } else {
@@ -68,7 +65,6 @@ class ReadRecurringConsoleJobConfigurationCommand extends ContainerAwareCommand
         }
 
         $table->render($output);
-
     }
 
     /**

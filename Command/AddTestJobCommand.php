@@ -2,10 +2,11 @@
 
 namespace Markup\JobQueueBundle\Command;
 
-use Markup\JobQueueBundle\Job\Test\BadJob;
-use Markup\JobQueueBundle\Job\Test\ErrorJob;
-use Markup\JobQueueBundle\Job\Test\ExceptionJob;
-use Markup\JobQueueBundle\Job\Test\SleepJob;
+use Markup\JobQueueBundle\Job\BadJob;
+use Markup\JobQueueBundle\Job\ExceptionJob;
+use Markup\JobQueueBundle\Job\MonologErrorJob;
+use Markup\JobQueueBundle\Job\SleepJob;
+use Markup\JobQueueBundle\Job\WorkJob;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -22,6 +23,7 @@ class AddTestJobCommand extends ContainerAwareCommand
     const TYPE_BAD = 'bad';
     const TYPE_ERROR = 'error';
     const TYPE_EXCEPTION = 'exception';
+    const TYPE_WORK = 'work';
 
     /**
      * @see Command
@@ -30,40 +32,50 @@ class AddTestJobCommand extends ContainerAwareCommand
     {
         $this
             ->setName('markup:job_queue:add:test')
-            ->setDescription('Adds a single job that sleeps for a period of time (required) to allow testing of the job queue')
+            ->setDescription('Adds a single job to allow testing of the job queue')
             ->addArgument(
                 'type',
                 InputArgument::REQUIRED,
-                'The type of job to add. Should be one of `sleep`, `bad`, or `exception`'
+                'The type of job to add. Should be one of `sleep`, `bad` (fatal error), `error` (monolog error), `work` (cryptography) or `exception` (uncaught exception)'
+            )
+            ->addArgument(
+                'quantity',
+                InputArgument::OPTIONAL,
+                'The number of times to add the job',
+                1
             );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $resque = $this->getContainer()->get('bcc_resque.resque');
+        $resque = $this->getContainer()->get('jobby');
         $type = $input->getArgument('type');
 
         switch ($type) {
             case self::TYPE_SLEEP:
-                $job = new SleepJob(30);
+                $job = new SleepJob(['time' => 3], 'test');
                 break;
             case self::TYPE_BAD:
-                $job = new BadJob();
+                $job = new BadJob([], 'test');
                 break;
             case self::TYPE_ERROR:
-                $job = new ErrorJob();
+                $job = new MonologErrorJob([], 'test');
                 break;
             case self::TYPE_EXCEPTION:
-                $job = new ExceptionJob();
+                $job = new ExceptionJob([], 'test');
+                break;
+            case self::TYPE_WORK:
+                $job = new WorkJob(['units' => 200, 'complexity' => 32], 'test');
                 break;
             default:
                 throw new \Exception(sprintf('Unknown job of type %s specified', $type));
                 break;
         }
 
-        // enqueue your job
-        $resque->enqueue($job);
-
-        $output->writeln(sprintf('<info>Added %s job</info>', $type));
+        $quantity = $input->getArgument('quantity');
+        for ($i = 0; $i < $quantity; $i++) {
+            $this->getContainer()->get('jobby')->addJob($job);
+        }
+        $output->writeln(sprintf('<info>Added %s job * %s</info>', $type, $quantity));
     }
 }

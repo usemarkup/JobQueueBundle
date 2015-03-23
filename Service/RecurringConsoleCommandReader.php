@@ -4,6 +4,7 @@ namespace Markup\JobQueueBundle\Service;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Markup\JobQueueBundle\Exception\InvalidConfigurationException;
+use Markup\JobQueueBundle\Exception\MissingScheduleException;
 use Markup\JobQueueBundle\Model\RecurringConsoleCommandConfiguration;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
@@ -39,7 +40,8 @@ class RecurringConsoleCommandReader
 
     /**
      * @return ArrayCollection<RecurringConsoleCommandConfiguration>
-     * @throws InvalidConfigurationException
+     * @throws InvalidConfigurationException                         If any configuration is missing parameters
+     * @throws MissingScheduleException                              If schedule file has not been configured
      */
     public function getConfigurations()
     {
@@ -47,10 +49,11 @@ class RecurringConsoleCommandReader
             return $this->configurations;
         }
         if ($this->configurationFileName === null) {
-            throw new \LogicException('Cannot get configurations as no config file has been defined');
+            throw new MissingScheduleException('Cannot get configurations as no config file has been defined');
         }
         $config = $this->getConfiguration();
         $configurations = $this->parseConfiguration($config);
+        // cache for next lookup
         $this->configurations = $configurations;
 
         return $configurations;
@@ -58,17 +61,13 @@ class RecurringConsoleCommandReader
 
     /**
      * Gets any configurations which are due NOW and returns a collection of them
-     * @param  string                                               $server
      * @return ArrayCollection<RecurringConsoleCommandConfiguration>
      */
-    public function getDue($server)
+    public function getDue()
     {
         $configurations = $this->getConfigurations();
         $due = new ArrayCollection();
         foreach ($configurations as $configuration) {
-            if ($configuration->getServer() !== $server) {
-                continue;
-            }
             if ($configuration->isDue()) {
                 $due->add($configuration);
             }
@@ -80,28 +79,25 @@ class RecurringConsoleCommandReader
     /**
      * Parses the configuration and returns an array of of configuration objects
      * Configuration is cached after running this function so it should only be run once
-     * @param array $config
+     *
+     * @param ArrayCollection<RecurringConsoleCommandConfiguration>
      */
     private function parseConfiguration(array $config)
     {
         $configurations = new ArrayCollection();
-        foreach ($config as $pair) {
-            if (!isset($pair['command']) || !isset($pair['schedule']) || !isset($pair['queue']) || !isset($pair['server'])) {
-                throw new InvalidConfigurationException('Every job schedule should have a `command`, `queue`, `schedule` and a `server` component');
-            }
-            //validate that the 'schedule' component is correct?
-
-            $servers = $pair['server'];
-            if (!is_array($servers)) {
-                $servers = [$servers];
-            }
-            foreach ($servers as $server) {
-                $recurringConsoleCommandConfiguration = new RecurringConsoleCommandConfiguration($pair['command'], $pair['queue'], $pair['schedule'], $server);
+        foreach ($config as $group) {
+            if (!isset($group['command']) || !isset($group['schedule']) || !isset($group['topic'])) {
+                throw new InvalidConfigurationException('Every job schedule should have a `command`, `topic` and `schedule` component'.json_encode($config));
             }
 
-            if (isset($pair['timeout'])) {
-                $recurringConsoleCommandConfiguration->setTimeout($pair['timeout']);
-            }
+            //@todo validate that the 'schedule' component is correct?
+            $recurringConsoleCommandConfiguration = new RecurringConsoleCommandConfiguration(
+                $group['command'],
+                $group['topic'],
+                $group['schedule'],
+                isset($group['timeout']) ? $group['timeout'] : null
+            );
+
             $configurations->add($recurringConsoleCommandConfiguration);
         }
 

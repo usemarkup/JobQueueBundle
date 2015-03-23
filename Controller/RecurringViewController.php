@@ -16,7 +16,6 @@ class RecurringViewController extends Controller
             'MarkupJobQueueBundle:View:recurring.html.twig',
             array(
                 'recurringReader' => $this->get('markup_admin_job_queue_recurring_console_command_reader'),
-                'resque' => $this->get('bcc_resque.resque'),
             )
         );
     }

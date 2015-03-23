@@ -5,22 +5,42 @@ namespace Markup\JobQueueBundle\Model;
 use Cron;
 
 /**
- * A configuration object that indicates a console command, and the cron systax for when it should be run
+ * A configuration object that indicates a console command
+ * and the cron systax for when it should be run
  */
 class RecurringConsoleCommandConfiguration
 {
+    /**
+     * @var string
+     */
     private $command;
+
+    /**
+     * @var string
+     */
     private $schedule;
-    private $queue;
-    private $server;
+
+    /**
+     * @var string
+     */
+    private $topic;
+
+    /**
+     * @var string
+     */
     private $timeout;
 
-    public function __construct($command, $queue, $schedule, $server, $timeout = 60)
+    /**
+     * @param string  $command
+     * @param string  $topic
+     * @param string  $schedule
+     * @param integer $timeout
+     */
+    public function __construct($command, $topic, $schedule, $timeout = 60)
     {
         $this->command = $command;
         $this->schedule = $schedule;
-        $this->queue = $queue;
-        $this->server = $server;
+        $this->topic = $topic;
         $this->timeout = $timeout;
     }
 
@@ -43,9 +63,9 @@ class RecurringConsoleCommandConfiguration
     /**
      * @return string
      */
-    public function getQueue()
+    public function getTopic()
     {
-        return $this->queue;
+        return $this->topic;
     }
 
     /**
@@ -54,19 +74,6 @@ class RecurringConsoleCommandConfiguration
     public function getTimeout()
     {
         return $this->timeout;
-    }
-
-    public function setTimeout($timeout)
-    {
-        $this->timeout = $timeout;
-    }
-
-    /**
-     * @return string
-     */
-    public function getServer()
-    {
-        return $this->server;
     }
 
     /**

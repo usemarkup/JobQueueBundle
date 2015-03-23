@@ -22,22 +22,16 @@ class Configuration implements ConfigurationInterface
 
         // can specify a list of allowed queues
         // can specify a configuration file (.yml) that can be evaluated using cron syntax
-
        $rootNode
             ->children()
-                ->arrayNode('queues')
-                    ->useAttributeAsKey('server')
+                ->arrayNode('topics')
+                    ->useAttributeAsKey('name')
                     ->prototype('array')
-                        ->prototype('array')
-                            ->addDefaultsIfNotSet()
-                            ->children()
-                                ->scalarNode('name')
-                                    ->isRequired()
-                                ->end()
-                                ->integerNode('count')
-                                    ->defaultValue(1)
-                                    ->min(1)
-                                ->end()
+                        ->addDefaultsIfNotSet()
+                        ->children()
+                            ->integerNode('consumption_quantity')
+                                ->defaultValue(1)
+                                ->min(1)
                             ->end()
                         ->end()
                     ->end()
@@ -53,11 +47,8 @@ class Configuration implements ConfigurationInterface
                         })->thenInvalid('Recurring Console Command configuration must be in .yml format')->end()
                     ->defaultFalse()
                 ->end()
-                ->scalarNode('supervisor_user')
-                    ->defaultNull()
-                ->end()
                 ->scalarNode('supervisor_config_path')
-                    ->defaultNull()
+                    ->defaultValue('/etc/supervisord/conf.d/')
                 ->end()
             ->end()
         ->end();

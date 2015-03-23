@@ -1,14 +1,14 @@
 Introduction
 ============
 
-This bundle provides a few features for providing a simple job queue mechanic and schdueling system for symfony console commands. It uses rabbit-mq to manage a job queue, (for which various workers process tasks). Before proceeding you should read: https://github.com/videlalvaro/RabbitMqBundle. This bundle assumes the use of 'topic' consumers rather than 'direct' consumers.
+This bundle provides a few features for providing a simple job queue mechanic and scheduling system for symfony console commands. It uses rabbit-mq to manage a job queue, (for which various workers process tasks). Before proceeding you should read: https://github.com/videlalvaro/RabbitMqBundle. This bundle assumes the use of 'topic' consumers rather than 'direct' consumers.
 
 These workers should be maintained by supervisord to ensure they don't fail. 
 
 Scheduling Jobs
 ---------------
 
-Rather than scheduling console commands using the crontab, they should be managed inenvironment specific configuration files (using crontab syntax). This allows the addition of new recurring jobs, or changing of timings, without having to modify crontab in multiple environments. It also has the advantage of forcing a common logging/exception notification strategy for all commands. Examples of these sorts of tasks are polling third party servers for files, sending spooled email or generating reports.
+Rather than scheduling console commands using the crontab, they should be managed in environment specific configuration files (using crontab syntax). This allows the addition of new recurring jobs, or changing of timings, without having to modify crontab in multiple environments. It also has the advantage of forcing a common logging/exception notification strategy for all commands. Examples of these sorts of tasks are polling third party servers for files, sending spooled email or generating reports.
 
 
 Configuration

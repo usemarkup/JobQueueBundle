@@ -31,6 +31,12 @@ Configuration
 	  topic: topic-of-a-configured-rabbitmq-producer
 ```
 
+Once you have configured your recurring schedule you need to add only one console command to your live crontab. This will run a single console command every minute adding any 'due' jobs to RabbitMQ for processing:
+
+```crontab
+        * * * * * /usr/bin/php /your/app/location/current/app/console markup:job_queue:recurring:add --no-debug -e=prod >> /var/log/recurring_jobs.log
+```
+
 Adding Jobs
 -----------
 
@@ -61,7 +67,7 @@ For the value of 'topic' a valid consumer and producer need to be set up in the 
 			callback:         markup_job_queue.consumer
 ```
 
-Deployment / Enabling and Montoring Workers (via supervisord)
+Enabling and Monitoring Workers (via supervisord)
 ================
 
 To aid with deployment this bundle, a console command has been provided which can be run as part of a deployment. This console command will generate a supervisord file for the purpose of including within your main supervisord.conf file. This will produce a configuration that initiates and watches php 'consumers', providing one consumer per topic:
@@ -94,7 +100,10 @@ This path needs to be included in your main /etc/supervisord.conf thus:
 	files=/path/to/conf/file/*.conf
 ```
 
-To use this as part of a capistrano deployment for example you can write some custom tasks that:
+Deployment
+================
+To use this as part of a capistrano deployment for example you can write some custom capistrano tasks that:
+
 - Stop consumers
 - Rewrite the configuration
 - Restart the consumers

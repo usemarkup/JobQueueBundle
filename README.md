@@ -14,7 +14,7 @@ Rather than scheduling console commands using the crontab, they should be manage
 
 
 Configuration
-~~~~~~~~~~~~~
+-------------
 
 ```yml
 	markup_job_queue:

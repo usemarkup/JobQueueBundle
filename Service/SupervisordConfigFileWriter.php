@@ -82,7 +82,7 @@ class SupervisordConfigFileWriter
             //number of jobs to run before restarting...
             $programName = sprintf("markup_job_queue_%s_%s", $uniqueEnvironment, $topic);
             $programNames[] = $programName;
-            $consumerCommand = sprintf('%s/console rabbitmq:consumer -m %s %s -e=%s', $this->kernelPath, $topicConfig['consumption_quantity'], $topic, $this->kernelEnv);
+            $consumerCommand = sprintf('%s/console rabbitmq:consumer -m %s %s -e=%s --no-debug', $this->kernelPath, $topicConfig['consumption_quantity'], $topic, $this->kernelEnv);
             $conf = [];
             $conf[] = "\n";
             $conf[] = sprintf("[program:%s]", $programName);

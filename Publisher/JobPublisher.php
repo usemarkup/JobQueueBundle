@@ -34,9 +34,9 @@ class JobPublisher extends ContainerAware
             $producer = $this->container->get($fqProducerName);
             $producer->setContentType('application/json');
             $producer->publish(json_encode($message));
-            $logger->error('Unable to add job to the job queue - AMQPRuntimeException - Is RabbitMQ running?:' . $e->getMessage());
+            $logger->error('Unable to add job to the job queue - AMQPRuntimeException - Is RabbitMQ running?:' . $e->getMessage());        
         } catch (\Exception $e) {
-            $logger->error('Unable to add job to the job queue - General Exception:' . $e->getMessage())
+            $logger->error('Unable to add job to the job queue - General Exception:' . $e->getMessage());
         }
     }
 }

@@ -5,6 +5,7 @@ namespace Markup\JobQueueBundle\Publisher;
 use Markup\JobQueueBundle\Exception\MissingTopicException;
 use Markup\JobQueueBundle\Exception\UndefinedProducerException;
 use Markup\JobQueueBundle\Model\Job;
+use PhpAmqpLib\Exception\AMQPRuntimeException;
 use Symfony\Component\DependencyInjection\ContainerAware;
 
 /**
@@ -14,6 +15,7 @@ class JobPublisher extends ContainerAware
 {
     public function publish(Job $job)
     {
+        $logger = $this->container->get('logger');
         $job->validate();
         $topic = str_replace('-', '_', $job->getTopic());
         if (!$topic) {
@@ -27,8 +29,14 @@ class JobPublisher extends ContainerAware
         }
         // add the 'class' of the job as an argument to allow it to be constructed again by consumer
         $message = array_merge($job->getArgs(), ['job_class' => get_class($job)]);
-        $producer = $this->container->get($fqProducerName);
-        $producer->setContentType('application/json');
-        $producer->publish(json_encode($message));
+        try {
+        } catch (AMQPRuntimeException $e) {
+            $producer = $this->container->get($fqProducerName);
+            $producer->setContentType('application/json');
+            $producer->publish(json_encode($message));
+            $logger->error('Unable to add job to the job queue - AMQPRuntimeException - Is RabbitMQ running?:' . $e->getMessage());
+        } catch (\Exception $e) {
+            $logger->error('Unable to add job to the job queue - General Exception:' . $e->getMessage())
+        }
     }
 }

@@ -5,6 +5,7 @@ namespace Markup\JobQueueBundle\Tests\Publisher;
 use Markup\JobQueueBundle\Job\BadJob;
 use Markup\JobQueueBundle\Publisher\JobPublisher;
 use Mockery as m;
+use Psr\Log\NullLogger;
 
 class JobPublisherTest extends \PHPUnit_Framework_TestCase
 {
@@ -16,6 +17,7 @@ class JobPublisherTest extends \PHPUnit_Framework_TestCase
         $this->container->shouldReceive('has')->with('old_sound_rabbit_mq.test_producer')->andReturn(true);
         $this->container->shouldReceive('get')->with('old_sound_rabbit_mq.test_producer')->andReturn($this->producer);
         $this->container->shouldReceive('has')->with('old_sound_rabbit_mq.nonsense_producer')->andReturn(false);
+        $this->container->shouldReceive('get')->with('logger')->andReturn(new NullLogger());
     }
 
     public function testPublishingJobWithInvalidTopicThrowsException()

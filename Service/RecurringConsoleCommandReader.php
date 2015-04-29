@@ -5,6 +5,7 @@ namespace Markup\JobQueueBundle\Service;
 use Doctrine\Common\Collections\ArrayCollection;
 use Markup\JobQueueBundle\Exception\InvalidConfigurationException;
 use Markup\JobQueueBundle\Exception\MissingScheduleException;
+use Markup\JobQueueBundle\Exception\MissingConfigurationException;
 use Markup\JobQueueBundle\Model\RecurringConsoleCommandConfiguration;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
@@ -117,6 +118,10 @@ class RecurringConsoleCommandReader
         $results = iterator_to_array($finder);
 
         $file = current($results);
+        if (false === $file) {
+            throw new MissingConfigurationException(sprintf('A configuration file "%s" was expected to be found in %s.', $this->configurationFileName, $this->kernelPath . '/config'));
+        }
+
         /**
          * @var SplFileInfo $file
          */

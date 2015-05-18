@@ -43,6 +43,12 @@ class AddTestJobCommand extends ContainerAwareCommand
                 InputArgument::OPTIONAL,
                 'The number of times to add the job',
                 1
+            )
+            ->addArgument(
+                'topic',
+                InputArgument::OPTIONAL,
+                'The topic of the test job (defaults to `test`)',
+                'test'
             );
     }
 
@@ -50,22 +56,23 @@ class AddTestJobCommand extends ContainerAwareCommand
     {
         $resque = $this->getContainer()->get('jobby');
         $type = $input->getArgument('type');
+        $topic = $input->getArgument('topic');
 
         switch ($type) {
             case self::TYPE_SLEEP:
-                $job = new SleepJob(['time' => 3], 'test');
+                $job = new SleepJob(['time' => 3], $topic);
                 break;
             case self::TYPE_BAD:
-                $job = new BadJob([], 'test');
+                $job = new BadJob([], $topic);
                 break;
             case self::TYPE_ERROR:
-                $job = new MonologErrorJob([], 'test');
+                $job = new MonologErrorJob([], $topic);
                 break;
             case self::TYPE_EXCEPTION:
-                $job = new ExceptionJob([], 'test');
+                $job = new ExceptionJob([], $topic);
                 break;
             case self::TYPE_WORK:
-                $job = new WorkJob(['units' => 200, 'complexity' => 32], 'test');
+                $job = new WorkJob(['units' => 200, 'complexity' => 32], $topic);
                 break;
             default:
                 throw new \Exception(sprintf('Unknown job of type %s specified', $type));

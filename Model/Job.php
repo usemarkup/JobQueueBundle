@@ -35,6 +35,14 @@ abstract class Job
     }
 
     /**
+     * @return string
+     */
+    public function getCommand()
+    {
+        return $this->args['command'];
+    }
+
+    /**
      * @param ContainerInterface|null $container
      */
     abstract public function run(ContainerInterface $container);

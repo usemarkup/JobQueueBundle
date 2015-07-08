@@ -145,14 +145,4 @@ class ScheduledJob
     {
         return $this->updated;
     }
-
-
-
-
-
-
-
-
-
-
 }

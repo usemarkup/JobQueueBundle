@@ -21,7 +21,7 @@ class JobManagerTest extends \PHPUnit_Framework_TestCase
     public function testCanAddJob()
     {
         $job = new SleepJob();
-        $scheduledTime = new DateTime();
+        $scheduledTime = new \DateTime();
         $this->assertNull($this->jobManager->addJob($job));
         $this->assertNull($this->jobManager->addJob($job, $scheduledTime));
     }

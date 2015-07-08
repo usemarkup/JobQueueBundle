@@ -8,7 +8,6 @@ use Markup\JobQueueBundle\Job\SleepJob;
 use Markup\JobQueueBundle\Service\JobManager;
 use Markup\JobQueueBundle\Service\ScheduledJobService;
 use Mockery as m;
-use Symfony\Component\Validator\Constraints\DateTime;
 
 class ScheduledJobServiceTest extends \PHPUnit_Framework_TestCase
 {
@@ -21,7 +20,7 @@ class ScheduledJobServiceTest extends \PHPUnit_Framework_TestCase
 
     public function testCanAddScheduledJob()
     {
-        $scheduledTime = new DateTime();
+        $scheduledTime = new \DateTime();
         $args = [];
         $args['command'] = 'command:test';
         $args['timeout'] = '60';

@@ -5,7 +5,6 @@ namespace Markup\Bundle\JobQueueBundle\Tests\Service;
 use Markup\JobQueueBundle\Job\SleepJob;
 use Markup\JobQueueBundle\Service\JobManager;
 use Mockery as m;
-use Symfony\Component\Validator\Constraints\DateTime;
 
 class JobManagerTest extends \PHPUnit_Framework_TestCase
 {

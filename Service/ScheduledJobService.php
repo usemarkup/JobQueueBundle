@@ -47,7 +47,7 @@ class ScheduledJobService
     /**
      * @return mixed
      */
-    public function getUnqueuezdJobs() {
+    public function getUnqueuedJobs() {
         return $this->scheduledJobRepository->fetchUnqueuedJobs();
     }
 }

@@ -1,0 +1,30 @@
+Markup\JobQueueBundle\Entity\ScheduledJob:
+  type: entity
+  repositoryClass: Markup\JobQueueBundle\Entity\Repository\ScheduledJobRepository
+  table: scheduled_job
+  id:
+    id:
+      type: integer
+      generator:
+        strategy: AUTO
+  fields:
+    job:
+      type: string
+      length: 256
+    topic:
+      type: string
+      length: 60
+    scheduledTime:
+      type: datetime
+    queued:
+      type: boolean
+    created:
+      type: datetime
+      gedmo:
+        timestampable:
+          on: create
+    updated:
+      type: datetime
+      gedmo:
+        timestampable:
+          on: update

@@ -11,6 +11,7 @@ services:
         class: Markup\JobQueueBundle\Service\JobManager
         arguments:
             - @markup_job_queue.publisher
+            - @markup_job_queue.scheduled
     jobby:
         alias: markup_job_queue.manager
     markup_admin_job_queue_recurring_console_command_reader:
@@ -23,3 +24,12 @@ services:
             - @logger
             - %kernel.root_dir%
             - %kernel.environment%
+    markup_job.scheduled_job.repository:
+        class: Doctrine\ORM\EntityRepository
+        factory: [@doctrine.orm.entity_manager, getRepository]
+        arguments:
+            - Markup\JobQueueBundle\Entity\ScheduledJob
+    markup_job_queue.scheduled:
+        class: Markup\JobQueueBundle\Service\ScheduledJobService
+        arguments:
+            - @markup_job.scheduled_job.repository

@@ -13,11 +13,15 @@ use Symfony\Bundle\FrameworkBundle\Console\Application;
  */
 class JobManager
 {
-    private $resque;
 
-    public function __construct(JobPublisher $publisher)
+    private $publisher;
+
+    private $scheduledJob;
+
+    public function __construct(JobPublisher $publisher, ScheduledJobService $scheduledJobService)
     {
         $this->publisher = $publisher;
+        $this->scheduledJob = $scheduledJobService;
     }
 
     /**
@@ -28,10 +32,11 @@ class JobManager
     {
         if ($dateTime === null) {
             $this->publisher->publish($job);
-
-            return;
+        } else {
+            $this->scheduledJob->addScheduledJob($job, $dateTime);
         }
-        throw new \Exception('Scheduled jobs are unimplemented');
+
+        return;
     }
 
     /**

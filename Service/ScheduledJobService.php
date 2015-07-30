@@ -29,7 +29,7 @@ class ScheduledJobService
      */
     public function addScheduledJob(Job $job, $scheduledTime) {
         $scheduledJob = new ScheduledJob($job->getCommand(), $scheduledTime, $job->getTopic());
-        $this->save($scheduledJob);
+        $this->save($scheduledJob, true);
         return $scheduledJob;
     }
 

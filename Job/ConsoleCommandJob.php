@@ -3,6 +3,7 @@
 namespace Markup\JobQueueBundle\Job;
 
 use Markup\JobQueueBundle\Exception\JobFailedException;
+use Markup\JobQueueBundle\Exception\InvalidJobArgumentException;
 use Markup\JobQueueBundle\Model\Job;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Finder\Finder;

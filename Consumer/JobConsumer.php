@@ -27,15 +27,19 @@ class JobConsumer extends ContainerAware implements ConsumerInterface
             $job->validate();
             $job->run($this->container);
         } catch (\Exception $e) {
-            $this->container->get('logger')->error(
-                sprintf(
-                    'Unable to process job due to `%s`: %s in `%s` line `%s`',
-                    get_class($e),
-                    $e->getMessage(),
-                    $e->getFile(),
-                    $e->getLine()
-                )
-            );
+            $command = '';
+
+            if ((isset($job)) && ($job instanceof Job)) {
+                $command = $job->getCommand();
+            }
+
+            $this->container->get('logger')->error(sprintf('Job Failed: %s', $command), [
+                'exception' => get_class($e),
+                'message' => $e->getMessage(),
+                'line' => $e->getLine(),
+                'file' => $e->getFile(),
+                'trace' => $e->getTraceAsString()
+            ]);
 
             return ConsumerInterface::MSG_REJECT;
         }

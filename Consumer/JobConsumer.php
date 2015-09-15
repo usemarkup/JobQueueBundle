@@ -35,7 +35,8 @@ class JobConsumer extends ContainerAware implements ConsumerInterface
 
             $this->container->get('logger')->error(sprintf('Job Failed: %s', $command), [
                 'exception' => get_class($e),
-                'line' => $e->getMessage(),
+                'message' => $e->getMessage(),
+                'line' => $e->getLine(),
                 'file' => $e->getFile(),
                 'trace' => $e->getTraceAsString()
             ]);

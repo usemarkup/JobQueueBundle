@@ -25,7 +25,7 @@
         "mtdowling/cron-expression": "1.0.*",
         "mockery/mockery": "~0.9",
         "doctrine/collections": "~1.2",
-        "oldsound/rabbitmq-bundle": "1.6.x-dev"
+        "oldsound/rabbitmq-bundle": "~1.7.0"
     },
     "suggests": {
         "symfony/console": "To use add Jobs via the CLI"

@@ -2,16 +2,16 @@ services:
     markup_job_queue.publisher:
         class: Markup\JobQueueBundle\Publisher\JobPublisher
         calls:
-          - [ setContainer,[ @service_container ] ]
+          - [ setContainer,[ '@service_container' ] ]
     markup_job_queue.consumer:
         class: Markup\JobQueueBundle\Consumer\JobConsumer
         calls:
-          - [ setContainer,[ @service_container ] ]
+          - [ setContainer,[ '@service_container' ] ]
     markup_job_queue.manager:
         class: Markup\JobQueueBundle\Service\JobManager
         arguments:
-            - @markup_job_queue.publisher
-            - @markup_job_queue.scheduled
+            - '@markup_job_queue.publisher'
+            - '@markup_job_queue.scheduled'
     jobby:
         alias: markup_job_queue.manager
     markup_admin_job_queue_recurring_console_command_reader:
@@ -21,15 +21,15 @@ services:
     markup_job_queue.writer.supervisord_config_file:
         class: Markup\JobQueueBundle\Service\SupervisordConfigFileWriter
         arguments:
-            - @logger
+            - '@logger'
             - %kernel.root_dir%
             - %kernel.environment%
     markup_job.scheduled_job.repository:
         class: Doctrine\ORM\EntityRepository
-        factory: [@doctrine.orm.entity_manager, getRepository]
+        factory: ['@doctrine.orm.entity_manager', getRepository]
         arguments:
             - Markup\JobQueueBundle\Entity\ScheduledJob
     markup_job_queue.scheduled:
         class: Markup\JobQueueBundle\Service\ScheduledJobService
         arguments:
-            - @markup_job.scheduled_job.repository
+            - '@markup_job.scheduled_job.repository'

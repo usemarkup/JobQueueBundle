@@ -6,10 +6,11 @@ use Markup\JobQueueBundle\Exception\JobMissingClassException;
 use Markup\JobQueueBundle\Model\Job;
 use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
 use PhpAmqpLib\Message\AMQPMessage;
-use Symfony\Component\DependencyInjection\ContainerAware;
 
-class JobConsumer extends ContainerAware implements ConsumerInterface
+class JobConsumer implements ConsumerInterface
 {
+    use \Symfony\Component\DependencyInjection\ContainerAwareTrait;
+
     public function execute(AMQPMessage $message)
     {
         try {

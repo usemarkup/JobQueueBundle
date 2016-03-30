@@ -6,13 +6,14 @@ use Markup\JobQueueBundle\Exception\MissingTopicException;
 use Markup\JobQueueBundle\Exception\UndefinedProducerException;
 use Markup\JobQueueBundle\Model\Job;
 use PhpAmqpLib\Exception\AMQPRuntimeException;
-use Symfony\Component\DependencyInjection\ContainerAware;
 
 /**
  * Delegates production of jobs to oldsound component
  */
-class JobPublisher extends ContainerAware
+class JobPublisher
 {
+    use \Symfony\Component\DependencyInjection\ContainerAwareTrait;
+
     public function publish(Job $job)
     {
         $logger = $this->container->get('logger');

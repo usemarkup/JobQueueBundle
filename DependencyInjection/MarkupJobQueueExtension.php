@@ -52,7 +52,7 @@ class MarkupJobQueueExtension extends Extension
     {
         $configFileWriter = $container->getDefinition('markup_job_queue.writer.supervisord_config_file');
         if (!$config['topics']) {
-            throw new InvalidConfigurationException('markup_top_queue requirea that at least 1 `topic` is configured');
+            throw new InvalidConfigurationException('markup_jop_queue requirea that at least 1 `topic` is configured');
         }
         $configFileWriter->addMethodCall('setSupervisordConfigPath', [$config['supervisor_config_path']]);
         $configFileWriter->addMethodCall('setTopicsConfiguration', [$config['topics']]);

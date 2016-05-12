@@ -23,9 +23,11 @@
         "twig/twig": ">=1.12",
         "php": ">=5.4.0",
         "mtdowling/cron-expression": "1.0.*",
-        "mockery/mockery": "~0.9",
         "doctrine/collections": "~1.2",
         "php-amqplib/rabbitmq-bundle": "~1.8"
+    },
+    "require-dev": {
+        "mockery/mockery": "~0.9"
     },
     "suggests": {
         "symfony/console": "To use add Jobs via the CLI"

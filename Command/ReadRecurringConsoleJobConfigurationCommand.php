@@ -53,7 +53,7 @@ class ReadRecurringConsoleJobConfigurationCommand extends ContainerAwareCommand
             $row[] = $configuration->getTopic();
             $row[] = $configuration->getSchedule();
             $row[] = $this->isCommandValid($configuration->getCommand()) ? '✓' : '✗';
-            $row[] = $configuration->isDue() ? '✓' : '✗';
+            $row[] = $configuration->isDue($time) ? '✓' : '✗';
             if ($configuration->nextRun()) {
                 $row[] = $configuration->nextRun()->format('r');
             } else {

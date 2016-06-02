@@ -50,6 +50,9 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode('supervisor_config_path')
                     ->defaultValue('/etc/supervisord/conf.d/')
                 ->end()
+                ->scalarNode('consumer_command_name')
+                    ->defaultValue('rabbitmq:consumer')
+                ->end()
             ->end()
         ->end();
 

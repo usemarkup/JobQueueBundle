@@ -63,14 +63,14 @@ class SupervisordConfigFileWriter
     public function writeConfig($uniqueEnvironment)
     {
         if (!$this->supervisordConfigPath) {
-            throw new \Exception('You must configure the supervisord config writer before writing a configuration file');
+            throw new \Exception(
+                sprintf('You must configure the supervisord config writer before writing a configuration file')
+            );
         }
 
         $supervisordConfigPath = $this->supervisordConfigPath;
         $kernelPath = realpath($this->kernelPath);
         $absoluteReleasePath = realpath($kernelPath.'/..');
-
-        $logger = $this->logger;
 
         $supervisordConfigFilePath = sprintf('%s/%s_programs.conf', $supervisordConfigPath, $uniqueEnvironment);
 
@@ -100,6 +100,10 @@ class SupervisordConfigFileWriter
 
         // append 'group' of these consumers
         file_put_contents($supervisordConfigFilePath, "\n", FILE_APPEND);
-        file_put_contents($supervisordConfigFilePath, sprintf("[group:markup_%s]\nprograms=%s", $uniqueEnvironment, implode(',', $programNames)), FILE_APPEND);
+        file_put_contents(
+            $supervisordConfigFilePath,
+            sprintf("[group:markup_%s]\nprograms=%s", $uniqueEnvironment, implode(',', $programNames)),
+            FILE_APPEND
+        );
     }
 }

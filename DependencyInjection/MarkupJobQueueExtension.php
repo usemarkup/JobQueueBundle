@@ -45,8 +45,11 @@ class MarkupJobQueueExtension extends Extension
 
     /**
      * If Supervisord config variables have been set then set them against the container as parameters
-     * @param array            $config
+     *
+     * @param array $config
      * @param ContainerBuilder $container
+     *
+     * @throws InvalidConfigurationException
      */
     private function addSupervisordConfig(array $config, ContainerBuilder $container)
     {
@@ -56,5 +59,6 @@ class MarkupJobQueueExtension extends Extension
         }
         $configFileWriter->addMethodCall('setSupervisordConfigPath', [$config['supervisor_config_path']]);
         $configFileWriter->addMethodCall('setTopicsConfiguration', [$config['topics']]);
+        $configFileWriter->addMethodCall('setConsumerCommandName', $config['consumer_command_name']);
     }
 }

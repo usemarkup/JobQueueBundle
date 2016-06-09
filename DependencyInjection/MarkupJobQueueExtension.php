@@ -59,6 +59,6 @@ class MarkupJobQueueExtension extends Extension
         }
         $configFileWriter->addMethodCall('setSupervisordConfigPath', [$config['supervisor_config_path']]);
         $configFileWriter->addMethodCall('setTopicsConfiguration', [$config['topics']]);
-        $configFileWriter->addMethodCall('setConsumerCommandName', $config['consumer_command_name']);
+        $configFileWriter->addMethodCall('setConsumerCommandName', [$config['consumer_command_name']]);
     }
 }

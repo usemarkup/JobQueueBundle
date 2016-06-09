@@ -104,8 +104,8 @@ class SupervisordConfigFileWriter
             $programNames[] = $programName;
             $consumerCommand = sprintf(
                 '%s/console %s -m %s %s -e=%s --no-debug',
-                $this->consumerCommandName,
                 $this->kernelPath,
+                $this->consumerCommandName,
                 $topicConfig['consumption_quantity'],
                 $topic,
                 $this->kernelEnv

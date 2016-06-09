@@ -17,13 +17,13 @@ services:
     markup_admin_job_queue_recurring_console_command_reader:
         class: Markup\JobQueueBundle\Service\RecurringConsoleCommandReader
         arguments:
-            - %kernel.root_dir%
+            - "%kernel.root_dir%"
     markup_job_queue.writer.supervisord_config_file:
         class: Markup\JobQueueBundle\Service\SupervisordConfigFileWriter
         arguments:
             - '@logger'
-            - %kernel.root_dir%
-            - %kernel.environment%
+            - "%kernel.root_dir%"
+            - "%kernel.environment%"
     markup_job.scheduled_job.repository:
         class: Doctrine\ORM\EntityRepository
         factory: ['@doctrine.orm.entity_manager', getRepository]

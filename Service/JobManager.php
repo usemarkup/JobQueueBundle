@@ -14,12 +14,20 @@ use Symfony\Bundle\FrameworkBundle\Console\Application;
 class JobManager
 {
 
+    /**
+     * @var JobPublisher
+     */
     private $publisher;
 
+    /**
+     * @var ScheduledJobService
+     */
     private $scheduledJob;
 
-    public function __construct(JobPublisher $publisher, ScheduledJobService $scheduledJobService)
-    {
+    public function __construct(
+        JobPublisher $publisher,
+        ScheduledJobService $scheduledJobService
+    ) {
         $this->publisher = $publisher;
         $this->scheduledJob = $scheduledJobService;
     }

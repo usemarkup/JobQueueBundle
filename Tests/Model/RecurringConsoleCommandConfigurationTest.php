@@ -13,10 +13,11 @@ class RecurringConsoleCommandConfigurationTest extends \PHPUnit_Framework_TestCa
 
     public function testCanBeConstructed()
     {
-        $config = new RecurringConsoleCommandConfiguration('foo:bar', 'test', '30 1 * * *');
+        $config = new RecurringConsoleCommandConfiguration('foo:bar', 'test', '30 1 * * *', 'a short description');
         $this->assertEquals($config->getCommand(), 'foo:bar');
         $this->assertEquals($config->getTopic(), 'test');
         $this->assertEquals($config->getSchedule(), '30 1 * * *');
+        $this->assertEquals($config->getDescription(), 'a short description');
     }
 
     public function tearDown()

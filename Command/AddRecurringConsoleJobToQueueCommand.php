@@ -8,7 +8,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * This command reads the recurring job configuration
- * and adds any reurring commands to the specified job queue
+ * and adds any recurring commands to the specified job queue
  *
  * This command should be run every minute via crontab
  */
@@ -25,9 +25,12 @@ class AddRecurringConsoleJobToQueueCommand extends ContainerAwareCommand
             ->setDescription('Adds any configured recurring jobs, which are due NOW, to the specified job queue');
     }
 
+    /**
+     * {@inheritdoc}
+     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $recurringConsoleCommandReader = $this->getContainer()->get('markup_admin_job_queue_recurring_console_command_reader');
+        $recurringConsoleCommandReader = $this->getContainer()->get('markup_job_queue.reader.recurring_console_command');
 
         $due = $recurringConsoleCommandReader->getDue();
 
@@ -38,11 +41,17 @@ class AddRecurringConsoleJobToQueueCommand extends ContainerAwareCommand
                 $configuration->getTimeout(),
                 $configuration->getTimeout()
             );
-            $message = sprintf('Added command `%s` with the topic `%s`', $configuration->getCommand(), $configuration->getTopic());
+            $message = sprintf(
+                'Added command `%s` with the topic `%s`',
+                $configuration->getCommand(),
+                $configuration->getTopic()
+            );
             if ($configuration->nextRun()) {
                 $message = sprintf('%s. Will next be added %s', $message, $configuration->nextRun()->format('r'));
             }
             $output->writeLn(sprintf('<info>%s</info>', $message));
         }
+
+        $this->getContainer()->get('markup_job_queue.repository.cron_health')->set();
     }
 }

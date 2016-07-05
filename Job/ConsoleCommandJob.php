@@ -10,20 +10,28 @@ use Symfony\Component\Finder\Finder;
 use Symfony\Component\Process\Process;
 
 /**
- * This job runs a console command
+ * This job runs a console command. Note this runs inside a 'Process' isolating errors that happen during the command.
+ * this means all exceptions are caught and the message can be rejected using ConsumerInterface::MSG_REJECT
  */
 class ConsoleCommandJob extends Job
 {
+    /**
+     * {inheritdoc}
+     */
     public function run(ContainerInterface $container)
     {
         ini_set('max_execution_time', 7200);
         $command = $this->args['command'];
-
-        // get the absolute path of the console and the environment
-        $command = sprintf('%s %s --env=%s', $this->getConsolePath($container->get('kernel')->getRootdir()), $command, $container->get('kernel')->getEnvironment());
+        $uuid = isset($this->args['uuid']) ? $this->args['uuid']: null;
+        if($uuid) {
+            $command = sprintf('%s --uuid=%s', $command, $uuid);
+        }
         if ($container->get('kernel')->isDebug() !== true) {
             $command = sprintf('%s --no-debug', $command);
         }
+
+        // get the absolute path of the console and the environment
+        $command = sprintf('%s %s --env=%s', $this->getConsolePath($container->get('kernel')->getRootdir()), $command, $container->get('kernel')->getEnvironment());
 
         $process = new Process($command);
         if (!isset($this->args['timeout'])) {
@@ -40,13 +48,19 @@ class ConsoleCommandJob extends Job
 
             if (!$process->isSuccessful()) {
                 $message = sprintf('A job `%s` failed with topic `%s` with output:%s and the error output: %s', $command, $this->topic, $process->getOutput(), $process->getErrorOutput());
-                throw new JobFailedException($message);
+                throw new JobFailedException($message, $process->getExitCode());
             }
+            return $process->getOutput();
+        } catch (JobFailedException $e) {
+            throw $e;
         } catch (\Exception $e) {
-            throw new JobFailedException($e->getMessage());
+            throw new JobFailedException($e->getMessage(), 'lol');
         }
     }
 
+    /**
+     * {inheritdoc}
+     */
     public function validate()
     {
         if (!isset($this->args['command'])) {
@@ -54,6 +68,18 @@ class ConsoleCommandJob extends Job
         }
     }
 
+    /**
+     * @return string
+     */
+    public function getCommand()
+    {
+        return $this->getArgs()['command'];
+    }
+
+    /**
+     * @param  string $kernelDir
+     * @return string
+     */
     private function getConsolePath($kernelDir)
     {
         $finder = new Finder();

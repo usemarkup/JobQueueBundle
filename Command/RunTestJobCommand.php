@@ -13,10 +13,10 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * This command can add a variety of test jobs
+ * This command can immediately runs a variety of test jobs
  * Exists for testing and development purposes of the job queue
  */
-class AddTestJobCommand extends ContainerAwareCommand
+class RunTestJobCommand extends ContainerAwareCommand
 {
 
     const TYPE_SLEEP = 'sleep';
@@ -31,18 +31,12 @@ class AddTestJobCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setName('markup:job_queue:add:test')
+            ->setName('markup:job_queue:run:test')
             ->setDescription('Adds a single job to allow testing of the job queue')
             ->addArgument(
                 'type',
                 InputArgument::REQUIRED,
                 'The type of job to add. Should be one of `sleep`, `bad` (fatal error), `error` (monolog error), `work` (cryptography) or `exception` (uncaught exception)'
-            )
-            ->addArgument(
-                'quantity',
-                InputArgument::OPTIONAL,
-                'The number of times to add the job',
-                1
             )
             ->addArgument(
                 'topic',
@@ -59,7 +53,7 @@ class AddTestJobCommand extends ContainerAwareCommand
 
         switch ($type) {
             case self::TYPE_SLEEP:
-                $job = new SleepJob(['time' => 10], $topic);
+                $job = new SleepJob(['time' => 3], $topic);
                 break;
             case self::TYPE_BAD:
                 $job = new BadJob([], $topic);
@@ -78,10 +72,7 @@ class AddTestJobCommand extends ContainerAwareCommand
                 break;
         }
 
-        $quantity = $input->getArgument('quantity');
-        for ($i = 0; $i < $quantity; $i++) {
-            $this->getContainer()->get('jobby')->addJob($job);
-        }
-        $output->writeln(sprintf('<info>Added %s job * %s</info>', $type, $quantity));
+        $job->validate();
+        $job->run($this->getContainer());
     }
 }

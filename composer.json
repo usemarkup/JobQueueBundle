@@ -24,14 +24,16 @@
         "php": ">=5.4.0",
         "mtdowling/cron-expression": "1.0.*",
         "doctrine/collections": "~1.2",
-        "php-amqplib/rabbitmq-bundle": "~1.8"
+        "php-amqplib/rabbitmq-bundle": "~1.8",
+        "markup/rabbitmq-management-api": "dev-master",
+        "snc/redis-bundle": "~1.1.2"
     },
     "require-dev": {
         "phpunit/phpunit": "~4.5",
         "mockery/mockery": "~0.9"
     },
     "suggests": {
-        "symfony/console": "To use add Jobs via the CLI"
+        "ricbra/rabbitmq-cli-consumer": "To consume jobs with Go instead of PHP"
     },
     "autoload": {
         "psr-0": { "Markup\\JobQueueBundle": "" }
@@ -44,5 +46,23 @@
     },
     "config": {
         "bin-dir": "bin"
+    },
+    "repositories": {
+        "ricbra/rabbitmq-cli-consumer": {
+            "type": "package",
+            "package": {
+                "name": "ricbra/rabbitmq-cli-consumer",
+                "version": "1.4.2",
+                "source": {
+                    "url": "https://github.com/ricbra/rabbitmq-cli-consumer.git",
+                    "type": "git",
+                    "reference": "master/1.4.2"
+                }
+            }
+        },
+        "markup/rabbitmq-management-api":  {
+            "type": "vcs",
+            "url": "https://github.com/usemarkup/php-rabbitmq-management-api"
+        }
     }
 }

@@ -19,13 +19,23 @@ use Symfony\Component\Yaml\Parser;
 class RecurringConsoleCommandReader
 {
     /**
-     * The path and filename of the configuration file - relative to the application kernel
      * @var string
      */
     private $kernelPath;
+
+    /**
+     * @var string
+     */
     private $configurationFileName;
+
+    /**
+     * @var ArrayCollection
+     */
     private $configurations;
 
+    /**
+     * @param $kernelPath string
+     */
     public function __construct(
         $kernelPath
     ) {
@@ -61,6 +71,19 @@ class RecurringConsoleCommandReader
     }
 
     /**
+     * @param $uuid
+     */
+    public function getConfigurationById($id)
+    {
+        foreach($this->getConfigurations() as $configuration) {
+            if ($configuration->getUuid() === $id) {
+                return $configuration;
+            }
+        }
+        return null;
+    }
+
+    /**
      * Gets any configurations which are due NOW and returns a collection of them
      * @return ArrayCollection<RecurringConsoleCommandConfiguration>
      */
@@ -91,11 +114,11 @@ class RecurringConsoleCommandReader
                 throw new InvalidConfigurationException('Every job schedule should have a `command`, `topic` and `schedule` component'.json_encode($config));
             }
 
-            //@todo validate that the 'schedule' component is correct?
             $recurringConsoleCommandConfiguration = new RecurringConsoleCommandConfiguration(
                 $group['command'],
                 $group['topic'],
                 $group['schedule'],
+                isset($group['description']) ? $group['description'] : null,
                 isset($group['timeout']) ? $group['timeout'] : null
             );
 
@@ -130,7 +153,7 @@ class RecurringConsoleCommandReader
         try {
             $config = $yamlParser->parse($contents);
         } catch (ParseException $e) {
-            throw new InvalidConfigurationException(sprintf('The job configuration file "%s" cannot be parsed.', $file->getRealPath()));
+            throw new InvalidConfigurationException(sprintf('The job configuration file "%s" cannot be parsed: %s', $file->getRealPath(), $e->getMessage()));
         }
 
         return $config;

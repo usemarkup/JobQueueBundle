@@ -21,7 +21,7 @@
         "symfony/console": "~2.3",
         "symfony/process": "~2.3",
         "twig/twig": ">=1.12",
-        "php": ">=5.4.0",
+        "php": ">=5.5.0",
         "mtdowling/cron-expression": "1.0.*",
         "doctrine/collections": "~1.2",
         "php-amqplib/rabbitmq-bundle": "~1.8"

@@ -128,7 +128,7 @@ class SupervisordConfigFileWriter
             );
         }
 
-        $kernelPath = realpath($this->kernelPath);
+        $kernelPath = $skipExistsChecks ? $this->kernelPath : realpath($this->kernelPath);
 
         // write a configuration entry for each queue
         $programNames = [];
@@ -177,10 +177,10 @@ class SupervisordConfigFileWriter
      * @param $uniqueEnvironment
      * @return string
      */
-    public function getConfigForPhpConsumer($uniqueEnvironment)
+    public function getConfigForPhpConsumer($uniqueEnvironment, $skipExistsChecks = false)
     {
-        $kernelPath = realpath($this->kernelPath);
-        $absoluteReleasePath = realpath($kernelPath.'/..');
+        $kernelPath = $skipExistsChecks ? $this->kernelPath : realpath($this->kernelPath);
+        $absoluteReleasePath = $skipExistsChecks ? $kernelPath.'/..' : realpath($kernelPath.'/..');
 
         // write a configuration entry for each queue
         $programNames = [];

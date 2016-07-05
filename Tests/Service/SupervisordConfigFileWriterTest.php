@@ -35,7 +35,7 @@ class SupervisordConfigFileWriterTest extends \PHPUnit_Framework_TestCase
     {
         $fixture = file_get_contents(__DIR__ . '/fixtures/supervisord_config_php.conf');
         $fixture = rtrim($fixture);
-        $config = $this->writer->getConfigForPhpConsumer('testenv');
+        $config = $this->writer->getConfigForPhpConsumer('testenv', $skipCheck = true);
 
         $this->assertEquals($fixture, $config);
     }

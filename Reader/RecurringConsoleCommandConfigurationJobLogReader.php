@@ -46,8 +46,7 @@ class RecurringConsoleCommandConfigurationJobLogReader
     {
         $collection = [];
         $configurations = $this->recurringConsoleCommandReader->getConfigurations();
-        foreach($configurations as $configuration)
-        {
+        foreach ($configurations as $configuration) {
             $searchData = new SearchJobLogs();
             $searchData->setCommand($configuration->getCommand());
             $jobLogs = $this->jobLogRepository->getJobLogs($searchData, $maxQuantity);

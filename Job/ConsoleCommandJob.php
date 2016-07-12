@@ -54,7 +54,7 @@ class ConsoleCommandJob extends Job
         } catch (JobFailedException $e) {
             throw $e;
         } catch (\Exception $e) {
-            throw new JobFailedException($e->getMessage(), 'lol');
+            throw new JobFailedException($e->getMessage());
         }
     }
 

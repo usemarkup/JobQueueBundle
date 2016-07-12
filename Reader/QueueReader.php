@@ -42,7 +42,7 @@ class QueueReader
     public function getQueues()
     {
         $collection = new ArrayCollection();
-        try{
+        try {
             $apiResponse = $this->api->queues()->all($this->vhost);
             foreach($apiResponse as $q) {
                 $collection->add(Queue::constructFromApiResponse($q));
@@ -60,7 +60,7 @@ class QueueReader
      */
     public function isAlive()
     {
-        try{
+        try {
             $this->api->alivenessTest('test');
             return true;
         } catch(\Exception $e) {

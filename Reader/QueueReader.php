@@ -48,7 +48,6 @@ class QueueReader
                 $collection->add(Queue::constructFromApiResponse($q));
             }
         } catch(\Exception $e) {
-            throw $e;
             return $collection;
         }
         return $collection;

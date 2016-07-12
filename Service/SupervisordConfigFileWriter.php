@@ -2,19 +2,29 @@
 
 namespace Markup\JobQueueBundle\Service;
 
-use Psr\Log\LoggerInterface;
+use Symfony\Component\Filesystem\Exception\IOException;
+use Symfony\Component\Filesystem\Filesystem;
 
 class SupervisordConfigFileWriter
 {
+
+    /**
+     * Symfony command that receives message from RabbitMQ and processes it (cli consumer)
+     */
+    const CLI_CONSUMPTION_COMMAND = 'markup:job_queue:consumer';
+
+    /**
+     * Symfony command that receives message from RabbitMQ and processes it (php consumer)
+     */
+    const PHP_CONSUMPTION_COMMAND = 'rabbitmq:consumer';
+
+    const MODE_PHP = 'php';
+    const MODE_CLI = 'cli';
+
     /**
      * @var string
      */
     private $supervisordConfigPath;
-
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
 
     /**
      * @var string
@@ -34,31 +44,42 @@ class SupervisordConfigFileWriter
     /**
      * @var string
      */
-    private $consumerCommandName;
+    private $consumerPath;
 
     /**
      * SupervisordConfigFileWriter constructor.
      *
-     * @param LoggerInterface $logger
-     * @param                 $kernelPath
-     * @param                 $kernelEnv
+     * @param $kernelPath
+     * @param $kernelEnv
+     * @param $supervisordConfigPath
+     * @param $consumerPath
+     * @param $configFilePath
      */
     public function __construct(
-        LoggerInterface $logger,
         $kernelPath,
-        $kernelEnv
+        $kernelEnv,
+        $supervisordConfigPath,
+        $consumerPath,
+        $configFilePath
     ) {
-        $this->logger = $logger;
         $this->kernelPath = $kernelPath;
         $this->kernelEnv = $kernelEnv;
+        $this->supervisordConfigPath = $supervisordConfigPath;
+        $this->consumerPath = $consumerPath;
+        $this->configFilePath = $configFilePath;
+        $this->mode = self::MODE_PHP;
     }
 
     /**
-     * Sets the path to write the configuration file to
+     * @param string $mode a valid mode constant
+     * @throws \Exception if an ainvalid mode supplied
      */
-    public function setSupervisordConfigPath($supervisordConfigPath)
+    public function setMode($mode)
     {
-        $this->supervisordConfigPath = $supervisordConfigPath;
+        if (!in_array($mode, [self::MODE_PHP, self::MODE_CLI])) {
+            throw new \Exception(sprintf('Mode `%s` is invalid'));
+        }
+        $this->mode = $mode;
     }
 
     /**
@@ -70,67 +91,126 @@ class SupervisordConfigFileWriter
     }
 
     /**
-     * @param $consumerCommandName
-     */
-    public function setConsumerCommandName($consumerCommandName)
-    {
-        $this->consumerCommandName = $consumerCommandName;
-    }
-
-    /**
-     * Writes the supervisord config file
+     * Writes the supervisord config file, the format of the file output depends on the mode
      */
     public function writeConfig($uniqueEnvironment)
     {
-        if (!$this->supervisordConfigPath) {
-            throw new \Exception(
-                sprintf('You must configure the supervisord config writer before writing a configuration file')
+        $fs = new Filesystem();
+        if (!$fs->exists($this->supervisordConfigPath)) {
+            throw new IOException(
+                sprintf("%s does not exist, please create this folder", $this->supervisordConfigPath)
             );
         }
 
-        $supervisordConfigPath = $this->supervisordConfigPath;
-        $kernelPath = realpath($this->kernelPath);
-        $absoluteReleasePath = realpath($kernelPath.'/..');
+        $supervisordConfigFilePath = sprintf('%s/%s_programs.conf', $this->supervisordConfigPath, $uniqueEnvironment);
 
-        $supervisordConfigFilePath = sprintf('%s/%s_programs.conf', $supervisordConfigPath, $uniqueEnvironment);
+        if ($this->mode === self::MODE_CLI) {
+            $conf = $this->getConfigForCliConsumer($uniqueEnvironment);
+        } else {
+            $conf = $this->getConfigForPhpConsumer($uniqueEnvironment);
+        }
+
+        file_put_contents($supervisordConfigFilePath, $conf);
+    }
+
+    /**
+     * @param $uniqueEnvironment string environment disambiguator
+     * @param bool $skipExistsChecks If set skips FS checks for binary and config file
+     * @return string
+     */
+    public function getConfigForCliConsumer($uniqueEnvironment, $skipExistsChecks = false)
+    {
+        // make sure consumer binary exists
+        $fs = new Filesystem();
+        if (!$skipExistsChecks && !$fs->exists($this->consumerPath)) {
+            throw new IOException(
+                sprintf("%s does not exist, please ensure the consumer binary is installed", $this->consumerPath)
+            );
+        }
+
+        $kernelPath = $skipExistsChecks ? $this->kernelPath : realpath($this->kernelPath);
 
         // write a configuration entry for each queue
         $programNames = [];
-        file_put_contents($supervisordConfigFilePath, '');
-        foreach ($this->topics as $topic => $topicConfig) {
+        $conf = [];
 
+        foreach ($this->topics as $topic => $topicConfig) {
+            $programName = sprintf("markup_job_queue_%s_%s", $uniqueEnvironment, $topic);
+            $programNames[] = $programName;
+
+            $cliConfigFile = sprintf(
+                '%s/%s_%s_consumer.conf',
+                $this->configFilePath,
+                $uniqueEnvironment,
+                $topic
+            );
+
+            if (!$skipExistsChecks && !$fs->exists($cliConfigFile)) {
+                throw new IOException(sprintf("%s does not exist, ensure consumer config file has been written before writing supervisor config", $cliConfigFile));
+            }
+
+            $consumer = sprintf(
+                '%s -e "%s/console %s --strict-exit-code --env=%s" -c %s -V -i --strict-exit-code',
+                $this->consumerPath,
+                $kernelPath,
+                self::CLI_CONSUMPTION_COMMAND,
+                $this->kernelEnv,
+                $cliConfigFile
+            );
+
+            $conf[] = "\n";
+            $conf[] = sprintf("[program:%s]", $programName);
+            $conf[] = sprintf("command=%s", $consumer);
+            $conf[] = sprintf("stderr_logfile=%s/logs/supervisord.error.log", $kernelPath);
+            $conf[] = sprintf("stdout_logfile=%s/logs/supervisord.out.log", $kernelPath);
+            $conf[] = "autostart=false";
+            $conf[] = "autorestart=true";
+            $conf[] = "stopsignal=QUIT";
+        }
+        $conf[] = "\n";
+        $conf[] = sprintf("[group:markup_%s]\nprograms=%s", $uniqueEnvironment, implode(',', $programNames));
+
+        return implode("\n", $conf);
+    }
+
+    /**
+     * @param $uniqueEnvironment
+     * @return string
+     */
+    public function getConfigForPhpConsumer($uniqueEnvironment, $skipExistsChecks = false)
+    {
+        $kernelPath = $skipExistsChecks ? $this->kernelPath : realpath($this->kernelPath);
+        $absoluteReleasePath = $skipExistsChecks ? $kernelPath.'/..' : realpath($kernelPath.'/..');
+
+        // write a configuration entry for each queue
+        $programNames = [];
+        $conf = [];
+
+        foreach ($this->topics as $topic => $topicConfig) {
             //number of jobs to run before restarting...
             $programName = sprintf("markup_job_queue_%s_%s", $uniqueEnvironment, $topic);
             $programNames[] = $programName;
             $consumerCommand = sprintf(
                 '%s/console %s -m %s %s -e=%s --no-debug',
                 $this->kernelPath,
-                $this->consumerCommandName,
-                $topicConfig['consumption_quantity'],
+                self::PHP_CONSUMPTION_COMMAND,
+                $topicConfig['prefetch_count'],
                 $topic,
                 $this->kernelEnv
             );
-            $conf = [];
             $conf[] = "\n";
             $conf[] = sprintf("[program:%s]", $programName);
             $conf[] = sprintf("command=%s", $consumerCommand);
-            //$conf[] = sprintf("user=%s", $supervisorUser);
             $conf[] = sprintf("directory=%s", $absoluteReleasePath);
             $conf[] = sprintf("stderr_logfile=%s/logs/supervisord.error.log", $kernelPath);
             $conf[] = sprintf("stdout_logfile=%s/logs/supervisord.out.log", $kernelPath);
             $conf[] = "autostart=false";
             $conf[] = "autorestart=true";
             $conf[] = "stopsignal=QUIT";
-            $conf[] = "\n";
-            file_put_contents($supervisordConfigFilePath, implode("\n", $conf), FILE_APPEND);
         }
+        $conf[] = "\n";
+        $conf[] = sprintf("[group:markup_%s]\nprograms=%s", $uniqueEnvironment, implode(',', $programNames));
 
-        // append 'group' of these consumers
-        file_put_contents($supervisordConfigFilePath, "\n", FILE_APPEND);
-        file_put_contents(
-            $supervisordConfigFilePath,
-            sprintf("[group:markup_%s]\nprograms=%s", $uniqueEnvironment, implode(',', $programNames)),
-            FILE_APPEND
-        );
+        return implode("\n", $conf);
     }
 }

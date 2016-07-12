@@ -6,7 +6,7 @@ use Cron;
 
 /**
  * A configuration object that indicates a console command
- * and the cron systax for when it should be run
+ * and the cron syntax for when it should be run
  */
 class RecurringConsoleCommandConfiguration
 {
@@ -31,17 +31,34 @@ class RecurringConsoleCommandConfiguration
     private $timeout;
 
     /**
+     * @var string
+     */
+    private $description;
+
+    /**
      * @param string  $command
      * @param string  $topic
      * @param string  $schedule
+     * @param string  $description
      * @param integer $timeout
      */
-    public function __construct($command, $topic, $schedule, $timeout = 60)
+    public function __construct($command, $topic, $schedule, $description = null, $timeout = 60)
     {
         $this->command = $command;
         $this->schedule = $schedule;
-        $this->topic = $topic;
+        $this->topic = str_replace('-', '_', $topic);
         $this->timeout = $timeout;
+        $this->description = $description;
+    }
+
+    /**
+     * Returns a hash which can be used to uniquely identify this configuration
+     *
+     * @return string
+     */
+    public function getUuid()
+    {
+        return hash('SHA1', serialize($this));
     }
 
     /**
@@ -97,12 +114,74 @@ class RecurringConsoleCommandConfiguration
     }
 
     /**
+     * This method will return the 'current' minute if the job is 'due' currently
+     *
      * @return \DateTime
      */
     public function previousRun($time = 'now')
     {
         $cron = Cron\CronExpression::factory($this->getSchedule());
 
+        if ($cron->isDue($time)) {
+            $now = new \DateTime();
+            $now->setTime($now->format('H'), $now->format('i'));
+            return $now;
+        }
         return $cron->getPreviousRunDate($time);
+    }
+
+    /**
+     * The number of seconds between now (or time passed) and the next time the command will be run
+     *
+     * @param mixed $time
+     * @return integer
+     */
+    public function secondsUntilNextRun($time = 'now')
+    {
+        $due = $this->nextRun($time);
+        if (!$time instanceof \DateTime) {
+            $time = new \DateTime($time);
+        }
+        $diff = $due->getTimestamp() - $time->getTimestamp();
+
+        return $diff;
+    }
+
+    /**
+     * The number of seconds between now (or time passed) and the next time the command will be run
+     *
+     * @param mixed $time
+     * @return integer
+     */
+    public function secondsSincePreviousRun($time = 'now')
+    {
+        $previous = $this->previousRun($time);
+        if (!$time instanceof \DateTime) {
+            $time = new \DateTime($time);
+        }
+
+        return $time->getTimestamp() - $previous->getTimestamp();
+    }
+
+    /**
+     * The number of seconds (interval) between last run and next run
+     *
+     * @param mixed $time
+     * @return int
+     */
+    public function secondsBetweenPreviousAndNextRun($time = 'now')
+    {
+        $previous = $this->previousRun($time);
+        $due = $this->nextRun($time);
+
+        return $due->getTimestamp() - $previous->getTimestamp();
+    }
+
+    /**
+     * @return string
+     */
+    public function getDescription()
+    {
+        return $this->description;
     }
 }

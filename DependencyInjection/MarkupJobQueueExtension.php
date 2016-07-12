@@ -3,8 +3,10 @@
 namespace Markup\JobQueueBundle\DependencyInjection;
 
 use Markup\JobQueueBundle\Exception\InvalidConfigurationException;
+use Markup\JobQueueBundle\Service\SupervisordConfigFileWriter;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
@@ -15,6 +17,7 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
  */
 class MarkupJobQueueExtension extends Extension
 {
+
     /**
      * {@inheritDoc}
      */
@@ -28,6 +31,8 @@ class MarkupJobQueueExtension extends Extension
 
         $this->registerRecurringConfigurationFile($config, $container);
         $this->addSupervisordConfig($config, $container);
+        $this->addCliConsumerConfig($config, $container);
+        $this->configureRabbitMqApiClient($config, $container);
     }
 
     /**
@@ -38,7 +43,7 @@ class MarkupJobQueueExtension extends Extension
     private function registerRecurringConfigurationFile(array $config, ContainerBuilder $container)
     {
         if ($config['recurring'] !== false) {
-            $recurringConsoleCommandReader = $container->getDefinition('markup_admin_job_queue_recurring_console_command_reader');
+            $recurringConsoleCommandReader = $container->getDefinition('markup_job_queue.reader.recurring_console_command');
             $recurringConsoleCommandReader->addMethodCall('setConfigurationFileName', [$config['recurring']]);
         }
     }
@@ -55,10 +60,66 @@ class MarkupJobQueueExtension extends Extension
     {
         $configFileWriter = $container->getDefinition('markup_job_queue.writer.supervisord_config_file');
         if (!$config['topics']) {
-            throw new InvalidConfigurationException('markup_top_queue requirea that at least 1 `topic` is configured');
+            throw new InvalidConfigurationException('markup_job_queue requires that at least 1 `topic` is configured');
         }
-        $configFileWriter->addMethodCall('setSupervisordConfigPath', [$config['supervisor_config_path']]);
+        $configFileWriter->replaceArgument(2, $config['supervisor_config_path']);
+        $configFileWriter->replaceArgument(3, $config['cli_consumer']['consumer_path']);
+        $configFileWriter->replaceArgument(4, $config['cli_consumer']['config_path']);
         $configFileWriter->addMethodCall('setTopicsConfiguration', [$config['topics']]);
-        $configFileWriter->addMethodCall('setConsumerCommandName', [$config['consumer_command_name']]);
+
+        if ($config['cli_consumer']['enabled'] === true) {
+            $configFileWriter->addMethodCall('setMode', [SupervisordConfigFileWriter::MODE_CLI]);
+        }
+    }
+
+    /**
+     * @param array $config
+     * @param ContainerBuilder $container
+     *
+     * @throws InvalidConfigurationException
+     */
+    private function addCliConsumerConfig(array $config, ContainerBuilder $container)
+    {
+        $configFileWriter = $container->getDefinition('markup_job_queue.writer.cli_consumer_config_file');
+        if (!$config['topics']) {
+            throw new InvalidConfigurationException('markup_job_queue requires that at least 1 `topic` is configured');
+        }
+
+        $cliConsumerConfig = $config['cli_consumer'];
+        $rabbitConfig = $config['rabbitmq'];
+
+        $configFileWriter->setArguments([
+            $cliConsumerConfig['log_path'],
+            $cliConsumerConfig['config_path'],
+            $rabbitConfig['host'],
+            $rabbitConfig['username'],
+            $rabbitConfig['password'],
+            $rabbitConfig['vhost'],
+            $rabbitConfig['port'],
+        ]);
+        $configFileWriter->addMethodCall('setTopicsConfiguration', [$config['topics']]);
+    }
+
+    /**
+     * Configures the RabbitMQ Api client to allow api connection
+     *
+     * @param array $config
+     * @param ContainerBuilder $container
+     */
+    private function configureRabbitMqApiClient(array $config, ContainerBuilder $container)
+    {
+        $rabbitMqClient = $container->getDefinition('markup_job_queue.rabbit_mq_api.client');
+        $rabbitConfig = $config['rabbitmq'];
+
+        $baseUrl = sprintf('http://%s:15672', $rabbitConfig['host']);
+        $rabbitMqClient->setArguments([
+            $baseUrl,
+            $rabbitConfig['username'],
+            $rabbitConfig['password'],
+        ]);
+
+        $queueReader = $container->getDefinition('markup_job_queue.reader.queue');
+
+        $queueReader->replaceArgument(1, $rabbitConfig['vhost']);
     }
 }

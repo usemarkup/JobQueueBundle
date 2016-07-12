@@ -16,30 +16,32 @@ abstract class Job
      */
     public $args = [];
 
+    /**
+     * @param array  $args
+     * @param string $topic
+     */
     final public function __construct(
         array $args = array(),
         $topic = 'default'
     ) {
         $this->args = $args;
-        $this->topic = $topic;
-    }
-
-    public function getTopic()
-    {
-        return $this->topic;
-    }
-
-    public function getArgs()
-    {
-        return $this->args;
+        $this->topic = str_replace('-', '_', $topic);
     }
 
     /**
      * @return string
      */
-    public function getCommand()
+    public function getTopic()
     {
-        return $this->args['command'];
+        return $this->topic;
+    }
+
+    /**
+     * @return array
+     */
+    public function getArgs()
+    {
+        return $this->args;
     }
 
     /**
@@ -48,7 +50,7 @@ abstract class Job
     abstract public function run(ContainerInterface $container);
 
     /**
-     * @return To be run after job constructed to check arguments are correct
+     * To be run after job constructed to check arguments are correct
      */
     public function validate()
     {

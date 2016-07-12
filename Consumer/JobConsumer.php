@@ -2,7 +2,9 @@
 
 namespace Markup\JobQueueBundle\Consumer;
 
+use Markup\JobQueueBundle\Exception\JobFailedException;
 use Markup\JobQueueBundle\Exception\JobMissingClassException;
+use Markup\JobQueueBundle\Job\ConsoleCommandJob;
 use Markup\JobQueueBundle\Model\Job;
 use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
 use PhpAmqpLib\Message\AMQPMessage;
@@ -10,6 +12,9 @@ use Symfony\Component\DependencyInjection\ContainerAware;
 
 class JobConsumer extends ContainerAware implements ConsumerInterface
 {
+    /**
+     * {@inheritdoc}
+     */
     public function execute(AMQPMessage $message)
     {
         try {
@@ -25,12 +30,37 @@ class JobConsumer extends ContainerAware implements ConsumerInterface
                 throw new \LogicException('This consumer can only consume instances of Markup\JobQueueBundle\Model\Job but job of following type was given: '.get_class($job));
             }
             $job->validate();
-            $job->run($this->container);
+            $output = $job->run($this->container);
+
+            if (isset($data['uuid'])) {
+                $this->container->get('markup_job_queue.repository.job_log')->saveOutput(
+                    $data['uuid'],
+                    $output
+                );
+            }
+
         } catch (\Exception $e) {
             $command = '';
 
-            if ((isset($job)) && ($job instanceof Job)) {
-                $command = $job->getCommand();
+            if ((isset($job))) {
+                $command = get_class($job);
+                if ($job instanceof ConsoleCommandJob) {
+                    $command = $job->getCommand();
+                }
+            }
+
+            $exitCode = null;
+            $output = $e->getMessage();
+            if ($e instanceof JobFailedException) {
+                $exitCode = $e->getExitCode();
+            }
+            // save failure if job had uuid
+            if (isset($data['uuid'])) {
+                $this->container->get('markup_job_queue.repository.job_log')->saveFailure(
+                    $data['uuid'],
+                    $output,
+                    $exitCode
+                );
             }
 
             $this->container->get('logger')->error(sprintf('Job Failed: %s', $command), [
@@ -38,7 +68,7 @@ class JobConsumer extends ContainerAware implements ConsumerInterface
                 'message' => $e->getMessage(),
                 'line' => $e->getLine(),
                 'file' => $e->getFile(),
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
 
             return ConsumerInterface::MSG_REJECT;

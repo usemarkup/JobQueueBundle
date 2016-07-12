@@ -8,6 +8,9 @@ use Markup\JobQueueBundle\Model\ScheduledJobRepositoryInterface;
 
 class ScheduledJobRepository extends EntityRepository implements ScheduledJobRepositoryInterface
 {
+    /**
+     * @return array|null
+     */
     public function fetchUnqueuedJobs()
     {
         $qb = $this->createQueryBuilder('job');
@@ -24,6 +27,10 @@ class ScheduledJobRepository extends EntityRepository implements ScheduledJobRep
         return null;
     }
 
+    /**
+     * @param ScheduledJob $scheduledJob
+     * @param bool $flush
+     */
     public function save(ScheduledJob $scheduledJob, $flush = false)
     {
         $this->_em->persist($scheduledJob);

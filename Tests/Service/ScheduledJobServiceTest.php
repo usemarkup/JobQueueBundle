@@ -8,12 +8,13 @@ use Markup\JobQueueBundle\Job\SleepJob;
 use Markup\JobQueueBundle\Service\JobManager;
 use Markup\JobQueueBundle\Service\ScheduledJobService;
 use Mockery as m;
+use Markup\JobQueueBundle\Model\ScheduledJobRepositoryInterface;
 
 class ScheduledJobServiceTest extends \PHPUnit_Framework_TestCase
 {
     public function setUp()
     {
-        $scheduledJobRepository = m::mock('Doctrine\ORM\EntityRepository');
+        $scheduledJobRepository = m::mock(ScheduledJobRepositoryInterface::class);
         $scheduledJobRepository->shouldReceive('save');
         $this->scheduledJobService = new ScheduledJobService($scheduledJobRepository);
     }

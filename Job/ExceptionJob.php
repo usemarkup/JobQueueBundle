@@ -8,6 +8,9 @@ use Markup\JobQueueBundle\Model\Job;
 
 class ExceptionJob extends Job
 {
+    /**
+     * {@inheritdoc}
+     */
     public function run(ContainerInterface $container)
     {
         throw new JobFailedException('Test job throws an exception');

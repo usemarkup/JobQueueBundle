@@ -5,19 +5,20 @@ namespace Markup\JobQueueBundle\Service;
 use Doctrine\ORM\EntityRepository;
 use Markup\JobQueueBundle\Entity\ScheduledJob;
 use Markup\JobQueueBundle\Model\Job;
+use Markup\JobQueueBundle\Model\ScheduledJobRepositoryInterface;
 
 class ScheduledJobService
 {
     /**
-     * @var \Doctrine\ORM\EntityRepository
+     * @var ScheduledJobRepositoryInterface
      */
     private $scheduledJobRepository;
 
     /**
-     * @param EntityRepository $scheduledJobRepository
+     * @param ScheduledJobRepositoryInterface $scheduledJobRepository
      */
     public function __construct(
-        EntityRepository $scheduledJobRepository
+        ScheduledJobRepositoryInterface $scheduledJobRepository
     ) {
         $this->scheduledJobRepository = $scheduledJobRepository;
     }

@@ -1,13 +1,19 @@
-[![Build Status](https://api.travis-ci.org/usemarkup/JobQueueBundle.png?branch=master)](http://travis-ci.org/usemarkup/JobQueueBundle)
-
-NOTICE: As of version 2.0-dev of this bundle support for php-resque has been dropped in favor of RabbitMQ. There are numerous reasons for this, namely performance and reliability. The last working version of this bundle that worked with resque is tagged at 0.1, however I strongly discourage its use (it may be useful to extract functionality for use in https://github.com/michelsalib/BCCResqueBundle).
-
 Introduction
 ============
 
-This bundle provides a few features for providing a simple job queue mechanic and scheduling system for symfony console commands. It uses rabbit-mq to manage a job queue, (for which various workers process tasks). Before proceeding you should read: https://github.com/videlalvaro/RabbitMqBundle. This bundle assumes the use of 'topic' consumers rather than 'direct' consumers.
+This bundle provides a few features for providing a simple job queue mechanic and scheduling system for symfony console commands.
+It uses rabbit-mq to manage a job queue, (for which various workers process tasks). Before proceeding you should read: https://github.com/videlalvaro/RabbitMqBundle.
+This bundle assumes the use of 'topic' consumers rather than 'direct' consumers.
 
 These workers should be maintained by supervisord to ensure they don't fail. 
+
+Features
+============
+- Add console command jobs to RabbitMq to be handled asyncronously
+- Add jobs to run at a date in the future
+- Log the status of jobs (status, peak memory use, output etc) in redis via uuid option added to all console commands
+- Consume Jobs with a PHP consumer or Golang consumer (thanks to ricbra/rabbitmq-cli-consumer)
+- Helper command for generating config to manage consumers with Supervisord
 
 Scheduling Jobs
 ---------------
@@ -33,13 +39,21 @@ markup_job_queue:
   topic: topic-of-a-configured-rabbitmq-producer
 ```
 
-Once you have configured your recurring schedule you need to add only one console command to your live crontab. This will run a single console command every minute adding any 'due' jobs to RabbitMQ for processing:
+Once you have configured your recurring schedule you need to add only one console command to your live crontab.
+This will run a single console command every minute adding any 'due' jobs to RabbitMQ for processing:
 
 ```vim
 * * * * * /usr/bin/php /your/app/location/current/app/console markup:job_queue:recurring:add --no-debug -e=prod >> /var/log/recurring_jobs.log
 ```
 
-For the value of 'topic' a valid consumer and producer need to be set up in the oldsound/rabbiitmq-bundle configuration as follows, without a configuration of this type, processing of the job will fail (this is currently a convention but would be better enforced by allowing this bundle to configure the oldsound bundle directly - PR's welcome):
+In development instead of installing to the crontab you can run on an interval in the command line if you prefer:
+
+```vim
+while true; do app/console markup:job_queue:recurring:add; sleep 60; done
+```
+
+For the value of 'topic' a valid consumer and producer need to be set up in the oldsound/rabbitmq-bundle configuration as follows, without a configuration of this type, processing of the job will fail (this is currently a convention but would be better enforced by allowing this bundle to configure the oldsound bundle directly - PR's welcome):
+__Due to the way oldsound/rabbitmq-bundle treats certain keys, do not use hypens in producers and consumers.__
 
 ```yml
 
@@ -73,14 +87,20 @@ $container->get('jobby')
 	)
 ```
 
-You can use this mechanism to break down large import tasks into smaller sections that can be processed asynchronously.
+You can use this mechanism to break down large import tasks into smaller sections that can be processed asynchronously. Make sure you appropriately escape any user provided parameters to your console commands. Due to the way that console commands are consumed using the Process component, unescaped parameters are a possible security attack vector.
 
 Enabling and Monitoring Workers (via supervisord)
 ================
 
-To aid with deployment  of this bundle, a console command has been provided which can be run as part of a deployment. This console command will generate a supervisord file for the purpose of including within your main supervisord.conf file. This will produce a configuration that initiates and watches php 'consumers', providing one consumer per topic:
+To aid with deployment of this bundle, a console command has been provided which can be run as part of a deployment. This console command will generate a supervisord file for the purpose of including within your main supervisord.conf file. This will produce a configuration that initiates and watches php 'consumers', providing one consumer per topic. There are two options for consuming jobs. The default mechanism is to use the PHP consumers provided by oldsound/rabbitmq-bundle, but an alternative mechanism uses the Golang based consumer (ricbra/rabbitmq-cli-consumer). To use the Golang variant, provide a configuration for the `cli_consumer` node.
 
-This console command requires a minimal configuration (one block for each consumer you want to start). By convention these must match the consumers you have already defined (as seen above):
+```yml
+markup_job_queue:
+	cli_consumer:
+	    enabled: true
+```
+
+This console command requires a minimal configuration (one block for each consumer you want to start). By convention these must match the consumers you have already defined (as seen above). __Due to the way oldsound/rabbitmq-bundle treats certain keys, do not use hypens in your topic names.__:
 
 ```yml
 markup_job_queue:

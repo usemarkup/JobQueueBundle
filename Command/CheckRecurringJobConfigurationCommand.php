@@ -23,7 +23,7 @@ class CheckRecurringJobConfigurationCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $reader = $this->getContainer()->get('markup_admin_job_queue_recurring_console_command_reader');
+        $reader = $this->getContainer()->get('markup_job_queue.reader.recurring_console_command');
         /**
          * @var RecurringConsoleCommandReader $reader
          */

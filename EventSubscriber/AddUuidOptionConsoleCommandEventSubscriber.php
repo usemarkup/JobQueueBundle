@@ -6,6 +6,7 @@ use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpKernel\Kernel;
 
 /**
  * Adds the `uuid` option to all console commands
@@ -31,17 +32,24 @@ class AddUuidOptionConsoleCommandEventSubscriber implements EventSubscriberInter
      */
     public function onConsoleCommand(ConsoleCommandEvent $event)
     {
-        $inputDefinition = $event->getCommand()->getApplication()->getDefinition();
-
-        $inputDefinition->addOption(
-            new InputOption(
-                'uuid',
-                null,
-                InputOption::VALUE_OPTIONAL,
-                'The uuid of this console command. Should be unique for this console command at this time',
-                null
-            )
+        $inputOption = new InputOption(
+            'uuid',
+            null,
+            InputOption::VALUE_OPTIONAL,
+            'The uuid of this console command. Should be unique for this console command at this time',
+            null
         );
 
+        //symfony 2.8+ has different behaviour available for adding options
+        if (version_compare(Kernel::VERSION, '2.7.0', '>=')) {
+            //for symfony 2.8 up
+            $definition = $event->getCommand()->getDefinition();
+            $input = $event->getInput();
+            $definition->addOption($inputOption);
+            $input->bind($definition);
+        } else {
+            $inputDefinition = $event->getCommand()->getApplication()->getDefinition();
+            $inputDefinition->addOption($inputOption);
+        }
     }
 }

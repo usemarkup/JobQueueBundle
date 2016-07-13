@@ -28,8 +28,17 @@ class JobManagerTest extends \PHPUnit_Framework_TestCase
     public function testDoesNotAcceptBadJobs()
     {
         $badjob = 'console:herp:derp';
-        $this->setExpectedException('PHPUnit_Framework_Error');
-        $this->jobManager->addJob($badjob);
+        $exceptionThrown = false;
+        try {
+            $this->jobManager->addJob($badjob);
+        } catch (\PHPUnit_Framework_Error $e) {
+            $exceptionThrown = true;
+        } catch (\TypeError $e) {
+            $exceptionThrown = true;
+        }
+        if (!$exceptionThrown) {
+            $this->fail();
+        }
     }
 
     public function testCanAddCommandJob()

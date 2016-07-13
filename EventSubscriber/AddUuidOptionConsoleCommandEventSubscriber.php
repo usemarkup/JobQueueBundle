@@ -41,7 +41,7 @@ class AddUuidOptionConsoleCommandEventSubscriber implements EventSubscriberInter
         );
 
         //symfony 2.8+ has different behaviour available for adding options
-        if (version_compare(Kernel::VERSION, '2.7.0', '>=')) {
+        if (version_compare(Kernel::VERSION, '2.8.0', '>=')) {
             //for symfony 2.8 up
             $definition = $event->getCommand()->getDefinition();
             $input = $event->getInput();

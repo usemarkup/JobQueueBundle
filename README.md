@@ -1,3 +1,5 @@
+[![Build Status](https://api.travis-ci.org/usemarkup/JobQueueBundle.svg)](http://travis-ci.org/usemarkup/JobQueueBundle)
+
 Introduction
 ============
 

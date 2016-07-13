@@ -28,12 +28,20 @@ class JobPublisher implements ContainerAwareInterface
     private $jobLogRepository;
 
     /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
      * @param JobLogRepository $jobLogRepository
+     * @param LoggerInterface $logger
      */
     public function __construct(
-        JobLogRepository $jobLogRepository
+        JobLogRepository $jobLogRepository,
+        LoggerInterface $logger
     ) {
         $this->jobLogRepository = $jobLogRepository;
+        $this->logger = $logger;
     }
 
     /**

@@ -3,6 +3,7 @@ services:
         class: Markup\JobQueueBundle\Publisher\JobPublisher
         arguments:
             - '@markup_job_queue.repository.job_log'
+            - '@logger'
         calls:
           - [ setContainer,[ '@service_container' ] ]
     markup_job_queue.consumer:

@@ -257,7 +257,10 @@ class JobLogRepository
             }
         } else {
             $result = new JobLogCollection();
-            $rangeOptions['limit'] = ['offset' => $options->getPageOffset(), 'count' => intval($quantity)];
+            $rangeOptions['limit'] = [
+                'offset' => $options->getPageOffset() == 0 ? 0 : $options->getPageOffset()*intval($quantity),
+                'count' => intval($quantity)
+            ];
             $matchingJobs = null;
 
             if ($options->isIdSearch()) {

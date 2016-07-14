@@ -190,6 +190,19 @@ class JobLog
     }
 
     /**
+     * The duration of the job in seconds
+     *
+     * @return integer
+     */
+    public function getDuration()
+    {
+        if (!$this->getCompleted()) {
+            return 0;
+        }
+        return $this->getCompleted() - $this->getStarted();
+    }
+
+    /**
      * @return string
      */
     public function getStatus()

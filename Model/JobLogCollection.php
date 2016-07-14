@@ -34,4 +34,25 @@ class JobLogCollection extends ArrayCollection
         }
         return round($completed/$total, 2);
     }
+
+    /**
+     * Returns the average duration of completion for the jobs in this collection
+     *
+     * @return int
+     */
+    public function getAverageDuration()
+    {
+        $withDuration = 0;
+        $totalDuration = 0;
+        foreach($this as $log) {
+            if ($log->getDuration()){
+                $withDuration++;
+                $totalDuration = $totalDuration + $log->getDuration();
+            }
+        }
+        if (!$withDuration || !$totalDuration) {
+            return 0;
+        }
+        return (int)floor($totalDuration/$withDuration);
+    }
 }

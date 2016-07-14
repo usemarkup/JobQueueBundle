@@ -59,7 +59,12 @@ class LogConsoleCommandEventSubscriber implements EventSubscriberInterface
         }
 
         // lookup job log repository for log and create one if it doesn't exist
-        $log = $this->jobLogRepository->getJobLog($uuid);
+        try { 
+            $log = $this->jobLogRepository->getJobLog($uuid);
+        } catch (UnknownJobLogException $e) {
+            return; // No job logged with the given uuid
+        }
+        
         if (!$log) {
             $commandString = $input->__toString();
             $log = $this->jobLogRepository->createAndSaveJobLog($commandString, $uuid);

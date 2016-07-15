@@ -7,6 +7,7 @@ use Markup\JobQueueBundle\Exception\InvalidJobArgumentException;
 use Markup\JobQueueBundle\Model\Job;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Process\Exception\RuntimeException;
 use Symfony\Component\Process\Process;
 
 /**
@@ -53,6 +54,15 @@ class ConsoleCommandJob extends Job
             return $process->getOutput();
         } catch (JobFailedException $e) {
             throw $e;
+        }  catch (RuntimeException $e) {
+            // if process has been signalled then use the termSignal as the exit code
+            try {
+                $code = sprintf('SIGNAL %s', $process->getTermSignal());
+            } catch(\Exception $e) {
+                // RuntimeException may have been thrown for some other reason
+                $code = 'UNKNOWN';
+            }
+            throw new JobFailedException($e->getMessage(), $code);
         } catch (\Exception $e) {
             throw new JobFailedException($e->getMessage());
         }

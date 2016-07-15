@@ -199,7 +199,11 @@ class JobLog
         if (!$this->getCompleted()) {
             return 0;
         }
-        return $this->getCompleted() - $this->getStarted();
+        $duration = $this->getCompleted() - $this->getStarted();
+        if ($duration === 0) {
+            $duration = 1;
+        }
+        return $duration;
     }
 
     /**

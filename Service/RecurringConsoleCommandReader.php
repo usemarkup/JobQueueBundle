@@ -101,6 +101,19 @@ class RecurringConsoleCommandReader
     }
 
     /**
+     * Gets an array of the distinct command strings used in recurring job configurations
+     */
+    public function getConfigurationCommands()
+    {
+        $commands = [];
+        foreach($this->getConfigurations() as $configuration) {
+            $key = hash('SHA256', $configuration->getCommand());
+            $commands[$key] = $configuration->getCommand();
+        }
+        return $commands;
+    }
+
+    /**
      * Parses the configuration and returns an array of of configuration objects
      * Configuration is cached after running this function so it should only be run once
      *

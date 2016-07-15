@@ -95,7 +95,7 @@ class SearchJobLogs
     }
 
     /**
-     * @return string
+     * @return \DateTime
      */
     public function getBefore()
     {
@@ -103,14 +103,14 @@ class SearchJobLogs
     }
 
     /**
-     * @param string $before
+     * @param \DateTime $before
      */
     public function setBefore($before)
     {
         $this->before = $before;
     }
     /**
-     * @return string
+     * @return \DateTime
      */
     public function getSince()
     {
@@ -118,7 +118,7 @@ class SearchJobLogs
     }
 
     /**
-     * @param string $since
+     * @param \DateTime $since
      */
     public function setSince($since)
     {

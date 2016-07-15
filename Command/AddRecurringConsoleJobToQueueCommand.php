@@ -9,6 +9,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * This command reads the recurring job configuration
  * and adds any recurring commands to the specified job queue
+ * also performs maintenance on the recurring job log
  *
  * This command should be run every minute via crontab
  */
@@ -29,6 +30,15 @@ class AddRecurringConsoleJobToQueueCommand extends ContainerAwareCommand
      * {@inheritdoc}
      */
     protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        $this->addRecurringJobs($output);
+        $this->maintainJobLogs();
+    }
+
+    /**
+     * @param OutputInterface $output
+     */
+    private function addRecurringJobs(OutputInterface $output)
     {
         $recurringConsoleCommandReader = $this->getContainer()->get('markup_job_queue.reader.recurring_console_command');
 
@@ -53,5 +63,10 @@ class AddRecurringConsoleJobToQueueCommand extends ContainerAwareCommand
         }
 
         $this->getContainer()->get('markup_job_queue.repository.cron_health')->set();
+    }
+
+    private function maintainJobLogs()
+    {
+        $this->getContainer()->get('markup_job_queue.repository.job_log')->removeExpiredJobsFromSecondaryIndexes();
     }
 }

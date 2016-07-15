@@ -44,7 +44,7 @@ class JobPublisherTest extends \PHPUnit_Framework_TestCase
     {
         $this->setExpectedException('Markup\JobQueueBundle\Exception\UndefinedProducerException');
         $job = new BadJob([], 'nonsense');
-        $publisher = new JobPublisher($this->jobLogRepository);
+        $publisher = new JobPublisher($this->jobLogRepository, new NullLogger());
         $publisher->setContainer($this->container);
         $publisher->publish($job);
     }
@@ -52,7 +52,7 @@ class JobPublisherTest extends \PHPUnit_Framework_TestCase
     public function testCanPublish()
     {
         $job = new BadJob([], 'test');
-        $publisher = new JobPublisher($this->jobLogRepository);
+        $publisher = new JobPublisher($this->jobLogRepository, new NullLogger());
         $publisher->setContainer($this->container);
         $this->producer->shouldReceive('publish')->once()->andReturn(null);
         $publisher->publish($job);

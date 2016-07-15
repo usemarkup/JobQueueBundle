@@ -6,6 +6,7 @@ use Markup\JobQueueBundle\Exception\UnknownJobLogException;
 use Markup\JobQueueBundle\Model\JobLog;
 use Markup\JobQueueBundle\Model\JobLogCollection;
 use Markup\JobQueueBundle\Form\Data\SearchJobLogs as SearchJobLogsData;
+use Markup\JobQueueBundle\Service\RecurringConsoleCommandReader;
 use Predis\Client as Predis;
 
 /**
@@ -30,12 +31,21 @@ class JobLogRepository
     private $tempKey;
 
     /**
+     * @var RecurringConsoleCommandReader
+     */
+    private $recurringConsoleCommandReader;
+
+    /**
      * JobLogRepository constructor.
      * @param Predis $predis
+     * @param RecurringConsoleCommandReader $recurringConsoleCommandReader
      */
-    public function __construct(Predis $predis)
-    {
+    public function __construct(
+        Predis $predis,
+        RecurringConsoleCommandReader $recurringConsoleCommandReader
+    ) {
         $this->predis = $predis;
+        $this->recurringConsoleCommandReader = $recurringConsoleCommandReader;
         $this->tempKey = null;
     }
 
@@ -53,8 +63,6 @@ class JobLogRepository
     }
 
     /**
-     * // @todo a cleanup job is required to evict old keys from secondary indexes
-     * // @todo after TTL of 'added' has been surpassed
      *
      * @param JobLog $jobLog
      * @param boolean $false If set to true will add the job to secondary indexes
@@ -71,26 +79,110 @@ class JobLogRepository
         $this->predis->expire($hashKey, self::LOG_TTL);
 
         // update the 'status' index
-        foreach([JobLog::STATUS_ADDED, JobLog::STATUS_RUNNING, JobLog::STATUS_FAILED, JobLog::STATUS_COMPLETE] as $status) {
-            if ($status === $jobLog->getStatus()) {
-                $this->predis->sadd($this->getStatusKey($status), $hashKey);
-            } else {
-                $this->predis->srem($this->getStatusKey($status), $hashKey);
-            }
-        }
+        $this->addJobToStatusIndex($hashKey, $jobLog->getStatus());
 
         if(!$initial) {
             return;
         }
 
         // add to 'added' range index
-        $indexName = $this->getJobAddedKey();
-        $data = [$hashKey => $compressed['added']];
-        $this->predis->zadd($indexName, $data);
+        $this->addJobToTimeAddedIndex($hashKey, $compressed['added']);
 
         // and also to command index which stores every log for a given command
-        $indexName = $this->getCommandKey($jobLog->getCommand());
+        $this->addJobToCommandKeyIndex($hashKey, $jobLog->getCommand());
+    }
+
+    /**
+     * @param $hashKey
+     * @param $added
+     */
+    private function addJobToTimeAddedIndex($hashKey, $added)
+    {
+        $indexName = $this->getJobAddedKey();
+        $data = [$hashKey => $added];
+        $this->predis->zadd($indexName, $data);
+    }
+
+    /**
+     * @param $hashKey
+     */
+    private function removeJobFromTimeAddedIndex($hashKey)
+    {
+        $indexName = $this->getJobAddedKey();
+        $this->predis->zrem($indexName, $hashKey);
+    }
+
+    /**
+     * @param $hashKey
+     * @param $command
+     */
+    private function addJobToCommandKeyIndex($hashKey, $command)
+    {
+        // Only add to the command key index if the command is within the recurring jobs library
+        // it only needs to be looked up for recurring console commands, so no point in creating sets for all other commands
+        if(!in_array($command, $this->recurringConsoleCommandReader->getConfigurationCommands())) {
+            return;
+        }
+        $indexName = $this->getCommandKey($command);
         $this->predis->sadd($indexName, $hashKey);
+    }
+
+    /**
+     * @param $hashKey
+     */
+    private function removeJobFromCommandKeyIndexes($hashKey)
+    {
+        // iterates known commands from recurring job config in order to get list of known commands for which to expire
+        foreach($this->recurringConsoleCommandReader->getConfigurationCommands() as $command) {
+            $indexName = $this->getCommandKey($command);
+            $this->predis->srem($indexName, $hashKey);
+        }
+    }
+
+    /**
+     * Adds the job to one status index and removes it from all others
+     * @param $hashKey
+     * @param $jobStatus
+     */
+    private function addJobToStatusIndex($hashKey, $jobStatus)
+    {
+        foreach([JobLog::STATUS_ADDED, JobLog::STATUS_RUNNING, JobLog::STATUS_FAILED, JobLog::STATUS_COMPLETE] as $status) {
+            if ($status === $jobStatus) {
+                $this->predis->sadd($this->getStatusKey($status), $hashKey);
+            } else {
+                $this->predis->srem($this->getStatusKey($status), $hashKey);
+            }
+        }
+    }
+
+    /**
+     * @param $hashKey
+     */
+    private function removeJobFromStatusIndexes($hashKey)
+    {
+        foreach([JobLog::STATUS_ADDED, JobLog::STATUS_RUNNING, JobLog::STATUS_FAILED, JobLog::STATUS_COMPLETE] as $status) {
+            $this->predis->srem($this->getStatusKey($status), $hashKey);
+        }
+    }
+
+    /**
+     * Removes all jobs older than (self::LOG_TTL - 120 seconds) from all secondary indexes
+     */
+    public function removeExpiredJobsFromSecondaryIndexes()
+    {
+        $interval = new \DateInterval(sprintf('PT%sS', self::LOG_TTL-120));
+        $before = (new \DateTime('now'))->sub($interval)->format('U');
+
+        // get all old jobs
+        $expiredJobs = $this->predis->zrevrangebyscore($this->getJobAddedKey(), $before, '-inf');
+        if (!$expiredJobs) {
+            return;
+        }
+        foreach($expiredJobs as $jobLogKey) {
+            $this->removeJobFromTimeAddedIndex($jobLogKey);
+            $this->removeJobFromCommandKeyIndexes($jobLogKey);
+            $this->removeJobFromStatusIndexes($jobLogKey);
+        }
     }
 
     /**
@@ -247,7 +339,6 @@ class JobLogRepository
         }
 
         if ($countOnly) {
-            $count = 0;
             if ($options->isIdSearch()) {
                 $result = $this->hasJobLog($options->getId()) ? 1 : 0;
             } else if ($options->isDiscriminatorSearch()) {
@@ -257,7 +348,10 @@ class JobLogRepository
             }
         } else {
             $result = new JobLogCollection();
-            $rangeOptions['limit'] = ['offset' => $options->getPageOffset(), 'count' => intval($quantity)];
+            $rangeOptions['limit'] = [
+                'offset' => $options->getPageOffset() == 0 ? 0 : $options->getPageOffset()*intval($quantity),
+                'count' => intval($quantity)
+            ];
             $matchingJobs = null;
 
             if ($options->isIdSearch()) {

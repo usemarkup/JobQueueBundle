@@ -3,6 +3,7 @@
 namespace Markup\JobQueueBundle\EventSubscriber;
 
 use Markup\JobQueueBundle\Exception\MissingJobLogException;
+use Markup\JobQueueBundle\Exception\UnknownJobLogException;
 use Markup\JobQueueBundle\Model\JobLog;
 use Markup\JobQueueBundle\Repository\JobLogRepository;
 use Symfony\Component\Console\ConsoleEvents;
@@ -70,18 +71,20 @@ class CompleteConsoleCommandEventSubscriber implements EventSubscriberInterface
             return;
         }
 
-        // lookup job log repository for log and create one if it doesn't exist
-        $log = $this->jobLogRepository->getJobLog($uuid);
-        if (!$log) {
-            throw new MissingJobLogException(sprintf('No log exists for uuid: `%s`', $uuid));
+        try {
+            // lookup job log and save status
+            $log = $this->jobLogRepository->getJobLog($uuid);
+
+            if($log->getStatus() === JobLog::STATUS_RUNNING) {
+                $log->setStatus(JobLog::STATUS_COMPLETE);
+            }
+            $log->setPeakMemoryUse($this->getPeakMemoryUse());
+            $log->setCompleted((new \DateTime('now'))->format('U'));
+            $this->jobLogRepository->save($log);
+        } catch (UnknownJobLogException $e){
+            // forgive exceptions
         }
 
-        if($log->getStatus() === JobLog::STATUS_RUNNING) {
-            $log->setStatus(JobLog::STATUS_COMPLETE);
-        }
-        $log->setPeakMemoryUse($this->getPeakMemoryUse());
-        $log->setCompleted((new \DateTime('now'))->format('U'));
-        $this->jobLogRepository->save($log);
     }
 
     /**

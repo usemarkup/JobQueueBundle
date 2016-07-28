@@ -62,14 +62,10 @@ class LogConsoleCommandEventSubscriber implements EventSubscriberInterface
         try { 
             $log = $this->jobLogRepository->getJobLog($uuid);
         } catch (UnknownJobLogException $e) {
-            return; // No job logged with the given uuid
-        }
-        
-        if (!$log) {
             $commandString = $input->__toString();
             $log = $this->jobLogRepository->createAndSaveJobLog($commandString, $uuid);
         }
-
+        
         // update job log to change status to running
         $log->setStatus(JobLog::STATUS_RUNNING);
         $log->setStarted((new \DateTime('now'))->format('U'));

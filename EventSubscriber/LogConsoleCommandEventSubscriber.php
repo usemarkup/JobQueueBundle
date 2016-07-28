@@ -59,12 +59,13 @@ class LogConsoleCommandEventSubscriber implements EventSubscriberInterface
         }
 
         // lookup job log repository for log and create one if it doesn't exist
-        $log = $this->jobLogRepository->getJobLog($uuid);
-        if (!$log) {
+        try { 
+            $log = $this->jobLogRepository->getJobLog($uuid);
+        } catch (UnknownJobLogException $e) {
             $commandString = $input->__toString();
             $log = $this->jobLogRepository->createAndSaveJobLog($commandString, $uuid);
         }
-
+        
         // update job log to change status to running
         $log->setStatus(JobLog::STATUS_RUNNING);
         $log->setStarted((new \DateTime('now'))->format('U'));

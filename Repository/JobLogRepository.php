@@ -194,16 +194,21 @@ class JobLogRepository
      */
     public function saveFailure($uuid, $output = '', $exitCode = null)
     {
-        $log = $this->getJobLog($uuid);
-        $log->setStatus(JobLog::STATUS_FAILED);
-        if (!$log->getCompleted()) {
-            $log->setCompleted((new \DateTime('now'))->format('U'));
+        try {
+            $log = $this->getJobLog($uuid);
+            $log->setStatus(JobLog::STATUS_FAILED);
+            if (!$log->getCompleted()) {
+                $log->setCompleted((new \DateTime('now'))->format('U'));
+            }
+            $log->setOutput($output);
+            if ($exitCode) {
+                $log->setExitCode($exitCode);
+            }
+            $this->save($log);
+        } catch (UnknownJobLogException $e){
+            // forgive exceptions
         }
-        $log->setOutput($output);
-        if ($exitCode) {
-            $log->setExitCode($exitCode);
-        }
-        $this->save($log);
+
     }
 
     /**
@@ -213,9 +218,13 @@ class JobLogRepository
      */
     public function saveOutput($uuid, $output = '')
     {
-        $log = $this->getJobLog($uuid);
-        $log->setOutput($output);
-        $this->save($log);
+      try {
+          $log = $this->getJobLog($uuid);
+          $log->setOutput($output);
+          $this->save($log);
+      } catch (UnknownJobLogException $e){
+          // forgive exceptions
+      }
     }
 
 

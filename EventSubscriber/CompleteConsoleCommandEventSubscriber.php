@@ -103,14 +103,18 @@ class CompleteConsoleCommandEventSubscriber implements EventSubscriberInterface
             return;
         }
 
-        // lookup job log repository for log and create one if it doesn't exist
-        $log = $this->jobLogRepository->getJobLog($uuid);
-        if (!$log) {
-            throw new MissingJobLogException(sprintf('No log exists for uuid: `%s`', $uuid));
-        }
+        try {
+            // lookup job log repository for log and create one if it doesn't exist
+            $log = $this->jobLogRepository->getJobLog($uuid);
+            if (!$log) {
+                throw new MissingJobLogException(sprintf('No log exists for uuid: `%s`', $uuid));
+            }
 
-        $log->setStatus(JobLog::STATUS_FAILED);
-        $this->jobLogRepository->save($log);
+            $log->setStatus(JobLog::STATUS_FAILED);
+            $this->jobLogRepository->save($log);
+        } catch (UnknownJobLogException $e){
+            // forgive exceptions
+        }
     }
 
     private function getPeakMemoryUse()

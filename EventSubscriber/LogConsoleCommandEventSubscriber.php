@@ -2,12 +2,12 @@
 
 namespace Markup\JobQueueBundle\EventSubscriber;
 
+use Markup\JobQueueBundle\Exception\UnknownJobLogException;
 use Markup\JobQueueBundle\Model\JobLog;
 use Markup\JobQueueBundle\Repository\JobLogRepository;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Input\ArgvInput;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**

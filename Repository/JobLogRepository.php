@@ -166,11 +166,11 @@ class JobLogRepository
     }
 
     /**
-     * Removes all jobs older than (self::LOG_TTL - 120 seconds) from all secondary indexes
+     * Removes all jobs older than (self::LOG_TTL - 86400 seconds) from all secondary indexes
      */
     public function removeExpiredJobsFromSecondaryIndexes()
     {
-        $interval = new \DateInterval(sprintf('PT%sS', self::LOG_TTL-120));
+        $interval = new \DateInterval(sprintf('PT%sS', self::LOG_TTL-86400));
         $before = (new \DateTime('now'))->sub($interval)->format('U');
 
         // get all old jobs

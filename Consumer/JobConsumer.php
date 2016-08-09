@@ -8,10 +8,12 @@ use Markup\JobQueueBundle\Job\ConsoleCommandJob;
 use Markup\JobQueueBundle\Model\Job;
 use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
 use PhpAmqpLib\Message\AMQPMessage;
-use Symfony\Component\DependencyInjection\ContainerAware;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
-class JobConsumer extends ContainerAware implements ConsumerInterface
+class JobConsumer implements ConsumerInterface
 {
+    use ContainerAwareTrait;
+
     /**
      * {@inheritdoc}
      */

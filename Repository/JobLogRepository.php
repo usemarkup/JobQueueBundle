@@ -376,7 +376,11 @@ class JobLogRepository
             if ($matchingJobs) {
                 // Iterate the matches and fetch them individually
                 foreach($matchingJobs as $jobLogKey) {
-                    $result->add($this->getJobLogByKey($jobLogKey));
+                    try {
+                        $result->add($this->getJobLogByKey($jobLogKey));
+                    } catch (UnknownJobLogException $e) {
+                        continue;
+                    }
                 }
             }
         }

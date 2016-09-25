@@ -20,12 +20,12 @@ services:
     markup_job_queue.reader.recurring_console_command:
         class: Markup\JobQueueBundle\Service\RecurringConsoleCommandReader
         arguments:
-            - %kernel.root_dir%
+            - '%kernel.root_dir%'
     markup_job_queue.writer.supervisord_config_file:
         class: Markup\JobQueueBundle\Service\SupervisordConfigFileWriter
         arguments:
-            - %kernel.root_dir%
-            - %kernel.environment%
+            - '%kernel.root_dir%'
+            - '%kernel.environment%'
             - ~
             - ~
             - ~
@@ -49,8 +49,8 @@ services:
     markup_job_queue.reader.queue:
         class: Markup\JobQueueBundle\Reader\QueueReader
         arguments:
-          - '@markup_job_queue.rabbit_mq_api'
-          - ~
+            - '@markup_job_queue.rabbit_mq_api'
+            - ~
     markup_job_queue.repository.job_log:
         class: Markup\JobQueueBundle\Repository\JobLogRepository
         arguments:

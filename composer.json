@@ -30,7 +30,8 @@
     },
     "require-dev": {
         "phpunit/phpunit": "~4.5",
-        "mockery/mockery": "~0.9"
+        "mockery/mockery": "~0.9",
+        "symfony/form": "~2.3"
     },
     "suggests": {
         "ricbra/rabbitmq-cli-consumer": "To consume jobs with Go instead of PHP"

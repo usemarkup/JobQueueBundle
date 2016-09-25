@@ -8,10 +8,16 @@ use Markup\JobQueueBundle\Job\ConsoleCommandJob;
 use Markup\JobQueueBundle\Model\Job;
 use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
 use PhpAmqpLib\Message\AMQPMessage;
-use Symfony\Component\DependencyInjection\ContainerAware;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class JobConsumer extends ContainerAware implements ConsumerInterface
+class JobConsumer implements ConsumerInterface, ContainerAwareInterface
 {
+    /**
+     * @var ContainerInterface
+     */
+    protected $container;
+
     /**
      * {@inheritdoc}
      */
@@ -74,4 +80,10 @@ class JobConsumer extends ContainerAware implements ConsumerInterface
             return ConsumerInterface::MSG_REJECT;
         }
     }
+
+    public function setContainer(ContainerInterface $container = null)
+    {
+        $this->container = $container;
+    }
+
 }

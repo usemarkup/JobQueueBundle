@@ -59,7 +59,7 @@ class AddRecurringConsoleJobToQueueCommand extends ContainerAwareCommand
             if ($configuration->nextRun()) {
                 $message = sprintf('%s. Will next be added %s', $message, $configuration->nextRun()->format('r'));
             }
-            $output->writeLn(sprintf('<info>%s</info>', $message));
+            $output->writeln(sprintf('<info>%s</info>', $message));
         }
 
         $this->getContainer()->get('markup_job_queue.repository.cron_health')->set();

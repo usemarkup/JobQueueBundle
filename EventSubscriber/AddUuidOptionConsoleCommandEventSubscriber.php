@@ -15,6 +15,8 @@ use Symfony\Component\HttpKernel\Kernel;
  */
 class AddUuidOptionConsoleCommandEventSubscriber implements EventSubscriberInterface
 {
+    use CheckUsingSymfony28Trait;
+
     /**
      * {@inheritdoc}
      */
@@ -22,7 +24,8 @@ class AddUuidOptionConsoleCommandEventSubscriber implements EventSubscriberInter
     {
         return [
             ConsoleEvents::COMMAND => [
-                ['onConsoleCommand', 100]
+                ['onConsoleCommand', 100],
+                ['bindInput', -9999999],
             ]
         ];
     }
@@ -41,15 +44,22 @@ class AddUuidOptionConsoleCommandEventSubscriber implements EventSubscriberInter
         );
 
         //symfony 2.8+ has different behaviour available for adding options
-        if (version_compare(Kernel::VERSION, '2.8.0', '>=')) {
+        if ($this->isUsingAtLeastSymfony28()) {
             //for symfony 2.8 up
             $definition = $event->getCommand()->getDefinition();
-            $input = $event->getInput();
             $definition->addOption($inputOption);
-            $input->bind($definition);
         } else {
             $inputDefinition = $event->getCommand()->getApplication()->getDefinition();
             $inputDefinition->addOption($inputOption);
         }
+    }
+
+    public function bindInput(ConsoleCommandEvent $event)
+    {
+        if (!$this->isUsingAtLeastSymfony28()) {
+            return;
+        }
+
+        $event->getInput()->bind($event->getCommand()->getDefinition());
     }
 }

@@ -26,6 +26,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class CompleteConsoleCommandEventSubscriber implements EventSubscriberInterface
 {
+    use CheckUsingSymfony28Trait;
 
     /**
      * @var JobLogRepository
@@ -61,10 +62,13 @@ class CompleteConsoleCommandEventSubscriber implements EventSubscriberInterface
      */
     public function onConsoleTerminate(ConsoleTerminateEvent $event)
     {
-        // following jiggerypokery can be removed in symfony 2.8+
-        $event->getCommand()->mergeApplicationDefinition();
-        $input = new ArgvInput();
-        $input->bind($event->getCommand()->getDefinition());
+        if ($this->isUsingAtLeastSymfony28()) {
+            $input = $event->getInput();
+        } else {
+            $event->getCommand()->mergeApplicationDefinition();
+            $input = new ArgvInput();
+            $input->bind($event->getCommand()->getDefinition());
+        }
 
         $uuid = $input->getOption('uuid');
         if (!$uuid) {
@@ -93,10 +97,13 @@ class CompleteConsoleCommandEventSubscriber implements EventSubscriberInterface
      */
     public function onConsoleException(ConsoleExceptionEvent $event)
     {
-        // following jiggerypokery can be removed in symfony 2.8+
-        $event->getCommand()->mergeApplicationDefinition();
-        $input = new ArgvInput();
-        $input->bind($event->getCommand()->getDefinition());
+        if ($this->isUsingAtLeastSymfony28()) {
+            $input = $event->getInput();
+        } else {
+            $event->getCommand()->mergeApplicationDefinition();
+            $input = new ArgvInput();
+            $input->bind($event->getCommand()->getDefinition());
+        }
 
         $uuid = $input->getOption('uuid');
         if (!$uuid) {

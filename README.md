@@ -70,6 +70,7 @@ consumers:
 		exchange_options: { name: 'a_valid_topic', type: topic }
 		queue_options:    { name: 'a_valid_topic' }
 		callback:         markup_job_queue.consumer
+		qos_options:      { prefetch_size: 0, prefetch_count: 1, global: false }
 ```
 
 There are a few console commands that allow you to preview and validate your configured console jobs via the CLI (see /Command)

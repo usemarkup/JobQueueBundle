@@ -10,7 +10,7 @@ Markup\JobQueueBundle\Entity\ScheduledJob:
   fields:
     job:
       type: string
-      length: 256
+      length: 2048
     topic:
       type: string
       length: 60

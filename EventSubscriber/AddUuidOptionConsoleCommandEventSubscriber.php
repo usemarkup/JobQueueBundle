@@ -25,7 +25,7 @@ class AddUuidOptionConsoleCommandEventSubscriber implements EventSubscriberInter
         return [
             ConsoleEvents::COMMAND => [
                 ['onConsoleCommand', 100],
-                ['bindInput', -9999999],
+                ['bindInput', -9999998],
             ]
         ];
     }

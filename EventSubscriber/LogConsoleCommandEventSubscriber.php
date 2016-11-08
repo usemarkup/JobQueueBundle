@@ -39,7 +39,7 @@ class LogConsoleCommandEventSubscriber implements EventSubscriberInterface
     {
         return [
             ConsoleEvents::COMMAND => [
-                ['onConsoleCommand', 10]
+                ['onConsoleCommand', -9999999]
             ]
         ];
     }
@@ -49,6 +49,7 @@ class LogConsoleCommandEventSubscriber implements EventSubscriberInterface
      */
     public function onConsoleCommand(ConsoleCommandEvent $event)
     {
+
         // following jiggerypokery can be removed in symfony 2.8+
         if ($this->isUsingAtLeastSymfony28()) {
             $input = $event->getInput();

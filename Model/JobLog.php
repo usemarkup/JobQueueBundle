@@ -196,7 +196,7 @@ class JobLog
      */
     public function getDuration()
     {
-        if (!$this->getCompleted()) {
+        if (!$this->getCompleted() || !$this->getStarted()) {
             return 0;
         }
         $duration = $this->getCompleted() - $this->getStarted();

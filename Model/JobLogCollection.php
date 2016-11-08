@@ -55,4 +55,20 @@ class JobLogCollection extends ArrayCollection
         }
         return (int)floor($totalDuration/$withDuration);
     }
+
+    /**
+     * Gets the highest memory use for jobs in this collection
+     *
+     * @return int
+     */
+    public function getPeakMemoryUse()
+    {
+        $peak = 0;
+        foreach($this as $log) {
+            if ($log->getPeakMemoryUse() && $log->getPeakMemoryUse() > $peak){
+                $peak = $log->getPeakMemoryUse();
+            }
+        }
+        return $peak;
+    }
 }

@@ -47,9 +47,15 @@ class SupervisordConfigFileWriter
     private $consumerPath;
 
     /**
+     * @var string
+     */
+    private $logsDir;
+
+    /**
      * SupervisordConfigFileWriter constructor.
      *
      * @param $kernelPath
+     * @param $logsDir
      * @param $kernelEnv
      * @param $supervisordConfigPath
      * @param $consumerPath
@@ -57,12 +63,14 @@ class SupervisordConfigFileWriter
      */
     public function __construct(
         $kernelPath,
+        $logsDir,
         $kernelEnv,
         $supervisordConfigPath,
         $consumerPath,
         $configFilePath
     ) {
         $this->kernelPath = $kernelPath;
+        $this->logsDir = $logsDir;
         $this->kernelEnv = $kernelEnv;
         $this->supervisordConfigPath = $supervisordConfigPath;
         $this->consumerPath = $consumerPath;
@@ -161,8 +169,8 @@ class SupervisordConfigFileWriter
             $conf[] = "\n";
             $conf[] = sprintf("[program:%s]", $programName);
             $conf[] = sprintf("command=%s", $consumer);
-            $conf[] = sprintf("stderr_logfile=%s/logs/supervisord.error.log", $kernelPath);
-            $conf[] = sprintf("stdout_logfile=%s/logs/supervisord.out.log", $kernelPath);
+            $conf[] = sprintf("stderr_logfile=%s/supervisord.error.log", $this->logsDir);
+            $conf[] = sprintf("stdout_logfile=%s/supervisord.out.log", $this->logsDir);
             $conf[] = "autostart=false";
             $conf[] = "autorestart=true";
             $conf[] = "stopsignal=QUIT";
@@ -202,8 +210,8 @@ class SupervisordConfigFileWriter
             $conf[] = sprintf("[program:%s]", $programName);
             $conf[] = sprintf("command=%s", $consumerCommand);
             $conf[] = sprintf("directory=%s", $absoluteReleasePath);
-            $conf[] = sprintf("stderr_logfile=%s/logs/supervisord.error.log", $kernelPath);
-            $conf[] = sprintf("stdout_logfile=%s/logs/supervisord.out.log", $kernelPath);
+            $conf[] = sprintf("stderr_logfile=%s/supervisord.error.log", $this->logsDir);
+            $conf[] = sprintf("stdout_logfile=%s/supervisord.out.log", $this->logsDir);
             $conf[] = "autostart=false";
             $conf[] = "autorestart=true";
             $conf[] = "stopsignal=QUIT";

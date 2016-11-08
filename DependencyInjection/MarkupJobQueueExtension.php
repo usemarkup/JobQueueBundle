@@ -62,9 +62,9 @@ class MarkupJobQueueExtension extends Extension
         if (!$config['topics']) {
             throw new InvalidConfigurationException('markup_job_queue requires that at least 1 `topic` is configured');
         }
-        $configFileWriter->replaceArgument(2, $config['supervisor_config_path']);
-        $configFileWriter->replaceArgument(3, $config['cli_consumer']['consumer_path']);
-        $configFileWriter->replaceArgument(4, $config['cli_consumer']['config_path']);
+        $configFileWriter->replaceArgument(3, $config['supervisor_config_path']);
+        $configFileWriter->replaceArgument(4, $config['cli_consumer']['consumer_path']);
+        $configFileWriter->replaceArgument(5, $config['cli_consumer']['config_path']);
         $configFileWriter->addMethodCall('setTopicsConfiguration', [$config['topics']]);
 
         if ($config['cli_consumer']['enabled'] === true) {

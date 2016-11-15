@@ -11,6 +11,7 @@ class SupervisordConfigFileWriterTest extends \PHPUnit_Framework_TestCase
     {
         $this->writer = new SupervisordConfigFileWriter(
             '/vagrant/app',
+            '/vagrant/app/logs',
             'dev',
             '/etc/supervisord/conf.d',
             '/usr/local/bin/rabbitmq-cli-consumer',

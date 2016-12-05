@@ -7,6 +7,7 @@ use Markup\JobQueueBundle\Exception\InvalidJobArgumentException;
 use Markup\JobQueueBundle\Model\Job;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Exception\RuntimeException;
 use Symfony\Component\Process\Process;
 
@@ -52,6 +53,16 @@ class ConsoleCommandJob extends Job
                 throw new JobFailedException($message, $process->getExitCode());
             }
             return $process->getOutput();
+         } catch (ProcessTimedOutException $e) {
+            if ($e->isGeneralTimeout()) {
+                throw new JobFailedException(sprintf('Timeout: %s', $e->getMessage()), $process->getExitCode(), 0, $e);
+            }
+
+            if ($e->isIdleTimeout()) {
+                throw new JobFailedException(sprintf('Idle Timeout: %s', $e->getMessage()), $process->getExitCode(), 0, $e);
+            }
+
+            throw $e;
         } catch (JobFailedException $e) {
             throw $e;
         }  catch (RuntimeException $e) {

@@ -104,13 +104,15 @@ markup_job_queue:
 
 This console command requires a minimal configuration (one block for each consumer you want to start). By convention these must match the consumers you have already defined (as seen above). __Due to the way oldsound/rabbitmq-bundle treats certain keys, do not use hypens in your topic names.__:
 
+By setting 'prefetch_count' you can select how many messages the consumer should process before respawning.
+
 ```yml
 markup_job_queue:
 	topics:
 		test:
-			consumption_quantity: 10
+			prefetch_count: 10
 		a_valid_topic:
-			consumption_quantity: 20
+			prefetch_count: 20
 ```
 
 To write the configuration file:

@@ -35,6 +35,8 @@ services:
         factory: ['@doctrine.orm.entity_manager', getRepository]
         arguments:
             - Markup\JobQueueBundle\Entity\ScheduledJob
+        calls:
+            - [ setContainer, [ '@service_container' ] ]
     markup_job_queue.scheduled:
         class: Markup\JobQueueBundle\Service\ScheduledJobService
         arguments:

@@ -5,9 +5,12 @@ namespace Markup\JobQueueBundle\Entity\Repository;
 use Doctrine\ORM\EntityRepository;
 use Markup\JobQueueBundle\Entity\ScheduledJob;
 use Markup\JobQueueBundle\Model\ScheduledJobRepositoryInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
 class ScheduledJobRepository extends EntityRepository implements ScheduledJobRepositoryInterface
 {
+    use ContainerAwareTrait;
+
     /**
      * @return array|null
      */
@@ -33,9 +36,12 @@ class ScheduledJobRepository extends EntityRepository implements ScheduledJobRep
      */
     public function save(ScheduledJob $scheduledJob, $flush = false)
     {
-        $this->_em->persist($scheduledJob);
+        $em = $this->container->get('doctrine')->getManager();
+
+        $em->persist($scheduledJob);
+
         if ($flush) {
-            $this->_em->flush();
+            $em->flush();
         }
     }
 

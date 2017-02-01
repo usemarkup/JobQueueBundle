@@ -18,7 +18,7 @@ class JobLogRepository
     const REDIS_NAMESPACE = 'markup_job_queue';
 
     // 2 weeks
-    const LOG_TTL = '1209600';
+    const DEFAULT_LOG_TTL = '1209600';
 
     /**
      * @var Predis
@@ -36,17 +36,24 @@ class JobLogRepository
     private $recurringConsoleCommandReader;
 
     /**
-     * JobLogRepository constructor.
+     * @var string
+     */
+    private $ttl;
+
+    /**
      * @param Predis $predis
      * @param RecurringConsoleCommandReader $recurringConsoleCommandReader
+     * @param int|null $ttl
      */
     public function __construct(
         Predis $predis,
-        RecurringConsoleCommandReader $recurringConsoleCommandReader
+        RecurringConsoleCommandReader $recurringConsoleCommandReader,
+        int $ttl = null
     ) {
         $this->predis = $predis;
         $this->recurringConsoleCommandReader = $recurringConsoleCommandReader;
         $this->tempKey = null;
+        $this->ttl = $ttl ?: self::DEFAULT_LOG_TTL;
     }
 
     /**
@@ -76,7 +83,7 @@ class JobLogRepository
 
         // add/update canonical record
         $this->predis->hmset($hashKey, $compressed);
-        $this->predis->expire($hashKey, self::LOG_TTL);
+        $this->predis->expire($hashKey, $this->ttl);
 
         // update the 'status' index
         $this->addJobToStatusIndex($hashKey, $jobLog->getStatus());
@@ -166,11 +173,11 @@ class JobLogRepository
     }
 
     /**
-     * Removes all jobs older than (self::LOG_TTL - 86400 seconds) from all secondary indexes
+     * Removes all jobs older than ($this->ttl - 86400 seconds) from all secondary indexes
      */
     public function removeExpiredJobsFromSecondaryIndexes()
     {
-        $interval = new \DateInterval(sprintf('PT%sS', self::LOG_TTL-86400));
+        $interval = new \DateInterval(sprintf('PT%sS', $this->ttl-86400));
         $before = (new \DateTime('now'))->sub($interval)->format('U');
 
         // get all old jobs

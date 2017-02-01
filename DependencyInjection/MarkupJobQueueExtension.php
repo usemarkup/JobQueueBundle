@@ -33,6 +33,7 @@ class MarkupJobQueueExtension extends Extension
         $this->addSupervisordConfig($config, $container);
         $this->addCliConsumerConfig($config, $container);
         $this->configureRabbitMqApiClient($config, $container);
+        $this->loadJobLoggingTtl($config, $container);
     }
 
     /**
@@ -121,5 +122,11 @@ class MarkupJobQueueExtension extends Extension
         $queueReader = $container->getDefinition('markup_job_queue.reader.queue');
 
         $queueReader->replaceArgument(1, $rabbitConfig['vhost']);
+    }
+
+    private function loadJobLoggingTtl(array $config, ContainerBuilder $container)
+    {
+        $definition = $container->getDefinition('markup_job_queue.repository.job_log');
+        $definition->addArgument($config['job_logging_ttl']);
     }
 }

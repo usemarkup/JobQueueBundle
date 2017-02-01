@@ -98,6 +98,9 @@ class Configuration implements ConfigurationInterface
                     ->info('Path to store supervisord configuration files. Your supervisord configuration should load all files from this path')
                     ->defaultValue('/etc/supervisord/conf.d/')
                 ->end()
+                ->integerNode('job_logging_ttl')
+                    ->defaultValue(1209600)
+                ->end()
             ->end()
         ->end();
 

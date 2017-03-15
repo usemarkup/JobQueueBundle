@@ -58,7 +58,7 @@ class JobConsumer implements ConsumerInterface, ContainerAwareInterface
             $exitCode = null;
             $output = $e->getMessage();
             if ($e instanceof JobFailedException) {
-                $exitCode = $e->getExitCode();
+                $exitCode = intval($e->getExitCode());
             }
             // save failure if job had uuid
             if (isset($data['uuid'])) {

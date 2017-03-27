@@ -158,7 +158,7 @@ class SupervisordConfigFileWriter
             }
 
             $consumer = sprintf(
-                '%s -e "%s/console %s --strict-exit-code --env=%s" -c %s -V -i --strict-exit-code',
+                '%s -e "%s/console %s --strict-exit-code --env=%s --no-debug" -c %s -V -i --strict-exit-code',
                 $this->consumerPath,
                 $kernelPath,
                 self::CLI_CONSUMPTION_COMMAND,

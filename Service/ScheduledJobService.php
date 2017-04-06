@@ -2,25 +2,26 @@
 
 namespace Markup\JobQueueBundle\Service;
 
-use Doctrine\ORM\EntityRepository;
+use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Common\Persistence\ObjectRepository;
+use Markup\JobQueueBundle\Entity\Repository\ScheduledJobRepository;
 use Markup\JobQueueBundle\Entity\ScheduledJob;
 use Markup\JobQueueBundle\Model\Job;
-use Markup\JobQueueBundle\Model\ScheduledJobRepositoryInterface;
 
 class ScheduledJobService
 {
     /**
-     * @var ScheduledJobRepositoryInterface
+     * @var ManagerRegistry
      */
-    private $scheduledJobRepository;
+    private $managerRegistry;
 
     /**
-     * @param ScheduledJobRepositoryInterface $scheduledJobRepository
+     * @param ManagerRegistry $managerRegistry
      */
     public function __construct(
-        ScheduledJobRepositoryInterface $scheduledJobRepository
+        ManagerRegistry $managerRegistry
     ) {
-        $this->scheduledJobRepository = $scheduledJobRepository;
+        $this->managerRegistry = $managerRegistry;
     }
 
     /**
@@ -28,9 +29,11 @@ class ScheduledJobService
      * @param \DateTime $scheduledTime
      * @return ScheduledJob
      */
-    public function addScheduledJob(Job $job, $scheduledTime) {
+    public function addScheduledJob(Job $job, $scheduledTime)
+    {
         $scheduledJob = new ScheduledJob($job->getCommand(), $scheduledTime, $job->getTopic());
         $this->save($scheduledJob, true);
+
         return $scheduledJob;
     }
 
@@ -41,14 +44,24 @@ class ScheduledJobService
      */
     public function save(ScheduledJob $scheduledJob, $flush = false)
     {
-        $this->scheduledJobRepository->save($scheduledJob, $flush);
+        $this->getScheduledJobRepository()->save($scheduledJob, $flush);
+
         return $scheduledJob;
     }
 
     /**
      * @return mixed
      */
-    public function getUnqueuedJobs() {
-        return $this->scheduledJobRepository->fetchUnqueuedJobs();
+    public function getUnqueuedJobs()
+    {
+        return $this->getScheduledJobRepository()->fetchUnqueuedJobs();
+    }
+
+    /**
+     * @return ObjectRepository|ScheduledJobRepository
+     */
+    private function getScheduledJobRepository()
+    {
+        return $this->managerRegistry->getRepository(ScheduledJob::class);
     }
 }

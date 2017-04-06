@@ -30,17 +30,11 @@ services:
             - ~
             - ~
             - ~
-    markup_job.scheduled_job.repository:
-        class: Doctrine\ORM\EntityRepository
-        factory: ['@doctrine.orm.entity_manager', getRepository]
-        arguments:
-            - Markup\JobQueueBundle\Entity\ScheduledJob
-        calls:
-            - [ setContainer, [ '@service_container' ] ]
     markup_job_queue.scheduled:
         class: Markup\JobQueueBundle\Service\ScheduledJobService
         arguments:
-            - '@markup_job.scheduled_job.repository'
+            - '@doctrine'
+
     markup_job_queue.writer.cli_consumer_config_file:
         class: Markup\JobQueueBundle\Service\CliConsumerConfigFileWriter
     markup_job_queue.rabbit_mq_api.client:

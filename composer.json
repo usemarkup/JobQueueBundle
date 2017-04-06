@@ -23,7 +23,7 @@
         "twig/twig": ">=1.12",
         "php": ">=5.5.0",
         "mtdowling/cron-expression": "1.0.*",
-        "doctrine/collections": "~1.2",
+        "doctrine/orm": "@stable",
         "php-amqplib/rabbitmq-bundle": "~1.8",
         "markup/rabbitmq-management-api": "dev-master",
         "snc/redis-bundle": "~1.1.2|^2.0"

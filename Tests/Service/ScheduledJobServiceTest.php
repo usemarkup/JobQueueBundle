@@ -2,6 +2,7 @@
 
 namespace Markup\Bundle\JobQueueBundle\Tests\Service;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Markup\JobQueueBundle\Entity\ScheduledJob;
 use Markup\JobQueueBundle\Job\ConsoleCommandJob;
 use Markup\JobQueueBundle\Job\SleepJob;
@@ -12,11 +13,18 @@ use Markup\JobQueueBundle\Model\ScheduledJobRepositoryInterface;
 
 class ScheduledJobServiceTest extends \PHPUnit_Framework_TestCase
 {
+    private $doctrine;
+
     public function setUp()
     {
+
         $scheduledJobRepository = m::mock(ScheduledJobRepositoryInterface::class);
         $scheduledJobRepository->shouldReceive('save');
-        $this->scheduledJobService = new ScheduledJobService($scheduledJobRepository);
+
+        $this->doctrine = m::mock(ManagerRegistry::class);
+        $this->doctrine->shouldReceive('getRepository')->andReturn($scheduledJobRepository);
+
+        $this->scheduledJobService = new ScheduledJobService($this->doctrine);
     }
 
     public function testCanAddScheduledJob()

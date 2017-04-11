@@ -36,12 +36,10 @@ class ScheduledJobRepository extends EntityRepository implements ScheduledJobRep
      */
     public function save(ScheduledJob $scheduledJob, $flush = false)
     {
-        $em = $this->container->get('doctrine')->getManager();
-
-        $em->persist($scheduledJob);
+        $this->_em->persist($scheduledJob);
 
         if ($flush) {
-            $em->flush();
+            $this->_em->flush();
         }
     }
 

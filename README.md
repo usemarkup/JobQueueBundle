@@ -77,7 +77,7 @@ There are a few console commands that allow you to preview and validate your con
 Adding Jobs
 -----------
 
-Jobs can also be added directly. There is a utility method for adding 'command' jobs, which uses the Symfony2 process component to execute console commands. Adding a 'Command Job' can be achieved using the 'jobby' service as follows:
+Jobs can also be added directly. There is a utility method for adding 'command' jobs, which uses the Symfony process component to execute console commands. Adding a 'Command Job' can be achieved using the 'jobby' service as follows:
 
 ```php
 $container->get('jobby')

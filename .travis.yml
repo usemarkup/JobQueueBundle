@@ -1,12 +1,28 @@
 language: php
 
-php:
-    - 5.5
-    - 5.6
-    - 7.0
-    - 7.1
+matrix:
+  include:
+    - php: 5.5
+    - php: 5.6
+    - php: 7.0
+    - php: 7.1
+      env: deps=low
+    - php: 7.1
+    - php: nightly
 
-before_script: composer install --dev --prefer-source
+sudo: false
+
+env:
+  global:
+    - deps=standard
+
+install:
+  - composer self-update -q
+  - if [ "$deps" = "standard" ]; then composer --ignore-platform-reqs --prefer-stable --prefer-dist -n update; fi;
+  - if [ "$deps" = "low" ]; then composer --ignore-platform-reqs --prefer-lowest -n --prefer-stable --prefer-dist update; fi;
+
+
+script: bin/phpunit
 
 notifications:
   email: "calum@usemarkup.com"

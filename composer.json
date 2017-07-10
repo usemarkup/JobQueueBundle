@@ -26,7 +26,7 @@
         "doctrine/orm": "~2.3",
         "doctrine/collections": "^1.2",
         "php-amqplib/rabbitmq-bundle": "^1.8",
-        "markup/rabbitmq-management-api": "dev-master",
+        "markup/rabbitmq-management-api": "^1",
         "snc/redis-bundle": "~1.1.2|^2"
     },
     "require-dev": {
@@ -51,18 +51,6 @@
         "bin-dir": "bin"
     },
     "repositories": {
-        "ricbra/rabbitmq-cli-consumer": {
-            "type": "package",
-            "package": {
-                "name": "ricbra/rabbitmq-cli-consumer",
-                "version": "1.4.2",
-                "source": {
-                    "url": "https://github.com/ricbra/rabbitmq-cli-consumer.git",
-                    "type": "git",
-                    "reference": "master/1.4.2"
-                }
-            }
-        },
         "markup/rabbitmq-management-api":  {
             "type": "vcs",
             "url": "https://github.com/usemarkup/php-rabbitmq-management-api"

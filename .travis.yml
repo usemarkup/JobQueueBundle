@@ -9,8 +9,11 @@ matrix:
       env: deps=low
     - php: 7.1
     - php: nightly
+  allow_failures:
+    - php: nightly
 
 sudo: false
+dist: trusty
 
 env:
   global:

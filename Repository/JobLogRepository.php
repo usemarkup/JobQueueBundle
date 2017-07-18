@@ -35,9 +35,14 @@ class JobLogRepository
     private $recurringConsoleCommandReader;
 
     /**
-     * @var string
+     * @var int
      */
     private $ttl;
+
+    /**
+     * @var bool
+     */
+    private $shouldClearLogForCompleteJob;
 
     /**
      * @param Predis $predis
@@ -53,6 +58,7 @@ class JobLogRepository
         $this->recurringConsoleCommandReader = $recurringConsoleCommandReader;
         $this->tempKey = null;
         $this->ttl = $ttl ?: self::DEFAULT_LOG_TTL;
+        $this->shouldClearLogForCompleteJob = false;
     }
 
     /**
@@ -79,6 +85,11 @@ class JobLogRepository
 
         // this key identifies the job in all indexes
         $hashKey = $this->getJobLogKey($jobLog->getUuid());
+
+        if ($this->shouldClearLogForCompleteJob && $jobLog->getStatus() === JobLog::STATUS_COMPLETE) {
+            $this->predis->del($hashKey);
+            return;
+        }
 
         // add/update canonical record
         $this->predis->hmset($hashKey, $compressed);
@@ -397,5 +408,25 @@ class JobLogRepository
         }
 
         return $result;
+    }
+
+    /**
+     * @param int $ttl
+     */
+    public function setTtl($ttl = null)
+    {
+        $this->ttl = $ttl;
+
+        return $this;
+    }
+
+    /**
+     * @param bool $shouldClearLogForCompleteJob
+     */
+    public function setShouldClearLogForCompleteJob($shouldClearLogForCompleteJob)
+    {
+        $this->shouldClearLogForCompleteJob = $shouldClearLogForCompleteJob;
+
+        return $this;
     }
 }

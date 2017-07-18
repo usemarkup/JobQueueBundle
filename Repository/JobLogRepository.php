@@ -14,7 +14,6 @@ use Predis\Client as Predis;
  */
 class JobLogRepository
 {
-
     const REDIS_NAMESPACE = 'markup_job_queue';
 
     // 2 weeks
@@ -48,7 +47,7 @@ class JobLogRepository
     public function __construct(
         Predis $predis,
         RecurringConsoleCommandReader $recurringConsoleCommandReader,
-        int $ttl = null
+        $ttl = null
     ) {
         $this->predis = $predis;
         $this->recurringConsoleCommandReader = $recurringConsoleCommandReader;
@@ -399,6 +398,4 @@ class JobLogRepository
 
         return $result;
     }
-
 }
-

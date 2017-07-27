@@ -101,6 +101,9 @@ class Configuration implements ConfigurationInterface
                 ->integerNode('job_logging_ttl')
                     ->defaultValue(1209600)
                 ->end()
+                ->booleanNode('clear_log_for_complete_jobs')
+                    ->defaultFalse()
+                ->end()
             ->end()
         ->end();
 

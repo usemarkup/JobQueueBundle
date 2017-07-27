@@ -128,6 +128,6 @@ class MarkupJobQueueExtension extends Extension
     {
         $repository = $container->getDefinition('markup_job_queue.repository.job_log');
         $repository->addMethodCall('setTtl', [$config['job_logging_ttl']]);
-        $repository->addMethodCall('setShouldClearLogForCompleteJob', $config['clear_log_for_complete_jobs']);
+        $repository->addMethodCall('setShouldClearLogForCompleteJob', [$config['clear_log_for_complete_jobs']]);
     }
 }

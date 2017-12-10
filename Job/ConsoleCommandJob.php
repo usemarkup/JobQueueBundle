@@ -33,7 +33,7 @@ class ConsoleCommandJob extends Job
         }
 
         // get the absolute path of the console and the environment
-        $command = sprintf('%s %s --env=%s', $this->getConsolePath($container->get('kernel')->getRootdir()), $command, $container->get('kernel')->getEnvironment());
+        $command = sprintf('%s %s --env=%s', $this->getConsolePath($container->get('kernel')->getProjectDir() . '/bin'), $command, $container->get('kernel')->getEnvironment());
 
         $process = new Process($command);
         if (!isset($this->args['timeout'])) {

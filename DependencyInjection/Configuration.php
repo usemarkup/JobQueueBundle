@@ -104,6 +104,10 @@ class Configuration implements ConfigurationInterface
                 ->booleanNode('clear_log_for_complete_jobs')
                     ->defaultFalse()
                 ->end()
+                ->booleanNode('use_root_dir_for_symfony_console')
+                    ->defaultFalse()
+                    ->info('Choose whether to use a Symfony app root directory for the location of the Symfony console script. Defaults to app root for Symfony 2, and bin/ for Symfony 3+.')
+                ->end()
             ->end()
         ->end();
 

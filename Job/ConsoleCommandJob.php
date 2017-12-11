@@ -33,7 +33,12 @@ class ConsoleCommandJob extends Job
         }
 
         // get the absolute path of the console and the environment
-        $command = sprintf('%s %s --env=%s', $this->getConsolePath($container->get('kernel')->getRootdir()), $command, $container->get('kernel')->getEnvironment());
+        $command = sprintf(
+            '%s %s --env=%s',
+            $this->getConsolePath($container->getParameter('markup_job_queue.console_dir')),
+            $command,
+            $container->get('kernel')->getEnvironment()
+        );
 
         $process = new Process($command);
         if (!isset($this->args['timeout'])) {
@@ -49,7 +54,13 @@ class ConsoleCommandJob extends Job
             $process->run();
 
             if (!$process->isSuccessful()) {
-                $message = sprintf('A job `%s` failed with topic `%s` with output:%s and the error output: %s', $command, $this->topic, $process->getOutput(), $process->getErrorOutput());
+                $message = sprintf(
+                    'A job `%s` failed with topic `%s` with output:%s and the error output: %s',
+                    $command,
+                    $this->topic,
+                    $process->getOutput(),
+                    $process->getErrorOutput()
+                );
                 throw new JobFailedException($message, $process->getExitCode());
             }
             return $process->getOutput();

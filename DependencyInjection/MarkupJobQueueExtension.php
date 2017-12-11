@@ -9,6 +9,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
+use Symfony\Component\HttpKernel\Kernel;
 
 /**
  * This is the class that loads and manages your bundle configuration
@@ -34,6 +35,7 @@ class MarkupJobQueueExtension extends Extension
         $this->addCliConsumerConfig($config, $container);
         $this->configureRabbitMqApiClient($config, $container);
         $this->configureJobLogRepository($config, $container);
+        $this->configureConsoleDirectory($config, $container);
     }
 
     /**
@@ -129,5 +131,22 @@ class MarkupJobQueueExtension extends Extension
         $repository = $container->getDefinition('markup_job_queue.repository.job_log');
         $repository->addMethodCall('setTtl', [$config['job_logging_ttl']]);
         $repository->addMethodCall('setShouldClearLogForCompleteJob', [$config['clear_log_for_complete_jobs']]);
+    }
+
+    private function configureConsoleDirectory(array $config, ContainerBuilder $container)
+    {
+        $parameter = 'markup_job_queue.console_dir';
+        $isUsingSymfony4OrGreater = Kernel::MAJOR_VERSION === 4;
+        if ($isUsingSymfony4OrGreater && $config['use_root_dir_for_symfony_console']) {
+            throw new \Exception('The `use_root_dir_for_symfony_console` option cannot be used with Symfony 4+.');
+        }
+        $isUsingSymfony2 = Kernel::MAJOR_VERSION === 2;
+        if ($isUsingSymfony2 || $config['use_root_dir_for_symfony_console']) {
+            $container->setParameter($parameter, $container->getParameter('kernel.root_dir'));
+
+            return;
+        }
+
+        $container->setParameter($parameter, $container->getParameter('kernel.project_dir') . '/bin');
     }
 }

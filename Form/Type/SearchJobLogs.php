@@ -3,6 +3,7 @@
 namespace Markup\JobQueueBundle\Form\Type;
 
 use Markup\JobQueueBundle\Model\JobLog;
+use Markup\JobQueueBundle\Util\LegacyFormHelper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -13,14 +14,14 @@ class SearchJobLogs extends AbstractType
     {
         $builder->add(
             'id',
-            'text',
+            LegacyFormHelper::getType('Symfony\Component\Form\Extension\Core\Type\TextType'),
             [
                 'required' => false,
                 'label'    => 'Uuid'
             ]
         )->add(
             'since',
-            'datetime',
+            LegacyFormHelper::getType('Symfony\Component\Form\Extension\Core\Type\DateTimeType'),
             [
                 'widget'   => 'single_text',
                 'attr'     => ['data-dtime-format' => "YYYY-MM-DDTHH:mm:ssZ"],
@@ -30,7 +31,7 @@ class SearchJobLogs extends AbstractType
             ]
         )->add(
             'before',
-            'datetime',
+            LegacyFormHelper::getType('Symfony\Component\Form\Extension\Core\Type\DateTimeType'),
             [
                 'widget'   => 'single_text',
                 'attr'     => ['data-dtime-format' => "YYYY-MM-DDTHH:mm:ssZ"],
@@ -40,33 +41,34 @@ class SearchJobLogs extends AbstractType
             ]
         )->add(
             'status',
-            'choice',
+            LegacyFormHelper::getType('Symfony\Component\Form\Extension\Core\Type\ChoiceType'),
             [
                 'required' => false,
                 'multiple' => false,
                 'empty_data' => null,
                 'choices' => [
-                    JobLog::STATUS_ADDED => 'Added',
-                    JobLog::STATUS_RUNNING => 'Running',
-                    JobLog::STATUS_FAILED => 'Failed',
-                    JobLog::STATUS_COMPLETE => 'Complete',
-                ]
+                    'Added' => JobLog::STATUS_ADDED,
+                    'Running' => JobLog::STATUS_RUNNING,
+                    'Failed' => JobLog::STATUS_FAILED,
+                    'Complete' => JobLog::STATUS_COMPLETE,
+                ],
+                'choices_as_values' => true,
             ]
         )->add(
             'command_configuration_id',
-            'hidden',
+            LegacyFormHelper::getType('Symfony\Component\Form\Extension\Core\Type\HiddenType'),
             [
                 'required' => false,
             ]
         )->add(
             'page',
-            'hidden',
+            LegacyFormHelper::getType('Symfony\Component\Form\Extension\Core\Type\HiddenType'),
             [
                 'required' => false,
             ]
         )->add(
             'search',
-            'submit',
+            LegacyFormHelper::getType('Symfony\Component\Form\Extension\Core\Type\SubmitType'),
             ['attr' => ['class' => 'btn-info'], 'icon' => 'search', 'label' => 'Search']
         );
     }
@@ -75,13 +77,18 @@ class SearchJobLogs extends AbstractType
     {
         $resolver->setDefaults([
             'method' => 'GET',
-            'data_class' => '\Markup\JobQueueBundle\Form\Data\SearchJobLogs',
+            'data_class' => SearchJobLogs::class,
             'csrf_protection' => false
         ]);
     }
 
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'phoenix_admin_search_job_logs';
+    }
+
+    public function getName()
+    {
+        return $this->getBlockPrefix();
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Markup\JobQueueBundle\Form\Type;
 
+use Markup\JobQueueBundle\Form\Data\SearchJobLogs as SearchJobLogsData;
 use Markup\JobQueueBundle\Model\JobLog;
 use Markup\JobQueueBundle\Util\LegacyFormHelper;
 use Symfony\Component\Form\AbstractType;
@@ -77,7 +78,7 @@ class SearchJobLogs extends AbstractType
     {
         $resolver->setDefaults([
             'method' => 'GET',
-            'data_class' => SearchJobLogs::class,
+            'data_class' => SearchJobLogsData::class,
             'csrf_protection' => false
         ]);
     }

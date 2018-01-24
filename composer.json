@@ -53,7 +53,8 @@
     "repositories": {
         "markup/rabbitmq-management-api":  {
             "type": "vcs",
-            "url": "https://github.com/usemarkup/php-rabbitmq-management-api"
+            "url": "https://github.com/usemarkup/php-rabbitmq-management-api",
+            "no-api": true
         }
     }
 }

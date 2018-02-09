@@ -3,6 +3,7 @@
 namespace Markup\JobQueueBundle\Command;
 
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -45,7 +46,7 @@ class ReadRecurringConsoleJobConfigurationCommand extends ContainerAwareCommand
         $recurringConsoleCommandReader = $this->getContainer()->get('markup_job_queue.reader.recurring_console_command');
 
         $output->writeln(sprintf('<info>Treating current time as %s</info>', $time->format('r')));
-        $table = $this->getHelperSet()->get('table');
+        $table = (class_exists(Table::class)) ? new Table($output) : $this->getHelperSet()->get('table');
         $table->setHeaders(['command', 'topic', 'schedule', 'valid command?', 'due?', 'next run?']);
         foreach ($recurringConsoleCommandReader->getConfigurations() as $configuration) {
             $row = [];
@@ -64,7 +65,7 @@ class ReadRecurringConsoleJobConfigurationCommand extends ContainerAwareCommand
             );
         }
 
-        $table->render($output);
+        $this->renderTable($table, $output);
     }
 
     /**
@@ -84,5 +85,16 @@ class ReadRecurringConsoleJobConfigurationCommand extends ContainerAwareCommand
         } catch (\InvalidArgumentException $e) {
             return false;
         }
+    }
+
+    private function renderTable($table, OutputInterface $output)
+    {
+        if (!$table instanceof Table) {
+            $table->render($output);
+
+            return;
+        }
+
+        $table->render();
     }
 }

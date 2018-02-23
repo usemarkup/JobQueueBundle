@@ -21,12 +21,11 @@
         "symfony/console": "^2.3|^3",
         "symfony/process": "^2.3|^3",
         "twig/twig": "^1.12|^2",
-        "php": ">=5.5.0",
+        "php": ">=7.1.0",
         "mtdowling/cron-expression": "1.0.*",
         "doctrine/orm": "~2.3",
         "doctrine/collections": "^1.2",
         "php-amqplib/rabbitmq-bundle": "^1.8",
-        "markup/rabbitmq-management-api": "^2",
         "snc/redis-bundle": "~1.1.2|^2",
         "markup/rabbitmq-management-api": ">=2.1.1"
     },

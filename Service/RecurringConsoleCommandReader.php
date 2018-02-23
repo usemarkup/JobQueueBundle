@@ -127,12 +127,17 @@ class RecurringConsoleCommandReader
                 throw new InvalidConfigurationException('Every job schedule should have a `command`, `topic` and `schedule` component'.json_encode($config));
             }
 
+            if (isset($group['envs']) && !is_array($group['envs'])) {
+                throw new InvalidConfigurationException('`envs` config key must be an array or null');
+            }
+
             $recurringConsoleCommandConfiguration = new RecurringConsoleCommandConfiguration(
                 $group['command'],
                 $group['topic'],
                 $group['schedule'],
                 isset($group['description']) ? $group['description'] : null,
-                isset($group['timeout']) ? $group['timeout'] : null
+                isset($group['timeout']) ? $group['timeout'] : null,
+                isset($group['envs']) ? $group['envs'] : null
             );
 
             $configurations->add($recurringConsoleCommandConfiguration);

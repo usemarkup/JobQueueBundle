@@ -45,6 +45,20 @@ class AddRecurringConsoleJobToQueueCommand extends ContainerAwareCommand
         $due = $recurringConsoleCommandReader->getDue();
 
         foreach ($due as $configuration) {
+
+            if ($configuration->getEnvs()) {
+                $env = $this->getContainer()->get('kernel')->getEnvironment();
+
+                if (!in_array($env, $configuration->getEnvs())) {
+                    $output->writeln(
+                        sprintf(
+                            '<info>Skipping `%s`, not to run in this env</info>',
+                            $configuration->getCommand()
+                        )
+                    );
+                    continue;
+                }
+            }
             $this->getContainer()->get('jobby')->addCommandJob(
                 $configuration->getCommand(),
                 $configuration->getTopic(),

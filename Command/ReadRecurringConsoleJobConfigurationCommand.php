@@ -47,12 +47,13 @@ class ReadRecurringConsoleJobConfigurationCommand extends ContainerAwareCommand
 
         $output->writeln(sprintf('<info>Treating current time as %s</info>', $time->format('r')));
         $table = (class_exists(Table::class)) ? new Table($output) : $this->getHelperSet()->get('table');
-        $table->setHeaders(['command', 'topic', 'schedule', 'valid command?', 'due?', 'next run?']);
+        $table->setHeaders(['command', 'topic', 'schedule', 'envs', 'valid command?', 'due?', 'next run?']);
         foreach ($recurringConsoleCommandReader->getConfigurations() as $configuration) {
             $row = [];
             $row[] = $configuration->getCommand();
             $row[] = $configuration->getTopic();
             $row[] = $configuration->getSchedule();
+            $row[] = $configuration->getEnvs() ? implode(',', $configuration->getEnvs()) : 'all';
             $row[] = $this->isCommandValid($configuration->getCommand()) ? '✓' : '✗';
             $row[] = $configuration->isDue($time) ? '✓' : '✗';
             if ($configuration->nextRun()) {

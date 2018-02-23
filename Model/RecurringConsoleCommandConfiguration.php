@@ -26,29 +26,36 @@ class RecurringConsoleCommandConfiguration
     private $topic;
 
     /**
-     * @var string
+     * @var int
      */
     private $timeout;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $description;
+
+    /**
+     * @var array|null
+     */
+    private $envs;
 
     /**
      * @param string  $command
      * @param string  $topic
      * @param string  $schedule
-     * @param string  $description
-     * @param integer $timeout
+     * @param string|null  $description
+     * @param integer|null $timeout
+     * @param array|null $envs
      */
-    public function __construct($command, $topic, $schedule, $description = null, $timeout = 60)
+    public function __construct($command, $topic, $schedule, $description = null, $timeout = 60, $envs = null)
     {
         $this->command = $command;
         $this->schedule = $schedule;
         $this->topic = str_replace('-', '_', $topic);
         $this->timeout = $timeout;
         $this->description = $description;
+        $this->envs = $envs;
     }
 
     /**
@@ -183,5 +190,13 @@ class RecurringConsoleCommandConfiguration
     public function getDescription()
     {
         return $this->description;
+    }
+
+    /**
+     * @return array|null
+     */
+    public function getEnvs(): ?array
+    {
+        return $this->envs;
     }
 }

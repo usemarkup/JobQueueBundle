@@ -26,7 +26,6 @@
         "doctrine/orm": "~2.3",
         "doctrine/collections": "^1.2",
         "php-amqplib/rabbitmq-bundle": "^1.8",
-        "markup/rabbitmq-management-api": "^2",
         "snc/redis-bundle": "~1.1.2|^2",
         "markup/rabbitmq-management-api": ">=2.1.1"
     },

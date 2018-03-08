@@ -199,7 +199,7 @@ class SupervisordConfigFileWriter
             $programName = sprintf("markup_job_queue_%s_%s", $uniqueEnvironment, $topic);
             $programNames[] = $programName;
             $consumerCommand = sprintf(
-                '%s/console %s -m %s %s -e=%s --no-debug',
+                '%s/console %s -m %s %s --env=%s --no-debug',
                 $this->kernelPath,
                 self::PHP_CONSUMPTION_COMMAND,
                 $topicConfig['prefetch_count'],

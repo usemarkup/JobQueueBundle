@@ -8,6 +8,7 @@ use Markup\JobQueueBundle\Model\JobLog;
 use Markup\JobQueueBundle\Repository\JobLogRepository;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
+use Symfony\Component\Console\Event\ConsoleEvent;
 use Symfony\Component\Console\Event\ConsoleExceptionEvent;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\Console\Input\ArgvInput;
@@ -46,12 +47,16 @@ class CompleteConsoleCommandEventSubscriber implements EventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
+        $consoleErrorEvent = (class_exists('Symfony\Component\Console\Event\ConsoleErrorEvent'))
+            ? ConsoleEvents::ERROR
+            : ConsoleEvents::EXCEPTION;
+
         return [
             ConsoleEvents::TERMINATE => [
                 ['onConsoleTerminate', 10]
             ],
-            ConsoleEvents::EXCEPTION => [
-                ['onConsoleException', 10]
+            $consoleErrorEvent => [
+                ['onConsoleError', 10]
             ],
         ];
     }
@@ -95,7 +100,7 @@ class CompleteConsoleCommandEventSubscriber implements EventSubscriberInterface
      * @param ConsoleExceptionEvent $event
      * @throws MissingJobLogException
      */
-    public function onConsoleException(ConsoleExceptionEvent $event)
+    public function onConsoleError(ConsoleEvent $event)
     {
         if ($this->isUsingAtLeastSymfony28()) {
             $input = $event->getInput();

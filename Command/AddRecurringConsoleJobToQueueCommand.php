@@ -66,7 +66,8 @@ class AddRecurringConsoleJobToQueueCommand extends ContainerAwareCommand
                 $configuration->getTimeout()
             );
             $message = sprintf(
-                'Added command `%s` with the topic `%s`',
+                '%s Added command `%s` with the topic `%s`',
+                $configuration->previousRun()->format('c'),
                 $configuration->getCommand(),
                 $configuration->getTopic()
             );

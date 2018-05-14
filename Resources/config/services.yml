@@ -6,6 +6,9 @@ services:
             - '@logger'
         calls:
           - [ setContainer,[ '@service_container' ] ]
+
+    Markup\JobQueueBundle\Publisher\JobPublisher: '@markup_job_queue.publisher'
+
     markup_job_queue.consumer:
         class: Markup\JobQueueBundle\Consumer\JobConsumer
         calls:
@@ -15,12 +18,17 @@ services:
         arguments:
             - '@markup_job_queue.publisher'
             - '@markup_job_queue.scheduled'
-    jobby:
-        alias: markup_job_queue.manager
+
+    jobby: '@markup_job_queue.manager'
+    Markup\JobQueueBundle\Service\JobManager: '@markup_job_queue.manager'
+
     markup_job_queue.reader.recurring_console_command:
         class: Markup\JobQueueBundle\Service\RecurringConsoleCommandReader
         arguments:
             - '%kernel.root_dir%'
+
+    Markup\JobQueueBundle\Service\RecurringConsoleCommandReader: '@markup_job_queue.reader.recurring_console_command'
+
     markup_job_queue.writer.supervisord_config_file:
         class: Markup\JobQueueBundle\Service\SupervisordConfigFileWriter
         arguments:
@@ -30,43 +38,72 @@ services:
             - ~
             - ~
             - ~
+
+    Markup\JobQueueBundle\Service\SupervisordConfigFileWriter: '@markup_job_queue.writer.supervisord_config_file'
+
     markup_job_queue.scheduled:
         class: Markup\JobQueueBundle\Service\ScheduledJobService
         arguments:
             - '@doctrine'
 
+    Markup\JobQueueBundle\Service\ScheduledJobService: '@markup_job_queue.scheduled'
+
     markup_job_queue.writer.cli_consumer_config_file:
         class: Markup\JobQueueBundle\Service\CliConsumerConfigFileWriter
+
+    Markup\JobQueueBundle\Service\CliConsumerConfigFileWriter: '@markup_job_queue.writer.cli_consumer_config_file'
+
     markup_job_queue.rabbit_mq_api.client:
         class: Markup\RabbitMq\ManagementApi\Client
+
+    Markup\RabbitMq\ManagementApi\Client: '@markup_job_queue.rabbit_mq_api.client'
+
     markup_job_queue.rabbit_mq_api:
         class: Markup\RabbitMq\ApiFactory
         arguments:
             - '@markup_job_queue.rabbit_mq_api.client'
+
+    Markup\RabbitMq\ApiFactory: '@markup_job_queue.rabbit_mq_api'
+
     markup_job_queue.reader.queue:
         class: Markup\JobQueueBundle\Reader\QueueReader
         arguments:
             - '@markup_job_queue.rabbit_mq_api'
             - ~
+
+    Markup\JobQueueBundle\Reader\QueueReader: '@markup_job_queue.reader.queue'
+
     markup_job_queue.repository.job_log:
         class: Markup\JobQueueBundle\Repository\JobLogRepository
         arguments:
             - '@snc_redis.default'
             - '@markup_job_queue.reader.recurring_console_command'
+
+    Markup\JobQueueBundle\Repository\JobLogRepository: '@markup_job_queue.repository.job_log'
+
     markup_job_queue.repository.cron_health:
         class: Markup\JobQueueBundle\Repository\CronHealthRepository
         arguments:
             - '@snc_redis.default'
+
+    Markup\JobQueueBundle\Repository\CronHealthRepository: '@markup_job_queue.repository.cron_health'
+
     markup_job_queue.event_subscriber.add_uuid_option_to_console_command:
         class: Markup\JobQueueBundle\EventSubscriber\AddUuidOptionConsoleCommandEventSubscriber
         tags:
             - { name: kernel.event_subscriber }
+
+    Markup\JobQueueBundle\EventSubscriber\AddUuidOptionConsoleCommandEventSubscriber: '@markup_job_queue.event_subscriber.add_uuid_option_to_console_command'
+
     markup_job_queue.event_subscriber.log_console_command:
         class: Markup\JobQueueBundle\EventSubscriber\LogConsoleCommandEventSubscriber
         arguments:
             - '@markup_job_queue.repository.job_log'
         tags:
             - { name: kernel.event_subscriber }
+
+    Markup\JobQueueBundle\EventSubscriber\LogConsoleCommandEventSubscriber: '@markup_job_queue.event_subscriber.log_console_command'
+
     markup_job_queue.event_subscriber.complete_console_command:
         class: Markup\JobQueueBundle\EventSubscriber\CompleteConsoleCommandEventSubscriber
         arguments:
@@ -74,19 +111,26 @@ services:
         tags:
             - { name: kernel.event_subscriber }
 
+    Markup\JobQueueBundle\EventSubscriber\CompleteConsoleCommandEventSubscriber: '@markup_job_queue.event_subscriber.complete_console_command'
+
     markup_job_queue.reader.recurring_console_command_configuration_job_log:
         class: Markup\JobQueueBundle\Reader\RecurringConsoleCommandConfigurationJobLogReader
         arguments:
             - '@markup_job_queue.reader.recurring_console_command'
             - '@markup_job_queue.repository.job_log'
 
+    Markup\JobQueueBundle\Reader\RecurringConsoleCommandConfigurationJobLogReader: '@markup_job_queue.reader.recurring_console_command_configuration_job_log'
+
     markup_job_queue.form.type.search_jobs:
         class: Markup\JobQueueBundle\Form\Type\SearchJobLogs
         tags:
             - { name: form.type, alias: phoenix_admin_search_job_logs }
+
+    Markup\JobQueueBundle\Form\Type\SearchJobLogs: '@markup_job_queue.form.type.search_jobs'
 
     markup_job_queue.form.handler.search_jobs:
         class: Markup\JobQueueBundle\Form\Handler\SearchJobLogs
         arguments:
             - '@markup_job_queue.repository.job_log'
 
+    Markup\JobQueueBundle\Form\Handler\SearchJobLogs: '@markup_job_queue.form.handler.search_jobs'

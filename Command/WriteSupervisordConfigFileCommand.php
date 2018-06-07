@@ -12,7 +12,6 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class WriteSupervisordConfigFileCommand extends ContainerAwareCommand
 {
-
     /**
      * @see Command
      */

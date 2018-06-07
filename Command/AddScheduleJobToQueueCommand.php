@@ -12,7 +12,6 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class AddScheduleJobToQueueCommand extends ContainerAwareCommand
 {
-
     /**
      * @see Command
      */

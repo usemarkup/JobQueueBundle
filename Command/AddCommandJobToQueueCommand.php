@@ -13,7 +13,6 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class AddCommandJobToQueueCommand extends ContainerAwareCommand
 {
-
     /**
      * @see Command
      */
@@ -55,7 +54,7 @@ class AddCommandJobToQueueCommand extends ContainerAwareCommand
         $timeout = $input->getOption('timeout');
         $idleTimeout = $input->getOption('idle_timeout');
 
-        $jobby = $this->getContainer()->get('jobby')->addCommandJob($command, $topic, $timeout, $idleTimeout);
+        $this->getContainer()->get('jobby')->addCommandJob($command, $topic, $timeout, $idleTimeout);
 
         $output->writeln('<info>Added command to job queue</info>');
     }

@@ -18,7 +18,6 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class AddTestJobCommand extends ContainerAwareCommand
 {
-
     const TYPE_SLEEP = 'sleep';
     const TYPE_BAD = 'bad';
     const TYPE_ERROR = 'error';

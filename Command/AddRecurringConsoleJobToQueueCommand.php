@@ -15,7 +15,6 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class AddRecurringConsoleJobToQueueCommand extends ContainerAwareCommand
 {
-
     /**
      * @see Command
      */

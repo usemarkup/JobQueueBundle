@@ -1,0 +1,41 @@
+services:
+    markup_job_queue.command.add_command_job_to_queue:
+        class: Markup\JobQueueBundle\Command\AddCommandJobToQueueCommand
+        tags:
+            - { name: console.command, command: 'markup:job_queue:add:command' }
+    markup_job_queue.command.add_recurring_console_job_to_queue:
+        class: Markup\JobQueueBundle\Command\AddRecurringConsoleJobToQueueCommand
+        tags:
+            - { name: console.command, command: 'markup:job_queue:recurring:add' }
+    markup_job_queue.command.add_schedule_job_to_queue:
+        class: Markup\JobQueueBundle\Command\AddScheduleJobToQueueCommand
+        tags:
+            - { name: console.command, command: 'markup:scheduled_job:add' }
+    markup_job_queue.command.add_test_job:
+        class: Markup\JobQueueBundle\Command\AddTestJobCommand
+        tags:
+            - { name: console.command, command: 'markup:job_queue:add:test' }
+    markup_job_queue.command.check_recurring_job_configuration:
+        class: Markup\JobQueueBundle\Command\CheckRecurringJobConfigurationCommand
+        tags:
+            - { name: console.command, command: 'markup:job_queue:recurring:check' }
+    markup_job_queue.command.consumer:
+        class: Markup\JobQueueBundle\Command\ConsumerCommand
+        tags:
+            - { name: console.command, command: 'markup:job_queue:consumer' }
+    markup_job_queue.command.read_recurring_console_job_configuration:
+        class: Markup\JobQueueBundle\Command\ReadRecurringConsoleJobConfigurationCommand
+        tags:
+            - { name: console.command, command: 'markup:job_queue:recurring:view' }
+    markup_job_queue.command.run_test_job:
+        class: Markup\JobQueueBundle\Command\RunTestJobCommand
+        tags:
+            - { name: console.command, command: 'markup:job_queue:run:test' }
+    markup_job_queue.command.write_cli_consumer_config_file:
+        class: Markup\JobQueueBundle\Command\WriteCliConsumerConfigFileCommand
+        tags:
+            - { name: console.command, command: 'markup:job_queue:cli_consumer_config:write' }
+    markup_job_queue.command.write_supervisord_config_file:
+        class: Markup\JobQueueBundle\Command\WriteSupervisordConfigFileCommand
+        tags:
+            - { name: console.command, command: 'markup:job_queue:supervisord_config:write'' }

@@ -12,7 +12,6 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class WriteCliConsumerConfigFileCommand extends ContainerAwareCommand
 {
-
     /**
      * @see Command
      */

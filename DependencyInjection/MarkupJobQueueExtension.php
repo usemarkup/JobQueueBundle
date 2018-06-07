@@ -29,6 +29,7 @@ class MarkupJobQueueExtension extends Extension
 
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.yml');
+        $loader->load('commands.yml');
 
         $this->registerRecurringConfigurationFile($config, $container);
         $this->addSupervisordConfig($config, $container);

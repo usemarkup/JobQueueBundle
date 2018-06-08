@@ -50,6 +50,7 @@ services:
 
     markup_job_queue.writer.cli_consumer_config_file:
         class: Markup\JobQueueBundle\Service\CliConsumerConfigFileWriter
+        abstract: true
 
     Markup\JobQueueBundle\Service\CliConsumerConfigFileWriter: '@markup_job_queue.writer.cli_consumer_config_file'
 

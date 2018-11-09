@@ -10,14 +10,14 @@ use Markup\JobQueueBundle\Service\JobManager;
 use Markup\JobQueueBundle\Service\ScheduledJobService;
 use Mockery as m;
 use Markup\JobQueueBundle\Model\ScheduledJobRepositoryInterface;
+use Mockery\Adapter\Phpunit\MockeryTestCase;
 
-class ScheduledJobServiceTest extends \PHPUnit_Framework_TestCase
+class ScheduledJobServiceTest extends MockeryTestCase
 {
     private $doctrine;
 
-    public function setUp()
+    protected function setUp()
     {
-
         $scheduledJobRepository = m::mock(ScheduledJobRepositoryInterface::class);
         $scheduledJobRepository->shouldReceive('save');
 
@@ -42,10 +42,5 @@ class ScheduledJobServiceTest extends \PHPUnit_Framework_TestCase
         $scheduledJob = new ScheduledJob($job->getCommand(), $scheduledTime, $topic);
 
         $this->assertEquals($this->scheduledJobService->addScheduledJob($job, $scheduledTime), $scheduledJob);
-    }
-
-    public function tearDown()
-    {
-        m::close();
     }
 }

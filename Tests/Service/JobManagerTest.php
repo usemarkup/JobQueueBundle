@@ -3,15 +3,19 @@
 namespace Markup\Bundle\JobQueueBundle\Tests\Service;
 
 use Markup\JobQueueBundle\Job\SleepJob;
+use Markup\JobQueueBundle\Publisher\JobPublisher;
 use Markup\JobQueueBundle\Service\JobManager;
+use Markup\JobQueueBundle\Service\ScheduledJobService;
 use Mockery as m;
+use Mockery\Adapter\Phpunit\MockeryTestCase;
+use PHPUnit\Framework\Error\Error;
 
-class JobManagerTest extends \PHPUnit_Framework_TestCase
+class JobManagerTest extends MockeryTestCase
 {
-    public function setUp()
+    protected function setUp()
     {
-        $jobPublisher = m::mock('Markup\JobQueueBundle\Publisher\JobPublisher');
-        $scheduledJob = m::mock('Markup\JobQueueBundle\Service\ScheduledJobService');
+        $jobPublisher = m::mock(JobPublisher::class);
+        $scheduledJob = m::mock(ScheduledJobService::class);
         $jobPublisher->shouldReceive('publish')->andReturn(null);
         $scheduledJob->shouldReceive('addScheduledJob')->andReturn(null);
         $this->jobManager = new JobManager($jobPublisher, $scheduledJob);
@@ -31,7 +35,7 @@ class JobManagerTest extends \PHPUnit_Framework_TestCase
         $exceptionThrown = false;
         try {
             $this->jobManager->addJob($badjob);
-        } catch (\PHPUnit_Framework_Error $e) {
+        } catch (Error $e) {
             $exceptionThrown = true;
         } catch (\TypeError $e) {
             $exceptionThrown = true;
@@ -44,10 +48,5 @@ class JobManagerTest extends \PHPUnit_Framework_TestCase
     public function testCanAddCommandJob()
     {
         $this->assertNull($this->jobManager->addCommandJob('console:herp:derp', 'system', 60, 60));
-    }
-
-    public function tearDown()
-    {
-        m::close();
     }
 }

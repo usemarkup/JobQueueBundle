@@ -3,15 +3,10 @@
 namespace Markup\Bundle\JobQueueBundle\Tests\Service;
 
 use Markup\JobQueueBundle\Service\CliConsumerConfigFileWriter;
-use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
-class CliConsumerConfigFileWriterTest extends \PHPUnit_Framework_TestCase
+class CliConsumerConfigFileWriterTest extends TestCase
 {
-    public function setUp()
-    {
-
-    }
-
     public function testCreatesCorrectConfigString()
     {
         $writer = new CliConsumerConfigFileWriter(
@@ -29,10 +24,5 @@ class CliConsumerConfigFileWriterTest extends \PHPUnit_Framework_TestCase
         $config = $writer->getConfigString('dev', 'indexing', ['prefetch_count' => 1]);
 
         $this->assertEquals($fixture, $config);
-    }
-
-    public function tearDown()
-    {
-        m::close();
     }
 }

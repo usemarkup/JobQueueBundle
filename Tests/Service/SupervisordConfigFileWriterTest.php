@@ -3,11 +3,11 @@
 namespace Markup\Bundle\JobQueueBundle\Tests\Service;
 
 use Markup\JobQueueBundle\Service\SupervisordConfigFileWriter;
-use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
-class SupervisordConfigFileWriterTest extends \PHPUnit_Framework_TestCase
+class SupervisordConfigFileWriterTest extends TestCase
 {
-    public function setUp()
+    protected function setUp()
     {
         $this->writer = new SupervisordConfigFileWriter(
             '/vagrant/app',
@@ -39,10 +39,5 @@ class SupervisordConfigFileWriterTest extends \PHPUnit_Framework_TestCase
         $config = $this->writer->getConfigForPhpConsumer('testenv', $skipCheck = true);
 
         $this->assertEquals($fixture, $config);
-    }
-
-    public function tearDown()
-    {
-        m::close();
     }
 }

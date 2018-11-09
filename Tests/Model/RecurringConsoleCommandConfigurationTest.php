@@ -3,14 +3,10 @@
 namespace Markup\Bundle\JobQueueBundle\Tests\Service;
 
 use Markup\JobQueueBundle\Model\RecurringConsoleCommandConfiguration;
-use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
-class RecurringConsoleCommandConfigurationTest extends \PHPUnit_Framework_TestCase
+class RecurringConsoleCommandConfigurationTest extends TestCase
 {
-    public function setUp()
-    {
-    }
-
     public function testCanBeConstructed()
     {
         $config = new RecurringConsoleCommandConfiguration('foo:bar', 'test', '30 1 * * *', 'a short description');
@@ -18,10 +14,5 @@ class RecurringConsoleCommandConfigurationTest extends \PHPUnit_Framework_TestCa
         $this->assertEquals($config->getTopic(), 'test');
         $this->assertEquals($config->getSchedule(), '30 1 * * *');
         $this->assertEquals($config->getDescription(), 'a short description');
-    }
-
-    public function tearDown()
-    {
-        m::close();
     }
 }

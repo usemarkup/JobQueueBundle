@@ -39,9 +39,8 @@
         "ricbra/rabbitmq-cli-consumer": "To consume jobs with Go instead of PHP"
     },
     "autoload": {
-        "psr-0": { "Markup\\JobQueueBundle": "" }
+        "psr-4": { "Markup\\JobQueueBundle\\": "" }
     },
-    "target-dir": "Markup/JobQueueBundle",
     "extra": {
         "branch-alias": {
             "dev-master": "2.0-dev"

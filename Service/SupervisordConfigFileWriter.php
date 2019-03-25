@@ -7,17 +7,6 @@ use Symfony\Component\Filesystem\Filesystem;
 
 class SupervisordConfigFileWriter
 {
-
-    /**
-     * Symfony command that receives message from RabbitMQ and processes it (cli consumer)
-     */
-    const CLI_CONSUMPTION_COMMAND = 'markup:job_queue:consumer';
-
-    /**
-     * Symfony command that receives message from RabbitMQ and processes it (php consumer)
-     */
-    const PHP_CONSUMPTION_COMMAND = 'rabbitmq:consumer';
-
     const MODE_PHP = 'php';
     const MODE_CLI = 'cli';
 
@@ -161,7 +150,7 @@ class SupervisordConfigFileWriter
                 '%s -e "%s/console %s --strict-exit-code --env=%s --no-debug" -c %s -V -i --strict-exit-code',
                 $this->consumerPath,
                 $kernelPath,
-                self::CLI_CONSUMPTION_COMMAND,
+                $topicConfig['consumer'],
                 $this->kernelEnv,
                 $cliConfigFile
             );
@@ -201,7 +190,7 @@ class SupervisordConfigFileWriter
             $consumerCommand = sprintf(
                 '%s/console %s -m %s %s --env=%s --no-debug',
                 $this->kernelPath,
-                self::PHP_CONSUMPTION_COMMAND,
+                'rabbitmq:consumer',
                 $topicConfig['prefetch_count'],
                 $topic,
                 $this->kernelEnv

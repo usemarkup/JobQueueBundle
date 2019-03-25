@@ -18,8 +18,8 @@ class SupervisordConfigFileWriterTest extends TestCase
             '/etc/rabbitmq-cli-consumer/config'
         );
 
-        $topicA = ['prefetch_count' => 1];
-        $topicB = ['prefetch_count' => 2];
+        $topicA = ['prefetch_count' => 1, 'consumer' => 'markup:job_queue:consumer'];
+        $topicB = ['prefetch_count' => 2, 'consumer' => 'markup:job_queue:consumer'];
         $this->writer->setTopicsConfiguration(['testqueuea' => $topicA, 'testqueueb' => $topicB]);
     }
 

@@ -44,7 +44,7 @@ class RabbitMqConsumerCommand extends ContainerAwareCommand
         $strict = $input->getOption('strict-exit-code');
 
         /** @var ConsumerInterface $consumer */
-        $consumer = $this->getContainer()->get('consumer');
+        $consumer = $this->getContainer()->get('simple_bus.rabbit_mq_bundle_bridge.commands_consumer');
 
         if ($consumer instanceof ConsumerInterface) {
             return 0;

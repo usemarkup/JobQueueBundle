@@ -38,4 +38,7 @@ services:
     markup_job_queue.command.write_supervisord_config_file:
         class: Markup\JobQueueBundle\Command\WriteSupervisordConfigFileCommand
         tags:
-            - { name: console.command, command: 'markup:job_queue:supervisord_config:write'' }
+            - { name: console.command, command: 'markup:job_queue:supervisord_config:write' }
+    Markup\JobQueueBundle\Command\RabbitMqConsumerCommand:
+        tags:
+            - { name: console.command, command: 'markup:job_queue:rabbitmq_consumer' }

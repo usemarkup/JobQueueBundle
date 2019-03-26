@@ -46,7 +46,7 @@ class RabbitMqConsumerCommand extends ContainerAwareCommand
         /** @var ConsumerInterface $consumer */
         $consumer = $this->getContainer()->get('simple_bus.rabbit_mq_bundle_bridge.commands_consumer');
 
-        if ($consumer instanceof ConsumerInterface) {
+        if (!$consumer instanceof ConsumerInterface) {
             return 0;
         }
 

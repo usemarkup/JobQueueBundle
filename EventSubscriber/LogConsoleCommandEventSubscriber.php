@@ -17,8 +17,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class LogConsoleCommandEventSubscriber implements EventSubscriberInterface
 {
-    use CheckUsingSymfony28Trait;
-
     /**
      * @var JobLogRepository
      */
@@ -49,14 +47,10 @@ class LogConsoleCommandEventSubscriber implements EventSubscriberInterface
      */
     public function onConsoleCommand(ConsoleCommandEvent $event)
     {
+        $input = $event->getInput();
 
-        // following jiggerypokery can be removed in symfony 2.8+
-        if ($this->isUsingAtLeastSymfony28()) {
-            $input = $event->getInput();
-        } else {
-            $event->getCommand()->mergeApplicationDefinition();
-            $input = new ArgvInput();
-            $input->bind($event->getCommand()->getDefinition());
+        if (!$input->hasOption('uuid')) {
+            return;
         }
 
         $uuid = $input->getOption('uuid');

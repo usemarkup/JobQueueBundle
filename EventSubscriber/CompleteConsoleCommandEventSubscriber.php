@@ -7,12 +7,9 @@ use Markup\JobQueueBundle\Exception\UnknownJobLogException;
 use Markup\JobQueueBundle\Model\JobLog;
 use Markup\JobQueueBundle\Repository\JobLogRepository;
 use Symfony\Component\Console\ConsoleEvents;
-use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Event\ConsoleEvent;
 use Symfony\Component\Console\Event\ConsoleExceptionEvent;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
-use Symfony\Component\Console\Input\ArgvInput;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -27,8 +24,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class CompleteConsoleCommandEventSubscriber implements EventSubscriberInterface
 {
-    use CheckUsingSymfony28Trait;
-
     /**
      * @var JobLogRepository
      */
@@ -47,15 +42,11 @@ class CompleteConsoleCommandEventSubscriber implements EventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        $consoleErrorEvent = (class_exists('Symfony\Component\Console\Event\ConsoleErrorEvent'))
-            ? ConsoleEvents::ERROR
-            : ConsoleEvents::EXCEPTION;
-
         return [
             ConsoleEvents::TERMINATE => [
                 ['onConsoleTerminate', 10]
             ],
-            $consoleErrorEvent => [
+            ConsoleEvents::ERROR => [
                 ['onConsoleError', 10]
             ],
         ];
@@ -67,15 +58,14 @@ class CompleteConsoleCommandEventSubscriber implements EventSubscriberInterface
      */
     public function onConsoleTerminate(ConsoleTerminateEvent $event)
     {
-        if ($this->isUsingAtLeastSymfony28()) {
-            $input = $event->getInput();
-        } else {
-            $event->getCommand()->mergeApplicationDefinition();
-            $input = new ArgvInput();
-            $input->bind($event->getCommand()->getDefinition());
+        $input = $event->getInput();
+
+        if (!$input->hasOption('uuid')) {
+            return;
         }
 
         $uuid = $input->getOption('uuid');
+
         if (!$uuid) {
             return;
         }
@@ -102,12 +92,10 @@ class CompleteConsoleCommandEventSubscriber implements EventSubscriberInterface
      */
     public function onConsoleError(ConsoleEvent $event)
     {
-        if ($this->isUsingAtLeastSymfony28()) {
-            $input = $event->getInput();
-        } else {
-            $event->getCommand()->mergeApplicationDefinition();
-            $input = new ArgvInput();
-            $input->bind($event->getCommand()->getDefinition());
+        $input = $event->getInput();
+
+        if (!$input->hasOption('uuid')) {
+            return;
         }
 
         $uuid = $input->getOption('uuid');

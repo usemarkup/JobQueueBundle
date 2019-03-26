@@ -141,8 +141,8 @@ class MarkupJobQueueExtension extends Extension
         if ($isUsingSymfony4OrGreater && $config['use_root_dir_for_symfony_console']) {
             throw new \Exception('The `use_root_dir_for_symfony_console` option cannot be used with Symfony 4+.');
         }
-        $isUsingSymfony2 = Kernel::MAJOR_VERSION === 2;
-        if ($isUsingSymfony2 || $config['use_root_dir_for_symfony_console']) {
+
+        if ($config['use_root_dir_for_symfony_console']) {
             $container->setParameter($parameter, $container->getParameter('kernel.root_dir'));
 
             return;

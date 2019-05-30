@@ -28,9 +28,11 @@ class SleepJob extends Job
     /**
      * {@inheritdoc}
      */
-    public function run(ContainerInterface $container)
+    public function run(ContainerInterface $container): string
     {
         $process = new Process(sprintf('sleep %s', $this->args['time']));
         $process->run();
+
+        return '';
     }
 }

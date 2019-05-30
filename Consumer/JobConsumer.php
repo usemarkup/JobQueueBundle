@@ -4,8 +4,8 @@ namespace Markup\JobQueueBundle\Consumer;
 
 use Markup\JobQueueBundle\Exception\JobFailedException;
 use Markup\JobQueueBundle\Exception\JobMissingClassException;
-use Markup\JobQueueBundle\Job\ConsoleCommandJob;
 use Markup\JobQueueBundle\Model\Job;
+use Markup\JobQueueBundle\Job\ConsoleCommandJob;
 use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
 use PhpAmqpLib\Message\AMQPMessage;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
@@ -56,7 +56,7 @@ class JobConsumer implements ConsumerInterface, ContainerAwareInterface
             }
 
             $exitCode = null;
-            $output = $e->getMessage();
+            $output = sprintf('%s - %s', $e->getMessage(), $e->getTraceAsString());
             if ($e instanceof JobFailedException) {
                 $exitCode = intval($e->getExitCode());
             }

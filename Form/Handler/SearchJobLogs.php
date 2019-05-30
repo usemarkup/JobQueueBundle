@@ -3,7 +3,6 @@
 namespace Markup\JobQueueBundle\Form\Handler;
 
 use Markup\JobQueueBundle\Repository\JobLogRepository;
-use Pagerfanta\Adapter\FixedAdapter;
 use Pagerfanta\Pagerfanta;
 use Markup\JobQueueBundle\Form\Data\SearchJobLogs as SearchJobLogsData;
 
@@ -12,8 +11,6 @@ use Markup\JobQueueBundle\Form\Data\SearchJobLogs as SearchJobLogsData;
  */
 class SearchJobLogs
 {
-    const PAGINATION_LIMIT = 10;
-
     /**
      * @var JobLogRepository
      */
@@ -28,20 +25,14 @@ class SearchJobLogs
     }
 
     /**
-     * @param SearchJobLogs $data
-     * @returns PagerFanta
+     * @param SearchJobLogsData $options
+     *
+     * @param int $page
+     *
+     * @return Pagerfanta
      */
-    public function handle(SearchJobLogsData $options)
+    public function handle(SearchJobLogsData $options, int $page = 1)
     {
-        $count = $this->jobLogRepository->getJobLogs($options, self::PAGINATION_LIMIT, $countOnly = true);
-        $results = $this->jobLogRepository->getJobLogs($options, self::PAGINATION_LIMIT);
-
-        $adapter = new FixedAdapter($count, $results);
-        $logs = new Pagerfanta($adapter);
-
-        $logs->setCurrentPage($options->getPage());
-        $logs->setMaxPerPage(self::PAGINATION_LIMIT);
-
-        return $logs;
+        return $this->jobLogRepository->getJobLogs($options, 10, $page);
     }
 }

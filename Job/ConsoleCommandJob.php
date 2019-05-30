@@ -20,7 +20,7 @@ class ConsoleCommandJob extends Job
     /**
      * {inheritdoc}
      */
-    public function run(ContainerInterface $container)
+    public function run(ContainerInterface $container): string
     {
         ini_set('max_execution_time', 7200);
         $command = $this->args['command'];
@@ -63,7 +63,7 @@ class ConsoleCommandJob extends Job
                 );
                 throw new JobFailedException($message, $process->getExitCode());
             }
-            return $process->getOutput();
+            return strval($process->getOutput());
          } catch (ProcessTimedOutException $e) {
             if ($e->isGeneralTimeout()) {
                 throw new JobFailedException(sprintf('Timeout: %s', $e->getMessage()), $process->getExitCode(), 0, $e);

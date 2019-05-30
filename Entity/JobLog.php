@@ -1,6 +1,6 @@
 <?php
 
-namespace Markup\JobQueueBundle\Model;
+namespace Markup\JobQueueBundle\Entity;
 
 use Symfony\Component\Process\Process;
 
@@ -46,7 +46,7 @@ class JobLog
     private $status;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $output;
 
@@ -65,38 +65,21 @@ class JobLog
      */
     private $exitCode;
 
-    /**
-     * @param string $command
-     * @param string $uuid
-     * @param string $topic
-     * @param \DateTime $added
-     * @param string $status
-     * @param string $output
-     * @param string|null $exitCode
-     * @param int|null $peakMemoryUse
-     * @param \DateTime|null $completed
-     */
     public function __construct(
-        $command,
-        $uuid = null,
-        $topic = self::TOPIC_UNDEFINED,
-        $added = null,
-        $status = self::STATUS_ADDED,
-        $output = '',
-        $exitCode = null,
-        $peakMemoryUse = null,
-        $completed = null,
-        $started = null
+        string $command,
+        string $uuid = null,
+        string $topic = self::TOPIC_UNDEFINED,
+        ?\DateTime $added = null,
+        string $status = self::STATUS_ADDED,
+        ?string $output = null,
+        ?string $exitCode = null,
+        ?int $peakMemoryUse = null,
+        ?\DateTime $completed = null,
+        ?\DateTime $started = null
     ) {
         $this->command = $command;
         $this->topic = $topic;
-        if ($added instanceof \DateTime) {
-            $added = $added->format('U');
-        }
-        if (!$added) {
-            $added = (new \DateTime('now'))->format('U');
-        }
-        $this->added = $added;
+        $this->added = $added ?? new \DateTime();
         $this->completed = $completed;
         $this->started = $started;
         $this->status = $status;
@@ -107,7 +90,7 @@ class JobLog
         // none of these values are mutable so are suitable to generate uuid
         // the 'added' makes it unique
         if (!$uuid) {
-            $uuid = $this->generateUuid($command, $topic, $added);
+            $uuid = $this->generateUuid($command, $topic, $this->added->format('U'));
         }
         $this->uuid = $uuid;
     }
@@ -121,7 +104,7 @@ class JobLog
      */
     public static function fromCompressedArray(
         array $array
-    ) {
+    ): self {
         return new self(
             $array['command'],
             $array['uuid'],
@@ -136,12 +119,7 @@ class JobLog
         );
     }
 
-    /**
-     * Converts this object into an array suitable for storing in redis
-     *
-     * @return array
-     */
-    public function toCompressedArray()
+    public function toCompressedArray(): array
     {
         return [
             'command' => $this->getCommand(),
@@ -157,179 +135,112 @@ class JobLog
         ];
     }
 
-    /**
-     * @return string
-     */
-    public function getCommand()
+    public function getCommand(): string
     {
         return $this->command;
     }
 
-    /**
-     * @return string
-     */
-    public function getTopic()
+    public function getTopic(): string
     {
         return $this->topic;
     }
 
-    /**
-     * @return string
-     */
-    public function getAdded()
+    public function getAdded(): ?\DateTime
     {
         return $this->added;
     }
 
-    /**
-     * @return string
-     */
-    public function getCompleted()
+    public function getCompleted(): ?\DateTime
     {
         return $this->completed;
     }
 
     /**
-     * The duration of the job in seconds
-     *
-     * @return integer
+     * Returns duration in seconds
+     * @return int
      */
-    public function getDuration()
+    public function getDuration(): int
     {
         if (!$this->getCompleted() || !$this->getStarted()) {
             return 0;
         }
-        $duration = $this->getCompleted() - $this->getStarted();
+        $diff = $this->getCompleted()->diff($this->getStarted());
+
+        // convert diff to duration seconds
+        $duration = ($diff->days * 3600 * 24) + ($diff->h * 3600) + ($diff->i * 60) + $diff->s;
         if ($duration === 0) {
             $duration = 1;
         }
-        return $duration;
+
+        return intval($duration);
     }
 
-    /**
-     * @return string
-     */
-    public function getStatus()
+    public function getStatus(): string
     {
         return $this->status;
     }
 
-    /**
-     * @return string
-     */
-    public function getOutput()
+    public function getOutput(): ?string
     {
         return $this->output;
     }
 
-    /**
-     * @return int
-     */
-    public function getPeakMemoryUse()
+    public function getPeakMemoryUse(): ?int
     {
         return $this->peakMemoryUse;
     }
 
-    /**
-     * @return string
-     */
-    public function getUuid()
+    public function getUuid(): string
     {
         return $this->uuid;
     }
 
-    /**
-     * @return string
-     */
-    public function getExitCode()
+    public function getExitCode(): ?string
     {
         return $this->exitCode;
     }
 
-    /**
-     * @param $command
-     * @param $topic
-     * @param string $added
-     *
-     * @return string
-     */
-    private function generateUuid($command, $topic, $added)
+    private function generateUuid(string $command, string $topic, string $added): string
     {
         return hash('SHA256', $command.$topic.$added);
     }
 
-    /**
-     * @param string|null $completed
-     * @return JobLog
-     */
-    public function setCompleted($completed)
+    public function setCompleted(?\DateTime $completed = null)
     {
         $this->completed = $completed;
-        return $this;
     }
 
-    /**
-     * @param string $status
-     * @return JobLog
-     */
-    public function setStatus($status)
+    public function setStatus(string $status)
     {
         $this->status = $status;
-        return $this;
     }
 
-    /**
-     * @param string $output
-     * @return JobLog
-     */
-    public function setOutput($output)
+    public function setOutput(?string $output = null)
     {
         $this->output = $output;
-        return $this;
     }
 
-    /**
-     * @param int|null $peakMemoryUse
-     * @return JobLog
-     */
-    public function setPeakMemoryUse($peakMemoryUse)
+    public function setPeakMemoryUse(?int $peakMemoryUse = null)
     {
         $this->peakMemoryUse = $peakMemoryUse;
-        return $this;
     }
 
-    /**
-     * @param null|string $exitCode
-     * @return JobLog
-     */
-    public function setExitCode($exitCode)
+    public function setExitCode(?string $exitCode)
     {
         $this->exitCode = $exitCode;
-        return $this;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getStarted()
+    public function getStarted(): ?\DateTime
     {
         return $this->started;
     }
 
-    /**
-     * @param string|null $started
-     * @return JobLog
-     */
-    public function setStarted($started)
+    public function setStarted(?\DateTime $started = null): void
     {
         $this->started = $started;
-        return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getExitCodeText()
+    public function getExitCodeText(): string
     {
         if (!$this->getExitCode()) {
             return '';

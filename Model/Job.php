@@ -45,9 +45,11 @@ abstract class Job
     }
 
     /**
-     * @param ContainerInterface|null $container
+     * @param ContainerInterface $container
+     *
+     * @return string - output of command
      */
-    abstract public function run(ContainerInterface $container);
+    abstract public function run(ContainerInterface $container): string;
 
     /**
      * To be run after job constructed to check arguments are correct

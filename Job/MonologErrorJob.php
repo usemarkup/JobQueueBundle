@@ -13,9 +13,11 @@ class MonologErrorJob extends Job
     /**
      * {@inheritdoc}
      */
-    public function run(ContainerInterface $container)
+    public function run(ContainerInterface $container): string
     {
         $logger = $container->get('logger');
         $logger->error('Test job produced an error');
+
+        return 'Test job produced an error';
     }
 }

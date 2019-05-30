@@ -2,6 +2,7 @@
 
 namespace Markup\JobQueueBundle\Model;
 
+use Markup\JobQueueBundle\Entity\JobLog;
 use Doctrine\Common\Collections\ArrayCollection;
 
 /**

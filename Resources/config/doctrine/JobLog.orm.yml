@@ -1,0 +1,36 @@
+Markup\JobQueueBundle\Entity\JobLog:
+  type: entity
+  table: job_log
+  id:
+    uuid:
+      type: string
+      unique: true
+      length: 100
+  fields:
+    command:
+      type: text
+    topic:
+      type: string
+      length: 60
+    added:
+      type: datetime
+    started:
+      type: datetime
+      nullable: true
+    completed:
+      type: datetime
+      nullable: true
+    status:
+      type: string
+      length: 60
+    output:
+      type: text
+      nullable: true
+    peakMemoryUse:
+      type: integer
+      length: 255
+      nullable: true
+    exitCode:
+      type: string
+      length: 60
+      nullable: true

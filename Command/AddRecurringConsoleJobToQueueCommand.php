@@ -81,6 +81,6 @@ class AddRecurringConsoleJobToQueueCommand extends ContainerAwareCommand
 
     private function maintainJobLogs()
     {
-        $this->getContainer()->get('markup_job_queue.repository.job_log')->removeExpiredJobsFromSecondaryIndexes();
+        $this->getContainer()->get('markup_job_queue.repository.job_log')->removeExpiredJobs();
     }
 }

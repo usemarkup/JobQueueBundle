@@ -3,9 +3,12 @@
 namespace Markup\JobQueueBundle\Form\Type;
 
 use Markup\JobQueueBundle\Form\Data\SearchJobLogs as SearchJobLogsData;
-use Markup\JobQueueBundle\Model\JobLog;
-use Markup\JobQueueBundle\Util\LegacyFormHelper;
+use Markup\JobQueueBundle\Entity\JobLog;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -15,14 +18,21 @@ class SearchJobLogs extends AbstractType
     {
         $builder->add(
             'id',
-            LegacyFormHelper::getType('Symfony\Component\Form\Extension\Core\Type\TextType'),
+            TextType::class,
             [
                 'required' => false,
                 'label'    => 'Uuid'
             ]
         )->add(
+            'command',
+            TextType::class,
+            [
+                'required' => false,
+                'label'    => 'Command'
+            ]
+        )->add(
             'since',
-            LegacyFormHelper::getType('Symfony\Component\Form\Extension\Core\Type\DateTimeType'),
+            DateTimeType::class,
             [
                 'widget'   => 'single_text',
                 'attr'     => ['data-dtime-format' => "YYYY-MM-DDTHH:mm:ssZ"],
@@ -32,7 +42,7 @@ class SearchJobLogs extends AbstractType
             ]
         )->add(
             'before',
-            LegacyFormHelper::getType('Symfony\Component\Form\Extension\Core\Type\DateTimeType'),
+            DateTimeType::class,
             [
                 'widget'   => 'single_text',
                 'attr'     => ['data-dtime-format' => "YYYY-MM-DDTHH:mm:ssZ"],
@@ -42,7 +52,7 @@ class SearchJobLogs extends AbstractType
             ]
         )->add(
             'status',
-            LegacyFormHelper::getType('Symfony\Component\Form\Extension\Core\Type\ChoiceType'),
+            ChoiceType::class,
             [
                 'required' => false,
                 'multiple' => false,
@@ -56,20 +66,8 @@ class SearchJobLogs extends AbstractType
                 'choices_as_values' => true,
             ]
         )->add(
-            'command_configuration_id',
-            LegacyFormHelper::getType('Symfony\Component\Form\Extension\Core\Type\HiddenType'),
-            [
-                'required' => false,
-            ]
-        )->add(
-            'page',
-            LegacyFormHelper::getType('Symfony\Component\Form\Extension\Core\Type\HiddenType'),
-            [
-                'required' => false,
-            ]
-        )->add(
             'search',
-            LegacyFormHelper::getType('Symfony\Component\Form\Extension\Core\Type\SubmitType'),
+            SubmitType::class,
             ['attr' => ['class' => 'btn-info'], 'icon' => 'search', 'label' => 'Search']
         );
     }

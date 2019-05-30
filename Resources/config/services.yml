@@ -51,8 +51,7 @@ services:
     markup_job_queue.repository.job_log:
         class: Markup\JobQueueBundle\Repository\JobLogRepository
         arguments:
-            - '@snc_redis.default'
-            - '@markup_job_queue.reader.recurring_console_command'
+            - '@doctrine'
     markup_job_queue.repository.cron_health:
         class: Markup\JobQueueBundle\Repository\CronHealthRepository
         arguments:

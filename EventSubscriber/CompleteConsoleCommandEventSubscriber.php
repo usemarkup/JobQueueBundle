@@ -3,8 +3,7 @@
 namespace Markup\JobQueueBundle\EventSubscriber;
 
 use Markup\JobQueueBundle\Exception\MissingJobLogException;
-use Markup\JobQueueBundle\Exception\UnknownJobLogException;
-use Markup\JobQueueBundle\Model\JobLog;
+use Markup\JobQueueBundle\Entity\JobLog;
 use Markup\JobQueueBundle\Repository\JobLogRepository;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Event\ConsoleEvent;
@@ -70,19 +69,17 @@ class CompleteConsoleCommandEventSubscriber implements EventSubscriberInterface
             return;
         }
 
-        try {
-            // lookup job log and save status
-            $log = $this->jobLogRepository->getJobLog($uuid);
-
-            if($log->getStatus() === JobLog::STATUS_RUNNING) {
-                $log->setStatus(JobLog::STATUS_COMPLETE);
-            }
-            $log->setPeakMemoryUse($this->getPeakMemoryUse());
-            $log->setCompleted((new \DateTime('now'))->format('U'));
-            $this->jobLogRepository->save($log);
-        } catch (UnknownJobLogException $e){
-            // forgive exceptions
+        // lookup job log and save status
+        $log = $this->jobLogRepository->findJobLog($uuid);
+        if (!$log) {
+            return ;
         }
+        if($log->getStatus() === JobLog::STATUS_RUNNING) {
+            $log->setStatus(JobLog::STATUS_COMPLETE);
+        }
+        $log->setPeakMemoryUse($this->getPeakMemoryUse());
+        $log->setCompleted(new \DateTime());
+        $this->jobLogRepository->save($log);
 
     }
 
@@ -103,18 +100,15 @@ class CompleteConsoleCommandEventSubscriber implements EventSubscriberInterface
             return;
         }
 
-        try {
-            // lookup job log repository for log and create one if it doesn't exist
-            $log = $this->jobLogRepository->getJobLog($uuid);
-            if (!$log) {
-                throw new MissingJobLogException(sprintf('No log exists for uuid: `%s`', $uuid));
-            }
-
-            $log->setStatus(JobLog::STATUS_FAILED);
-            $this->jobLogRepository->save($log);
-        } catch (UnknownJobLogException $e){
-            // forgive exceptions
+        // lookup job log repository for log and create one if it doesn't exist
+        $log = $this->jobLogRepository->findJobLog($uuid);
+        if (!$log) {
+            throw new MissingJobLogException(sprintf('No log exists for uuid: `%s`', $uuid));
         }
+
+        $log->setStatus(JobLog::STATUS_FAILED);
+        $this->jobLogRepository->save($log);
+
     }
 
     private function getPeakMemoryUse()

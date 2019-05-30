@@ -2,12 +2,10 @@
 
 namespace Markup\JobQueueBundle\EventSubscriber;
 
-use Markup\JobQueueBundle\Exception\UnknownJobLogException;
-use Markup\JobQueueBundle\Model\JobLog;
+use Markup\JobQueueBundle\Entity\JobLog;
 use Markup\JobQueueBundle\Repository\JobLogRepository;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
-use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -59,16 +57,16 @@ class LogConsoleCommandEventSubscriber implements EventSubscriberInterface
         }
 
         // lookup job log repository for log and create one if it doesn't exist
-        try { 
-            $log = $this->jobLogRepository->getJobLog($uuid);
-        } catch (UnknownJobLogException $e) {
+
+        $log = $this->jobLogRepository->findJobLog($uuid);
+        if (!$log) {
             $commandString = $input->__toString();
             $log = $this->jobLogRepository->createAndSaveJobLog($commandString, $uuid);
         }
         
         // update job log to change status to running
         $log->setStatus(JobLog::STATUS_RUNNING);
-        $log->setStarted((new \DateTime('now'))->format('U'));
+        $log->setStarted(new \DateTime());
         $this->jobLogRepository->save($log);
     }
 }

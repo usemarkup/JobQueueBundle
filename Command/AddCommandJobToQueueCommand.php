@@ -2,7 +2,8 @@
 
 namespace Markup\JobQueueBundle\Command;
 
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Markup\JobQueueBundle\Service\JobManager;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -11,8 +12,19 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * This command adds another command to the job queue
  */
-class AddCommandJobToQueueCommand extends ContainerAwareCommand
+class AddCommandJobToQueueCommand extends Command
 {
+    /**
+     * @var JobManager
+     */
+    private $jobby;
+
+    public function __construct(JobManager $jobby)
+    {
+        parent::__construct();
+        $this->jobby = $jobby;
+    }
+
     /**
      * @see Command
      */
@@ -54,7 +66,7 @@ class AddCommandJobToQueueCommand extends ContainerAwareCommand
         $timeout = $input->getOption('timeout');
         $idleTimeout = $input->getOption('idle_timeout');
 
-        $this->getContainer()->get('jobby')->addCommandJob($command, $topic, $timeout, $idleTimeout);
+        $this->jobby->addCommandJob($command, $topic, $timeout, $idleTimeout);
 
         $output->writeln('<info>Added command to job queue</info>');
     }

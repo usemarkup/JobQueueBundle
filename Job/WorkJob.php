@@ -30,7 +30,7 @@ class WorkJob extends Job
     /**
      * {@inheritdoc}
      */
-    public function run(ContainerInterface $container)
+    public function run(ContainerInterface $container): string
     {
         $garbage = '';
         $completed = 0;
@@ -38,5 +38,7 @@ class WorkJob extends Job
             $garbage .= password_hash(openssl_random_pseudo_bytes($this->args['complexity']), PASSWORD_BCRYPT);
             $completed++;
         }
+
+        return '';
     }
 }

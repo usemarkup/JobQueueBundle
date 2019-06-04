@@ -267,7 +267,7 @@ class JobLogRepository
         if ($this->tempKey) {
             return $this->tempKey;
         }
-        $tmp = sprintf('%s:temp_key_%', self::REDIS_NAMESPACE, (new \DateTime('now'))->format('U'));
+        $tmp = sprintf('%s:temp_key_%s', self::REDIS_NAMESPACE, (new \DateTime('now'))->format('U'));
         $this->tempKey = $tmp;
         return $tmp;
     }

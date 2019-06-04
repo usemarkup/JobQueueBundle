@@ -27,13 +27,15 @@
         "doctrine/collections": "^1.2",
         "php-amqplib/rabbitmq-bundle": "^1.8",
         "snc/redis-bundle": "~1.1.2|^2",
-        "markup/rabbitmq-management-api": ">=2.1.1"
+        "markup/rabbitmq-management-api": ">=2.1.1",
+        "pagerfanta/pagerfanta": "^2.1"
     },
     "require-dev": {
         "phpunit/phpunit": "^7.2",
         "mockery/mockery": "^1.2",
         "symfony/form": "^3",
-        "predis/predis": "^1.0"
+        "predis/predis": "^1.0",
+        "phpstan/phpstan-shim": "^0.11.8"
     },
     "suggest": {
         "ricbra/rabbitmq-cli-consumer": "To consume jobs with Go instead of PHP"

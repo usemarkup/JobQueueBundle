@@ -16,6 +16,6 @@ class BadJob extends Job
      */
     public function run(ContainerInterface $container)
     {
-        callToUndefinedFunction();
+        throw new \Exception('Error');
     }
 }

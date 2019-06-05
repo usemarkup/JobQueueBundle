@@ -3,9 +3,8 @@ Markup\JobQueueBundle\Entity\JobLog:
   table: job_log
   id:
     uuid:
-      type: string
+      type: guid
       unique: true
-      length: 100
   fields:
     command:
       type: text
@@ -31,6 +30,5 @@ Markup\JobQueueBundle\Entity\JobLog:
       length: 255
       nullable: true
     exitCode:
-      type: string
-      length: 60
+      type: int
       nullable: true

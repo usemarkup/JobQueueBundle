@@ -61,10 +61,10 @@ class AddCommandJobToQueueCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $command = $input->getArgument('cmd');
-        $topic = $input->getArgument('topic');
-        $timeout = $input->getOption('timeout');
-        $idleTimeout = $input->getOption('idle_timeout');
+        $command = strval($input->getArgument('cmd'));
+        $topic = strval($input->getArgument('topic'));
+        $timeout = intval($input->getOption('timeout'));
+        $idleTimeout = intval($input->getOption('idle_timeout'));
 
         $this->jobby->addCommandJob($command, $topic, $timeout, $idleTimeout);
 

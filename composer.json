@@ -18,7 +18,7 @@
         "symfony/framework-bundle": "^3",
         "symfony/finder": "^3",
         "symfony/yaml": "^3",
-        "symfony/console": "^3",
+        "symfony/console": "^3, >3.3",
         "symfony/process": "^3",
         "twig/twig": "^1.12|^2",
         "php": ">=7.1.0",
@@ -34,7 +34,8 @@
         "phpunit/phpunit": "^7.2",
         "mockery/mockery": "^1.2",
         "symfony/form": "^3",
-        "predis/predis": "^1.0"
+        "predis/predis": "^1.0",
+        "phpstan/phpstan-shim": "^0.11.8"
     },
     "suggest": {
         "ricbra/rabbitmq-cli-consumer": "To consume jobs with Go instead of PHP"

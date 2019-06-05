@@ -24,6 +24,8 @@ class CheckRecurringJobConfigurationCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $reader = $this->getContainer()->get('markup_job_queue.reader.recurring_console_command');
+
+        $message = '';
         /**
          * @var RecurringConsoleCommandReader $reader
          */
@@ -32,13 +34,16 @@ class CheckRecurringJobConfigurationCommand extends ContainerAwareCommand
             $isGood = true;
         } catch (InvalidConfigurationException $e) {
             $isGood = false;
+
+            $message = $e->getMessage();
         }
+
         if ($isGood) {
             $output->writeln('<info>Recurring jobs config is good.</info>');
 
             return 0;
         } else {
-            $output->writeln(sprintf('<error>Recurring jobs config is invalid. Message: %s</error>', $e->getMessage()));
+            $output->writeln(sprintf('<error>Recurring jobs config is invalid. Message: %s</error>', $message));
 
             return 1;
         }

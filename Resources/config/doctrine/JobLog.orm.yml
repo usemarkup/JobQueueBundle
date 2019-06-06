@@ -30,5 +30,5 @@ Markup\JobQueueBundle\Entity\JobLog:
       length: 255
       nullable: true
     exitCode:
-      type: int
+      type: integer
       nullable: true

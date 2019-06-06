@@ -7,8 +7,8 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query;
 use Markup\JobQueueBundle\Entity\JobLog;
-use Markup\JobQueueBundle\Model\JobLogCollection;
 use Markup\JobQueueBundle\Form\Data\SearchJobLogs as SearchJobLogsData;
+use Markup\JobQueueBundle\Model\JobLogCollection;
 use Pagerfanta\Adapter\DoctrineORMAdapter;
 use Pagerfanta\Pagerfanta;
 
@@ -18,7 +18,7 @@ use Pagerfanta\Pagerfanta;
 class JobLogRepository
 {
     // 2 weeks
-    const DEFAULT_LOG_TTL = '1209600';
+    private const DEFAULT_LOG_TTL = '1209600';
 
     /**
      * @var int
@@ -35,71 +35,43 @@ class JobLogRepository
      */
     private $doctrine;
 
-    /**
-     * @param int|null $ttl
-     */
     public function __construct(
         ManagerRegistry $doctrine,
-        $ttl = null
+        ?int $ttl = null
     ) {
-        $this->ttl = $ttl ?: self::DEFAULT_LOG_TTL;
         $this->shouldClearLogForCompleteJob = false;
         $this->doctrine = $doctrine;
+        $this->ttl = $ttl ?: self::DEFAULT_LOG_TTL;
     }
 
-    public function createAndSaveJobLog(string $command, ?string $uuid = null, ?string $topic = null): JobLog
+    public function saveFailure(string $uuid, string $output, int $exitCode): void
     {
-        $log = new JobLog($command, $uuid, $topic);
-        $this->save($log);
-        return $log;
-    }
+        $log = $this->findJobLog($uuid);
 
-    public function save(JobLog $jobLog): void
-    {
-        $existingJobLog = $this->findJobLog($jobLog->getUuid());
-        if ($existingJobLog) {
-            if ($this->shouldClearLogForCompleteJob) {
-                if ($jobLog->getStatus() === JobLog::STATUS_COMPLETE) {
-                    $this->deleteJob($existingJobLog);
-                }
-                return;
-            }
-
-            // update status of existing job
-            $existingJobLog->setStatus($jobLog->getStatus());
-
-            $this->update($existingJobLog);
+        if (!$log) {
             return;
         }
 
-        // if no existing job, store new job
-
-        $this->add($jobLog);
-    }
-
-    public function saveFailure(string $uuid, string $output = '', ?int $exitCode = null): void
-    {
-        $log = $this->findJobLog($uuid);
-        if (!$log) {
-            return ;
-        }
         $log->setStatus(JobLog::STATUS_FAILED);
+
         if (!$log->getCompleted()) {
             $log->setCompleted(new \DateTime());
         }
+
         $log->setOutput($output);
-        if ($exitCode) {
-            $log->setExitCode($exitCode);
-        }
+        $log->setExitCode($exitCode);
+
         $this->save($log);
     }
 
-    public function saveOutput(string $uuid, string $output = ''): void
+    public function saveOutput(string $uuid, string $output): void
     {
           $log = $this->findJobLog($uuid);
+
           if (!$log) {
               return;
           }
+
           $log->setOutput($output);
           $this->save($log);
     }
@@ -178,6 +150,51 @@ class JobLogRepository
         $this->shouldClearLogForCompleteJob = $shouldClearLogForCompleteJob;
     }
 
+    public function findJobLog(string $uuid): ?JobLog
+    {
+        $jobLog = $this->getEntityRepository()->findOneBy(['uuid' => $uuid]);
+        if ($jobLog instanceof JobLog) {
+            return $jobLog;
+        }
+
+        return null;
+    }
+
+    /**
+     * Removes all jobs older than ($this->ttl - 86400 seconds) from all secondary indexes
+     */
+    public function removeExpiredJobs(): void
+    {
+        $interval = new \DateInterval(sprintf('PT%sS', $this->ttl - 86400));
+        $before = (new \DateTime('now'))->sub($interval)->format('U');
+
+        $qb = $this->getEntityManager()->createQueryBuilder();
+        $qb->delete(JobLog::class, 'j')
+            ->where($qb->expr()->lte('j.added', ':before'))
+            ->setParameter(':before', $before);
+
+        $qb->getQuery()->execute();
+    }
+
+    public function add(JobLog $jobLog): void
+    {
+        $this->getEntityManager()->persist($jobLog);
+        $this->getEntityManager()->flush($jobLog);
+    }
+
+    public function save(JobLog $jobLog): void
+    {
+        if ($this->shouldClearLogForCompleteJob) {
+            if ($jobLog->getStatus() === JobLog::STATUS_COMPLETE) {
+                $this->getEntityManager()->remove($jobLog);
+            }
+
+            return;
+        }
+
+        $this->getEntityManager()->flush($jobLog);
+    }
+
     private function getEntityRepository(): EntityRepository
     {
         $repository = $this->doctrine->getRepository(JobLog::class);
@@ -197,51 +214,5 @@ class JobLogRepository
         }
 
         throw new \RuntimeException(sprintf('Doctrine returned an invalid type for entity manager'));
-    }
-
-    public function findJobLog(string $uuid): ?JobLog
-    {
-        $jobLog = $this->getEntityRepository()->findOneBy(['uuid' => $uuid]);
-        if ($jobLog instanceof JobLog) {
-            return $jobLog;
-        }
-
-        return null;
-    }
-
-    public function deleteJob(JobLog $jobLog): void
-    {
-        $em = $this->getEntityManager();
-        $em->remove($jobLog);
-        $em->flush($jobLog);
-    }
-
-    public function add(JobLog $jobLog): void
-    {
-        $em = $this->getEntityManager();
-        $em->persist($jobLog);
-        $em->flush($jobLog);
-    }
-
-    public function update(JobLog $jobLog): void
-    {
-        $em = $this->getEntityManager();
-        $em->flush($jobLog);
-    }
-
-    /**
-     * Removes all jobs older than ($this->ttl - 86400 seconds) from all secondary indexes
-     */
-    public function removeExpiredJobs(): void
-    {
-        $interval = new \DateInterval(sprintf('PT%sS', $this->ttl - 86400));
-        $before = (new \DateTime('now'))->sub($interval)->format('U');
-
-        $qb = $this->getEntityManager()->createQueryBuilder();
-        $qb->delete(JobLog::class, 'j')
-            ->where($qb->expr()->lte('j.added', ':before'))
-            ->setParameter(':before', $before);
-
-        $qb->getQuery()->execute();
     }
 }

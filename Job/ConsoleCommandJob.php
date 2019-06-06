@@ -46,7 +46,7 @@ class ConsoleCommandJob extends Job
         }
         $process->setTimeout((int) $this->args['timeout']);
         if (!isset($this->args['idleTimeout'])) {
-            $this->idleTimeout = $this->args['idleTimeout'];
+            $this->args['idleTimeout'] = $process->getIdleTimeout();
         }
         $process->setIdleTimeout((int) $this->args['idleTimeout']);
 

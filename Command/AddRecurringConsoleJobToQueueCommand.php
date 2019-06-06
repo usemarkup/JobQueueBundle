@@ -2,6 +2,7 @@
 
 namespace Markup\JobQueueBundle\Command;
 
+use Markup\JobQueueBundle\Model\RecurringConsoleCommandConfiguration;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -44,6 +45,9 @@ class AddRecurringConsoleJobToQueueCommand extends ContainerAwareCommand
         $due = $recurringConsoleCommandReader->getDue();
 
         foreach ($due as $configuration) {
+            if (!$configuration instanceof RecurringConsoleCommandConfiguration) {
+                throw new \Exception('Invalid configuration');
+            }
 
             if ($configuration->getEnvs()) {
                 $env = $this->getContainer()->get('kernel')->getEnvironment();

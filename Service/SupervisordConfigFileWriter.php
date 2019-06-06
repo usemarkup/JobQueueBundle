@@ -40,6 +40,13 @@ class SupervisordConfigFileWriter
      */
     private $logsDir;
 
+    private $configFilePath;
+
+    /**
+     * @var string
+     */
+    private $mode;
+
     /**
      * SupervisordConfigFileWriter constructor.
      *
@@ -74,7 +81,7 @@ class SupervisordConfigFileWriter
     public function setMode($mode)
     {
         if (!in_array($mode, [self::MODE_PHP, self::MODE_CLI])) {
-            throw new \Exception(sprintf('Mode `%s` is invalid'));
+            throw new \Exception(sprintf('Mode `%s` is invalid', $mode));
         }
         $this->mode = $mode;
     }

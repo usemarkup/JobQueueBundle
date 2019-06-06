@@ -6,6 +6,7 @@ use Markup\JobQueueBundle\Exception\JobFailedException;
 use Markup\JobQueueBundle\Exception\JobMissingClassException;
 use Markup\JobQueueBundle\Model\Job;
 use Markup\JobQueueBundle\Job\ConsoleCommandJob;
+use Markup\JobQueueBundle\Repository\JobLogRepository;
 use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
 use PhpAmqpLib\Message\AMQPMessage;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
@@ -23,8 +24,9 @@ class JobConsumer implements ConsumerInterface, ContainerAwareInterface
      */
     public function execute(AMQPMessage $message)
     {
+        $data = json_decode($message->body, true);
+
         try {
-            $data = json_decode($message->body, $array = true);
             if (!isset($data['job_class'])) {
                 throw new JobMissingClassException('`job_class` must be set in the message');
             }
@@ -39,9 +41,9 @@ class JobConsumer implements ConsumerInterface, ContainerAwareInterface
             $output = $job->run($this->container);
 
             if (isset($data['uuid'])) {
-                $this->container->get('markup_job_queue.repository.job_log')->saveOutput(
+                $this->getJobLogRepository()->saveOutput(
                     $data['uuid'],
-                    $output
+                    strval($output)
                 );
             }
 
@@ -62,10 +64,10 @@ class JobConsumer implements ConsumerInterface, ContainerAwareInterface
             }
             // save failure if job had uuid
             if (isset($data['uuid'])) {
-                $this->container->get('markup_job_queue.repository.job_log')->saveFailure(
+                $this->getJobLogRepository()->saveFailure(
                     $data['uuid'],
-                    $output,
-                    $exitCode
+                    strval($output),
+                    $exitCode ?? 1
                 );
             }
 
@@ -84,6 +86,17 @@ class JobConsumer implements ConsumerInterface, ContainerAwareInterface
     public function setContainer(ContainerInterface $container = null)
     {
         $this->container = $container;
+    }
+
+    private function getJobLogRepository(): JobLogRepository
+    {
+        $jobLogRepository = $this->container->get('markup_job_queue.repository.job_log');
+
+        if (!$jobLogRepository instanceof JobLogRepository) {
+            throw new \LogicException('Could not find the JobLogRepository in the container');
+        }
+
+        return $jobLogRepository;
     }
 
 }

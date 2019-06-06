@@ -61,78 +61,20 @@ class JobLog
     private $uuid;
 
     /**
-     * @var string|null
+     * @var int|null
      */
     private $exitCode;
 
     public function __construct(
         string $command,
-        string $uuid = null,
-        string $topic = self::TOPIC_UNDEFINED,
-        ?\DateTime $added = null,
-        string $status = self::STATUS_ADDED,
-        ?string $output = null,
-        ?string $exitCode = null,
-        ?int $peakMemoryUse = null,
-        ?\DateTime $completed = null,
-        ?\DateTime $started = null
+        string $uuid,
+        string $topic = self::TOPIC_UNDEFINED
     ) {
         $this->command = $command;
+        $this->uuid = $uuid;
         $this->topic = $topic;
         $this->added = $added ?? new \DateTime();
-        $this->completed = $completed;
-        $this->started = $started;
-        $this->status = $status;
-        $this->output = $output;
-        $this->peakMemoryUse = $peakMemoryUse;
-        $this->exitCode = $exitCode;
-
-        // none of these values are mutable so are suitable to generate uuid
-        // the 'added' makes it unique
-        if (!$uuid) {
-            $uuid = $this->generateUuid($command, $topic, $this->added->format('U'));
-        }
-        $this->uuid = $uuid;
-    }
-
-    /**
-     * Constructs from data as it is returned from redis
-     * The inverse of toCompressedArray
-     *
-     * @param $array
-     * @return JobLog
-     */
-    public static function fromCompressedArray(
-        array $array
-    ): self {
-        return new self(
-            $array['command'],
-            $array['uuid'],
-            $array['topic'],
-            $array['added'],
-            $array['status'],
-            gzuncompress($array['output']),
-            $array['exitCode'],
-            $array['peakMemoryUse'],
-            $array['completed'],
-            $array['started']
-        );
-    }
-
-    public function toCompressedArray(): array
-    {
-        return [
-            'command' => $this->getCommand(),
-            'uuid' => $this->getUuid(),
-            'topic' => $this->getTopic(),
-            'added' => $this->getAdded(),
-            'status' => $this->getStatus(),
-            'output' => gzcompress($this->getOutput()),
-            'exitCode' => $this->getExitCode(),
-            'peakMemoryUse' => $this->getPeakMemoryUse(),
-            'completed' => $this->getCompleted(),
-            'started' => $this->getStarted(),
-        ];
+        $this->status = self::STATUS_ADDED;
     }
 
     public function getCommand(): string
@@ -161,18 +103,14 @@ class JobLog
      */
     public function getDuration(): int
     {
-        if (!$this->getCompleted() || !$this->getStarted()) {
+        $completed = $this->getCompleted();
+        $started = $this->getStarted();
+
+        if (!$completed || !$started) {
             return 0;
         }
-        $diff = $this->getCompleted()->diff($this->getStarted());
 
-        // convert diff to duration seconds
-        $duration = ($diff->days * 3600 * 24) + ($diff->h * 3600) + ($diff->i * 60) + $diff->s;
-        if ($duration === 0) {
-            $duration = 1;
-        }
-
-        return intval($duration);
+        return $completed->getTimestamp() - $started->getTimestamp();
     }
 
     public function getStatus(): string
@@ -195,14 +133,9 @@ class JobLog
         return $this->uuid;
     }
 
-    public function getExitCode(): ?string
+    public function getExitCode(): int
     {
-        return $this->exitCode;
-    }
-
-    private function generateUuid(string $command, string $topic, string $added): string
-    {
-        return hash('SHA256', $command.$topic.$added);
+        return $this->exitCode ?? 0;
     }
 
     public function setCompleted(?\DateTime $completed = null)
@@ -215,7 +148,7 @@ class JobLog
         $this->status = $status;
     }
 
-    public function setOutput(?string $output = null)
+    public function setOutput(string $output)
     {
         $this->output = $output;
     }
@@ -225,7 +158,7 @@ class JobLog
         $this->peakMemoryUse = $peakMemoryUse;
     }
 
-    public function setExitCode(?string $exitCode)
+    public function setExitCode(int $exitCode)
     {
         $this->exitCode = $exitCode;
     }
@@ -242,10 +175,12 @@ class JobLog
 
     public function getExitCodeText(): string
     {
-        if (!$this->getExitCode()) {
+        if (!$this->exitCode) {
             return '';
         }
+
         $text = isset(Process::$exitCodes[$this->getExitCode()]) ? Process::$exitCodes[$this->getExitCode()] : '';
+
         return sprintf('Exit code `%s`: %s', $this->getExitCode(), $text);
     }
 }

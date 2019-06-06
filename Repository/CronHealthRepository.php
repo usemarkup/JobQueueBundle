@@ -13,6 +13,11 @@ class CronHealthRepository
     const REDIS_KEY = 'markup_job_queue:recurring_cron_health';
 
     /**
+     * @var Predis
+     */
+    private $predis;
+
+    /**
      * JobLogRepository constructor.
      * @param Predis $predis
      */

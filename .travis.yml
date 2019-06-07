@@ -24,7 +24,7 @@ install:
   - if [ "$deps" = "low" ]; then composer --prefer-lowest -n --prefer-stable --prefer-dist update; fi;
 
 
-script: bin/phpunit
+script: bin/phpunit && bin/phpstan analyse -l 1 ./
 
 notifications:
   email: "calum@usemarkup.com"

@@ -2,13 +2,12 @@
 
 namespace Markup\JobQueueBundle\EventSubscriber;
 
-use Markup\JobQueueBundle\Exception\UnknownJobLogException;
-use Markup\JobQueueBundle\Model\JobLog;
+use Markup\JobQueueBundle\Entity\JobLog;
 use Markup\JobQueueBundle\Repository\JobLogRepository;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
-use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Ramsey\Uuid\Uuid;
 
 /**
  * Uses the `uuid` option to log a console command
@@ -42,10 +41,7 @@ class LogConsoleCommandEventSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param ConsoleCommandEvent $event
-     */
-    public function onConsoleCommand(ConsoleCommandEvent $event)
+    public function onConsoleCommand(ConsoleCommandEvent $event): void
     {
         $input = $event->getInput();
 
@@ -54,21 +50,29 @@ class LogConsoleCommandEventSubscriber implements EventSubscriberInterface
         }
 
         $uuid = $input->getOption('uuid');
+
         if (!$uuid) {
             return;
         }
 
-        // lookup job log repository for log and create one if it doesn't exist
-        try { 
-            $log = $this->jobLogRepository->getJobLog($uuid);
-        } catch (UnknownJobLogException $e) {
+        $uuid = strval($uuid);
+
+        $log = $this->jobLogRepository->findJobLog($uuid);
+
+        if (!$log) {
+            if (!method_exists($input, '__toString')) {
+                return;
+            }
+
             $commandString = $input->__toString();
-            $log = $this->jobLogRepository->createAndSaveJobLog($commandString, $uuid);
+            $log = new JobLog($commandString, $uuid);
+
+            $this->jobLogRepository->add($log);
         }
         
-        // update job log to change status to running
         $log->setStatus(JobLog::STATUS_RUNNING);
-        $log->setStarted((new \DateTime('now'))->format('U'));
+        $log->setStarted(new \DateTime());
+
         $this->jobLogRepository->save($log);
     }
 }

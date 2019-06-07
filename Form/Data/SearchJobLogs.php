@@ -2,19 +2,12 @@
 
 namespace Markup\JobQueueBundle\Form\Data;
 
-use Pagerfanta\Adapter\FixedAdapter;
-
 class SearchJobLogs
 {
     /**
      * @var string
      */
     private $id;
-
-    /**
-     * @var string
-     */
-    private $commandConfigurationId;
 
     /**
      * @var string
@@ -46,126 +39,54 @@ class SearchJobLogs
         $this->page = 1;
     }
 
-    /**
-     * @return string
-     */
-    public function getId()
+    public function getId(): ?string
     {
         return $this->id;
     }
 
-    /**
-     * @param string $id
-     */
-    public function setId($id)
+    public function setId(string $id)
     {
         $this->id = $id;
     }
 
-    /**
-     * @return string
-     */
-    public function getCommandConfigurationId()
-    {
-        return $this->commandConfigurationId;
-    }
-
-    /**
-     * @param string $commandConfigurationId
-     */
-    public function setCommandConfigurationId($commandConfigurationId)
-    {
-        $this->commandConfigurationId = $commandConfigurationId;
-    }
-
-    /**
-     * @return string
-     */
-    public function getCommand()
+    public function getCommand(): ?string
     {
         return $this->command;
     }
 
-    /**
-     * @param string $command
-     */
-    public function setCommand($command)
+    public function setCommand(string $command)
     {
         $this->command = $command;
     }
 
-    /**
-     * @return \DateTime
-     */
-    public function getBefore()
+    public function getBefore(): ?\DateTime
     {
         return $this->before;
     }
 
-    /**
-     * @param \DateTime $before
-     */
-    public function setBefore($before)
+    public function setBefore(?\DateTime $before = null)
     {
         $this->before = $before;
     }
-    /**
-     * @return \DateTime
-     */
-    public function getSince()
+
+    public function getSince(): ?\DateTime
     {
         return $this->since;
     }
 
-    /**
-     * @param \DateTime $since
-     */
-    public function setSince($since)
+    public function setSince(?\DateTime $since = null)
     {
         $this->since = $since;
     }
 
-    /**
-     * @return string
-     */
-    public function getStatus()
+    public function getStatus(): ?string
     {
         return $this->status;
     }
 
-    /**
-     * @param string $status
-     */
-    public function setStatus($status)
+    public function setStatus(string $status)
     {
         $this->status = $status;
-    }
-
-    /**
-     * @return int
-     */
-    public function getPage()
-    {
-        return $this->page;
-    }
-
-    /**
-     * @param int $page
-     */
-    public function setPage($page)
-    {
-        if (!$page) {
-            return;
-        }
-        $this->page = $page;
-    }
-
-    /**
-     * @return int Gets a zero indexed version of the page for use in a query
-     */
-    public function getPageOffset()
-    {
-        return max(0, $this->getPage() - 1);
     }
 
     /**
@@ -203,6 +124,16 @@ class SearchJobLogs
         return false;
     }
 
+    public function setPage(int $page)
+    {
+        $this->page = $page;
+    }
+
+    public function getPage(): int
+    {
+        return $this->page;
+    }
+
     public function toArray()
     {
         return [
@@ -210,7 +141,7 @@ class SearchJobLogs
             'since' => $this->getSince(),
             'before' => $this->getBefore(),
             'status' => $this->getStatus(),
-            'command_configuration_id' => $this->getCommandConfigurationId()
+            'command' => $this->getCommand()
         ];
     }
 

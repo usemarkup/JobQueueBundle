@@ -21,13 +21,9 @@ class QueueReader
      */
     private $vhost;
 
-    /**
-     * @param ApiFactory $apiFactory
-     * @param            $vhost
-     */
     public function __construct(
         ApiFactory $apiFactory,
-        $vhost
+        string $vhost
     ) {
         $this->api = $apiFactory;
         $this->vhost = $vhost;

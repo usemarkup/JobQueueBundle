@@ -1,6 +1,8 @@
 services:
     markup_job_queue.command.add_command_job_to_queue:
         class: Markup\JobQueueBundle\Command\AddCommandJobToQueueCommand
+        arguments:
+            - '@jobby'
         tags:
             - { name: console.command, command: 'markup:job_queue:add:command' }
     markup_job_queue.command.add_recurring_console_job_to_queue:

@@ -11,7 +11,7 @@ class ExceptionJob extends Job
     /**
      * {@inheritdoc}
      */
-    public function run(ContainerInterface $container)
+    public function run(ContainerInterface $container): string
     {
         throw new JobFailedException('Test job throws an exception');
     }

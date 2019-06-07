@@ -41,9 +41,9 @@ class ScheduledJob
     private $updated;
 
     /**
-     * @param $job
-     * @param $scheduledTime
-     * @param $topic
+     * @param mixed $job
+     * @param mixed $scheduledTime
+     * @param mixed $topic
      */
     function __construct($job, $scheduledTime, $topic)
     {

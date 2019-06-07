@@ -2,6 +2,7 @@
 
 namespace Markup\JobQueueBundle\Command;
 
+use Markup\JobQueueBundle\Model\RecurringConsoleCommandConfiguration;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -44,6 +45,9 @@ class AddRecurringConsoleJobToQueueCommand extends ContainerAwareCommand
         $due = $recurringConsoleCommandReader->getDue();
 
         foreach ($due as $configuration) {
+            if (!$configuration instanceof RecurringConsoleCommandConfiguration) {
+                throw new \Exception('Invalid configuration');
+            }
 
             if ($configuration->getEnvs()) {
                 $env = $this->getContainer()->get('kernel')->getEnvironment();
@@ -81,6 +85,6 @@ class AddRecurringConsoleJobToQueueCommand extends ContainerAwareCommand
 
     private function maintainJobLogs()
     {
-        $this->getContainer()->get('markup_job_queue.repository.job_log')->removeExpiredJobsFromSecondaryIndexes();
+        $this->getContainer()->get('markup_job_queue.repository.job_log')->removeExpiredJobs();
     }
 }

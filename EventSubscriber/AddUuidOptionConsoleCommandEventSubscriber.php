@@ -40,12 +40,24 @@ class AddUuidOptionConsoleCommandEventSubscriber implements EventSubscriberInter
             null
         );
 
-        $definition = $event->getCommand()->getDefinition();
+        $command = $event->getCommand();
+
+        if (!$command) {
+            return;
+        }
+
+        $definition = $command->getDefinition();
         $definition->addOption($inputOption);
     }
 
     public function bindInput(ConsoleCommandEvent $event)
     {
-        $event->getInput()->bind($event->getCommand()->getDefinition());
+        $command = $event->getCommand();
+
+        if (!$command) {
+            return;
+        }
+
+        $event->getInput()->bind($command->getDefinition());
     }
 }

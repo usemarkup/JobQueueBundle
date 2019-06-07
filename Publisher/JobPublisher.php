@@ -2,6 +2,7 @@
 
 namespace Markup\JobQueueBundle\Publisher;
 
+use Markup\JobQueueBundle\Entity\JobLog;
 use Markup\JobQueueBundle\Exception\MissingTopicException;
 use Markup\JobQueueBundle\Exception\UndefinedProducerException;
 use Markup\JobQueueBundle\Job\ConsoleCommandJob;
@@ -9,6 +10,7 @@ use Markup\JobQueueBundle\Model\Job;
 use Markup\JobQueueBundle\Repository\JobLogRepository;
 use PhpAmqpLib\Exception\AMQPRuntimeException;
 use Psr\Log\LoggerInterface;
+use Ramsey\Uuid\Uuid;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -83,10 +85,14 @@ class JobPublisher implements ContainerAwareInterface
 
             // log the job as existing
             if ($job instanceof ConsoleCommandJob) {
-                $log = $this->jobLogRepository->createAndSaveJobLog($job->getCommand(), $uuid = null, $job->getTopic());
+                $uuid = Uuid::uuid4()->toString();
+                $log = new JobLog($job->getCommand(), $uuid, $job->getTopic());
+
+                $this->jobLogRepository->add($log);
+
                 // adds the uuid to the published job
                 // which allows the consumer to specify the Uuid when running the command
-                $message['uuid'] = $log->getUuid();
+                $message['uuid'] = $uuid;
             }
 
             $producer->publish(json_encode($message));

@@ -49,7 +49,7 @@ class RecurringConsoleCommandConfigurationJobLogReader
         foreach ($configurations as $configuration) {
             $searchData = new SearchJobLogs();
             $searchData->setCommand($configuration->getCommand());
-            $jobLogs = $this->jobLogRepository->getJobLogs($searchData, $maxQuantity);
+            $jobLogs = $this->jobLogRepository->getJobLogCollection($searchData, $maxQuantity);
 
             $collection[$configuration->getUuid()] = $jobLogs;
         }

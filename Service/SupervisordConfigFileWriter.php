@@ -212,6 +212,7 @@ class SupervisordConfigFileWriter
             $conf[] = "autostart=false";
             $conf[] = "autorestart=true";
             $conf[] = "stopsignal=QUIT";
+            $conf[] = "startsecs=0";
         }
         $conf[] = "\n";
         $conf[] = sprintf("[group:markup_%s]\nprograms=%s", $uniqueEnvironment, implode(',', $programNames));

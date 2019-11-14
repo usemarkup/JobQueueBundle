@@ -40,8 +40,6 @@ class RecurringConsoleCommandReader
         $kernelPath
     ) {
         $this->kernelPath = $kernelPath;
-        $this->configurationFileName = null;
-        $this->configurations = null;
     }
 
     public function setConfigurationFileName($name)

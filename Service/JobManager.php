@@ -43,46 +43,44 @@ class JobManager
         } else {
             $this->scheduledJob->addScheduledJob($job, $dateTime);
         }
-
-        return;
     }
 
     /**
      * Adds a named command to the job queue
-     * @param string  $command     A valid command for this application
-     * @param string  $topic       The name of a valid topic
-     * @param integer $timeout     The amount of time to allow the command to run
-     * @param integer $idleTimeout The amount of idle time to allow the command to run
+     * @param string  $command     A valid command for this application.
+     * @param string  $topic       The name of a valid topic.
+     * @param integer $timeout     The amount of time to allow the command to run.
+     * @param integer $idleTimeout The amount of idle time to allow the command to run. Defaults to the same as timeout.
      */
-    public function addCommandJob($command, $topic = 'default', $timeout = 60, $idleTimeout = 60)
+    public function addCommandJob($command, $topic = 'default', $timeout = 60, $idleTimeout = null)
     {
         $args = [];
         $args['command'] = $command;
         $args['timeout'] = $timeout;
-        $args['idleTimeout'] = $idleTimeout;
+        $args['idleTimeout'] = $idleTimeout ?? $timeout;
         $job = new ConsoleCommandJob($args, $topic);
         $this->addJob($job);
     }
 
     /**
      * Adds a named command to the job queue at a specific datetime
-     * @param string  $command     A valid command for this application
-     * @param string  $dateTime    The DateTime to execute the command
-     * @param string  $topic       The name of a valid topic
-     * @param integer $timeout     The amount of time to allow the command to run
-     * @param integer $idleTimeout The amount of idle time to allow the command to run
+     * @param string  $command     A valid command for this application.
+     * @param string  $dateTime    The DateTime to execute the command.
+     * @param string  $topic       The name of a valid topic.
+     * @param integer $timeout     The amount of time to allow the command to run.
+     * @param integer $idleTimeout The amount of idle time to allow the command to run. Default to the same as timeout.
      */
     public function addScheduledCommandJob(
         $command,
         \DateTime $dateTime,
         $topic = 'default',
         $timeout = 60,
-        $idleTimeout = 60
+        $idleTimeout = null
     ) {
         $args = [];
         $args['command'] = $command;
         $args['timeout'] = $timeout;
-        $args['idleTimeout'] = $idleTimeout;
+        $args['idleTimeout'] = $idleTimeout ?? $timeout;
         $job = new ConsoleCommandJob($args, $topic);
         $this->addJob($job, $dateTime);
     }

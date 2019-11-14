@@ -10,6 +10,7 @@ use Markup\JobQueueBundle\Model\Job;
 use Markup\JobQueueBundle\Repository\JobLogRepository;
 use PhpAmqpLib\Exception\AMQPRuntimeException;
 use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -34,16 +35,12 @@ class JobPublisher implements ContainerAwareInterface
      */
     private $logger;
 
-    /**
-     * @param JobLogRepository $jobLogRepository
-     * @param LoggerInterface $logger
-     */
     public function __construct(
         JobLogRepository $jobLogRepository,
-        LoggerInterface $logger
+        LoggerInterface $logger = null
     ) {
         $this->jobLogRepository = $jobLogRepository;
-        $this->logger = $logger;
+        $this->logger = $logger ?? new NullLogger();
     }
 
     /**

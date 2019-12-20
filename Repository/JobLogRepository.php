@@ -188,8 +188,6 @@ class JobLogRepository
             if ($jobLog->getStatus() === JobLog::STATUS_COMPLETE) {
                 $this->getEntityManager()->remove($jobLog);
             }
-
-            return;
         }
 
         $this->getEntityManager()->flush($jobLog);

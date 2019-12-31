@@ -41,13 +41,17 @@ class JobConsumer implements ConsumerInterface, ContainerAwareInterface
             $output = $job->run($this->container);
 
             if (isset($data['uuid'])) {
-                $this->getJobLogRepository()->saveOutput(
-                    $data['uuid'],
-                    strval($output)
-                );
+                try {
+                    $this->getJobLogRepository()->saveOutput(
+                        $data['uuid'],
+                        strval($output)
+                    );
+                } catch (\Throwable $t) {
+                    // do nothing
+                }
             }
 
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             $command = '';
 
             if ((isset($job))) {
@@ -64,11 +68,15 @@ class JobConsumer implements ConsumerInterface, ContainerAwareInterface
             }
             // save failure if job had uuid
             if (isset($data['uuid'])) {
-                $this->getJobLogRepository()->saveFailure(
-                    $data['uuid'],
-                    strval($output),
-                    $exitCode ?? 1
-                );
+                try {
+                    $this->getJobLogRepository()->saveFailure(
+                        $data['uuid'],
+                        strval($output),
+                        $exitCode ?? 1
+                    );
+                } catch (\Throwable $t) {
+                    // do nothing
+                }
             }
 
             $this->container->get('logger')->error(sprintf('Job Failed: %s', $command), [

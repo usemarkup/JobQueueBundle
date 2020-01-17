@@ -52,15 +52,6 @@ class CliConsumerConfigFileWriter
      */
     private $topics;
 
-    /**
-     * @param $logPath
-     * @param $configFilePath
-     * @param $host
-     * @param $username
-     * @param $password
-     * @param $vhost
-     * @param $port
-     */
     public function __construct(
         $logPath,
         $configFilePath,
@@ -117,9 +108,9 @@ class CliConsumerConfigFileWriter
     }
 
     /**
-     * @param $uniqueEnvironment
-     * @param $topic
-     * @param $topicConfig
+     * @param string $uniqueEnvironment
+     * @param string $topic
+     * @param array $topicConfig
      * @return string
      */
     public function getConfigString($uniqueEnvironment, $topic, $topicConfig)

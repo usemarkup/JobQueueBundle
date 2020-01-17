@@ -5,7 +5,6 @@ namespace Markup\JobQueueBundle\Service;
 use Markup\JobQueueBundle\Job\ConsoleCommandJob;
 use Markup\JobQueueBundle\Model\Job;
 use Markup\JobQueueBundle\Publisher\JobPublisher;
-use Symfony\Bundle\FrameworkBundle\Console\Application;
 
 /**
  * Controller for adding jobs to a queue
@@ -13,7 +12,6 @@ use Symfony\Bundle\FrameworkBundle\Console\Application;
  */
 class JobManager
 {
-
     /**
      * @var JobPublisher
      */
@@ -40,7 +38,7 @@ class JobManager
     {
         if ($dateTime === null) {
             $this->publisher->publish($job);
-        } else {
+        } elseif ($job instanceof ConsoleCommandJob) {
             $this->scheduledJob->addScheduledJob($job, $dateTime);
         }
     }
@@ -64,11 +62,11 @@ class JobManager
 
     /**
      * Adds a named command to the job queue at a specific datetime
-     * @param string  $command     A valid command for this application.
-     * @param string  $dateTime    The DateTime to execute the command.
-     * @param string  $topic       The name of a valid topic.
-     * @param integer $timeout     The amount of time to allow the command to run.
-     * @param integer $idleTimeout The amount of idle time to allow the command to run. Default to the same as timeout.
+     * @param string    $command     A valid command for this application.
+     * @param \DateTime $dateTime    The DateTime to execute the command.
+     * @param string    $topic       The name of a valid topic.
+     * @param int       $timeout     The amount of time to allow the command to run.
+     * @param int       $idleTimeout The amount of idle time to allow the command to run. Default to the same as timeout.
      */
     public function addScheduledCommandJob(
         $command,

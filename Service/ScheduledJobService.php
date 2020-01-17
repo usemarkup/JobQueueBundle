@@ -3,10 +3,9 @@
 namespace Markup\JobQueueBundle\Service;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Persistence\ObjectRepository;
-use Markup\JobQueueBundle\Entity\Repository\ScheduledJobRepository;
 use Markup\JobQueueBundle\Entity\ScheduledJob;
-use Markup\JobQueueBundle\Model\Job;
+use Markup\JobQueueBundle\Job\ConsoleCommandJob;
+use Markup\JobQueueBundle\Model\ScheduledJobRepositoryInterface;
 
 class ScheduledJobService
 {
@@ -25,11 +24,11 @@ class ScheduledJobService
     }
 
     /**
-     * @param Job $job
-     * @param \DateTime $scheduledTime
+     * @param ConsoleCommandJob $job
+     * @param \DateTime|string $scheduledTime
      * @return ScheduledJob
      */
-    public function addScheduledJob(Job $job, $scheduledTime)
+    public function addScheduledJob(ConsoleCommandJob $job, $scheduledTime)
     {
         $scheduledJob = new ScheduledJob($job->getCommand(), $scheduledTime, $job->getTopic());
         $this->save($scheduledJob, true);
@@ -57,11 +56,11 @@ class ScheduledJobService
         return $this->getScheduledJobRepository()->fetchUnqueuedJobs();
     }
 
-    /**
-     * @return ObjectRepository|ScheduledJobRepository
-     */
-    private function getScheduledJobRepository()
+    private function getScheduledJobRepository(): ScheduledJobRepositoryInterface
     {
-        return $this->managerRegistry->getRepository(ScheduledJob::class);
+        /** @var ScheduledJobRepositoryInterface $repository */
+        $repository = $this->managerRegistry->getRepository(ScheduledJob::class);
+
+        return $repository;
     }
 }

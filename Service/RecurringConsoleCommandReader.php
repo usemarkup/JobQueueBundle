@@ -34,7 +34,7 @@ class RecurringConsoleCommandReader
     private $configurations;
 
     /**
-     * @param $kernelPath string
+     * @param string $kernelPath
      */
     public function __construct(
         $kernelPath
@@ -69,7 +69,7 @@ class RecurringConsoleCommandReader
     }
 
     /**
-     * @param $uuid
+     * @param string $id
      */
     public function getConfigurationById($id)
     {
@@ -115,7 +115,7 @@ class RecurringConsoleCommandReader
      * Parses the configuration and returns an array of of configuration objects
      * Configuration is cached after running this function so it should only be run once
      *
-     * @param ArrayCollection<RecurringConsoleCommandConfiguration>
+     * @return ArrayCollection<RecurringConsoleCommandConfiguration>
      */
     private function parseConfiguration(array $config)
     {

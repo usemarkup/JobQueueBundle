@@ -70,8 +70,8 @@ class ReadRecurringConsoleJobConfigurationCommand extends ContainerAwareCommand
 
     /**
      * Uses the process component to determine if a command is valid, by looking at the output of cmd:xyz --help
-     * @param  $command
-     * @return boolean
+     * @param  string $command
+     * @return bool
      */
     private function isCommandValid($command)
     {

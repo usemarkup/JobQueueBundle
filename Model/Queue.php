@@ -46,18 +46,6 @@ class Queue
      */
     private $idleSince;
 
-    /**
-     * Queue constructor.
-     *
-     * @param          $name
-     * @param          $vhost
-     * @param          $state
-     * @param          $consumerCount
-     * @param          $messages
-     * @param          $messagesReady
-     * @param          $messagesUnacknowledged
-     * @param \DateTime $idleSince
-     */
     public function __construct(
         $name,
         $vhost,
@@ -81,12 +69,11 @@ class Queue
     /**
      * Takes the response from the RabbitMq Api for queues and uses it to build an instance of this class
      *
-     * @param $response string
+     * @param  array $response
      * @return Queue
      */
     public static function constructFromApiResponse(array $response)
     {
-
         return new self(
             isset($response['name']) ? $response['name'] : 'undefined',
             isset($response['vhost']) ? $response['vhost'] : 'undefined',

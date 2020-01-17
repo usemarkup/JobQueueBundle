@@ -3,6 +3,8 @@
 namespace Markup\Bundle\JobQueueBundle\Tests\Service;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Markup\JobQueueBundle\Entity\ScheduledJob;
+use Markup\JobQueueBundle\Job\ConsoleCommandJob;
 use Markup\JobQueueBundle\Job\SleepJob;
 use Markup\JobQueueBundle\Model\Job;
 use Markup\JobQueueBundle\Publisher\JobPublisher;
@@ -40,23 +42,28 @@ class JobManagerTest extends MockeryTestCase
         );
     }
 
-    public function testCanAddJob()
+    public function testCanAddJobWithoutDateTime(): void
     {
         $job = new SleepJob();
-        $scheduledTime = new \DateTime();
         $this->jobManager->addJob($job);
-        $this->jobManager->addJob($job, $scheduledTime);
         $this->assertSame([$job], $this->jobPublisher->getJobs());
+    }
+
+    public function testCanAddConsoleCommandJobWithDateTime(): void
+    {
+        $job = new ConsoleCommandJob();
+        $scheduledTime = new \DateTime();
+        $this->jobManager->addJob($job, $scheduledTime);
         $this->assertSame([$job], $this->scheduledJobService->getJobs());
     }
 
-    public function testCanAddCommandJob()
+    public function testCanAddCommandJob(): void
     {
         $this->jobManager->addCommandJob('console:herp:derp', 'system', 60, 60);
         $this->assertCount(1, $this->jobPublisher->getJobs());
     }
 
-    public function testIdleTimeoutDefaultsToTimeout()
+    public function testIdleTimeoutDefaultsToTimeout(): void
     {
         $timeout = 720;
         $this->jobManager->addCommandJob('command', 'topic', $timeout);
@@ -94,7 +101,7 @@ class JobManagerTest extends MockeryTestCase
                 $this->initializeJobs();
             }
 
-            public function addScheduledJob(Job $job, $scheduledTime)
+            public function addScheduledJob(ConsoleCommandJob $job, $scheduledTime)
             {
                 $this->addJob($job);
             }

@@ -6,7 +6,6 @@ use Markup\JobQueueBundle\Entity\ScheduledJob;
 
 interface ScheduledJobRepositoryInterface
 {
-
     /**
      * @return mixed
      */

@@ -47,16 +47,6 @@ class SupervisordConfigFileWriter
      */
     private $mode;
 
-    /**
-     * SupervisordConfigFileWriter constructor.
-     *
-     * @param $kernelPath
-     * @param $logsDir
-     * @param $kernelEnv
-     * @param $supervisordConfigPath
-     * @param $consumerPath
-     * @param $configFilePath
-     */
     public function __construct(
         $kernelPath,
         $logsDir,
@@ -118,7 +108,7 @@ class SupervisordConfigFileWriter
     }
 
     /**
-     * @param $uniqueEnvironment string environment disambiguator
+     * @param string $uniqueEnvironment  environment disambiguator
      * @param bool $skipExistsChecks If set skips FS checks for binary and config file
      * @return string
      */
@@ -179,7 +169,7 @@ class SupervisordConfigFileWriter
     }
 
     /**
-     * @param $uniqueEnvironment
+     * @param string $uniqueEnvironment
      * @return string
      */
     public function getConfigForPhpConsumer($uniqueEnvironment, $skipExistsChecks = false)

@@ -4,6 +4,7 @@ namespace Markup\JobQueueBundle\Repository;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query;
 use Markup\JobQueueBundle\Entity\JobLog;
@@ -195,7 +196,7 @@ class JobLogRepository
 
     private function getEntityRepository(): EntityRepository
     {
-        $repository = $this->doctrine->getRepository(JobLog::class);
+        $repository = $this->getEntityManager()->getRepository(JobLog::class);
 
         if ($repository instanceof EntityRepository) {
             return $repository;
@@ -207,6 +208,11 @@ class JobLogRepository
     private function getEntityManager(): EntityManager
     {
         $manager = $this->doctrine->getManager();
+
+        if ($manager instanceof EntityManagerInterface && !$manager->isOpen()) {
+            $manager = $this->doctrine->resetManager();
+        }
+
         if ($manager instanceof EntityManager) {
             return $manager;
         }

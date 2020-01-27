@@ -50,12 +50,12 @@ class SupervisordConfigFileWriter
     /**
      * SupervisordConfigFileWriter constructor.
      *
-     * @param $kernelPath
-     * @param $logsDir
-     * @param $kernelEnv
-     * @param $supervisordConfigPath
-     * @param $consumerPath
-     * @param $configFilePath
+     * @param mixed $kernelPath
+     * @param mixed $logsDir
+     * @param mixed $kernelEnv
+     * @param mixed $supervisordConfigPath
+     * @param mixed $consumerPath
+     * @param mixed $configFilePath
      */
     public function __construct(
         $kernelPath,
@@ -118,7 +118,7 @@ class SupervisordConfigFileWriter
     }
 
     /**
-     * @param $uniqueEnvironment string environment disambiguator
+     * @param mixed $uniqueEnvironment string environment disambiguator
      * @param bool $skipExistsChecks If set skips FS checks for binary and config file
      * @return string
      */
@@ -179,7 +179,7 @@ class SupervisordConfigFileWriter
     }
 
     /**
-     * @param $uniqueEnvironment
+     * @param mixed $uniqueEnvironment
      * @return string
      */
     public function getConfigForPhpConsumer($uniqueEnvironment, $skipExistsChecks = false)

@@ -65,14 +65,14 @@ class JobManager
     /**
      * Adds a named command to the job queue at a specific datetime
      * @param string  $command     A valid command for this application.
-     * @param string  $dateTime    The DateTime to execute the command.
+     * @param \DateTimeInterface  $dateTime    The DateTime to execute the command.
      * @param string  $topic       The name of a valid topic.
      * @param integer $timeout     The amount of time to allow the command to run.
      * @param integer $idleTimeout The amount of idle time to allow the command to run. Default to the same as timeout.
      */
     public function addScheduledCommandJob(
         $command,
-        \DateTime $dateTime,
+        \DateTimeInterface $dateTime,
         $topic = 'default',
         $timeout = 60,
         $idleTimeout = null

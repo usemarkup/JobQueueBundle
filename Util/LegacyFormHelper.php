@@ -16,7 +16,7 @@ final class LegacyFormHelper
     ];
 
     /**
-     * @param $class
+     * @param mixed $class
      *
      * @return mixed
      */

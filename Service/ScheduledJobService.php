@@ -6,7 +6,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectRepository;
 use Markup\JobQueueBundle\Entity\Repository\ScheduledJobRepository;
 use Markup\JobQueueBundle\Entity\ScheduledJob;
-use Markup\JobQueueBundle\Model\Job;
+use Markup\JobQueueBundle\Job\ConsoleCommandJob;
 
 class ScheduledJobService
 {
@@ -25,11 +25,11 @@ class ScheduledJobService
     }
 
     /**
-     * @param Job $job
+     * @param ConsoleCommandJob $job
      * @param \DateTime $scheduledTime
      * @return ScheduledJob
      */
-    public function addScheduledJob(Job $job, $scheduledTime)
+    public function addScheduledJob(ConsoleCommandJob $job, $scheduledTime)
     {
         $scheduledJob = new ScheduledJob($job->getCommand(), $scheduledTime, $job->getTopic());
         $this->save($scheduledJob, true);
@@ -42,7 +42,7 @@ class ScheduledJobService
      * @param bool $flush
      * @return ScheduledJob
      */
-    public function save(ScheduledJob $scheduledJob, $flush = false)
+    public function save(ScheduledJob $scheduledJob, bool $flush = false)
     {
         $this->getScheduledJobRepository()->save($scheduledJob, $flush);
 
@@ -58,7 +58,7 @@ class ScheduledJobService
     }
 
     /**
-     * @return ObjectRepository|ScheduledJobRepository
+     * @return ScheduledJobRepository
      */
     private function getScheduledJobRepository()
     {

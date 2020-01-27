@@ -49,13 +49,13 @@ class Queue
     /**
      * Queue constructor.
      *
-     * @param          $name
-     * @param          $vhost
-     * @param          $state
-     * @param          $consumerCount
-     * @param          $messages
-     * @param          $messagesReady
-     * @param          $messagesUnacknowledged
+     * @param mixed $name
+     * @param mixed $vhost
+     * @param mixed $state
+     * @param mixed $consumerCount
+     * @param mixed $messages
+     * @param mixed $messagesReady
+     * @param mixed $messagesUnacknowledged
      * @param \DateTime $idleSince
      */
     public function __construct(
@@ -81,7 +81,7 @@ class Queue
     /**
      * Takes the response from the RabbitMq Api for queues and uses it to build an instance of this class
      *
-     * @param $response string
+     * @param array $response
      * @return Queue
      */
     public static function constructFromApiResponse(array $response)

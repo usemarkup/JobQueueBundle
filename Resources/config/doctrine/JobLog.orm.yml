@@ -7,6 +7,17 @@ Markup\JobQueueBundle\Entity\JobLog:
       unique: true
       generator:
         strategy: none
+  indexes:
+    added:
+      columns: [ added ]
+    completed:
+      columns: [ completed ]
+    started:
+      columns: [ started ]
+    topic:
+      columns: [ topic ]
+    status:
+      columns: [ status ]
   fields:
     command:
       type: text

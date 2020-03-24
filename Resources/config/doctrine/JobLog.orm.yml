@@ -5,6 +5,8 @@ Markup\JobQueueBundle\Entity\JobLog:
     uuid:
       type: guid
       unique: true
+      generator:
+        strategy: none
   fields:
     command:
       type: text

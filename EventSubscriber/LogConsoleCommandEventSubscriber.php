@@ -60,16 +60,9 @@ class LogConsoleCommandEventSubscriber implements EventSubscriberInterface
         $log = $this->jobLogRepository->findJobLog($uuid);
 
         if (!$log) {
-            if (!method_exists($input, '__toString')) {
-                return;
-            }
-
-            $commandString = $input->__toString();
-            $log = new JobLog($commandString, $uuid);
-
-            $this->jobLogRepository->add($log);
+            return;
         }
-        
+
         $log->setStatus(JobLog::STATUS_RUNNING);
         $log->setStarted(new \DateTime());
 

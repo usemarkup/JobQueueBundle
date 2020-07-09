@@ -59,14 +59,14 @@ class JobManagerTest extends MockeryTestCase
 
     public function testCanAddCommandJob(): void
     {
-        $this->jobManager->addCommandJob('console:herp:derp', 'system', 60, 60);
+        $this->jobManager->addConsoleCommandJob('console:herp:derp', [], 'system', 60, 60);
         $this->assertCount(1, $this->jobPublisher->getJobs());
     }
 
     public function testIdleTimeoutDefaultsToTimeout(): void
     {
         $timeout = 720;
-        $this->jobManager->addCommandJob('command', 'topic', $timeout);
+        $this->jobManager->addConsoleCommandJob('command', [], 'topic', $timeout);
         /** @var Job $job */
         $job = $this->jobPublisher->getJobs()[0];
         $this->assertEquals($timeout, $job->getArgs()['idleTimeout']);

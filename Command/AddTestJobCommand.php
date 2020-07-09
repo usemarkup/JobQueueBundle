@@ -53,7 +53,7 @@ class AddTestJobCommand extends Command
                 'quantity',
                 InputArgument::OPTIONAL,
                 'The number of times to add the job',
-                1
+                '1'
             )
             ->addArgument(
                 'topic',
@@ -86,7 +86,7 @@ class AddTestJobCommand extends Command
                 break;
         }
 
-        $quantity = $input->getArgument('quantity');
+        $quantity = intval($input->getArgument('quantity'));
         for ($i = 0; $i < $quantity; $i++) {
             $this->jobby->addJob($job);
         }

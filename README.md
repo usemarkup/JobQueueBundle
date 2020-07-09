@@ -81,8 +81,9 @@ Jobs can also be added directly. There is a utility method for adding 'command' 
 
 ```php
 $container->get('jobby')
-	->addCommandJob(
-		'your:console:command --plus=any --options or arguments', #this needs to be a valid command
+	->addConsoleCommandJob(
+		'your:console:command',
+		['--test']
 		'a_valid_topic', # should be a valid topic name
 		600, # allowed timeout for command (see symfony process component documentation)
 		600, # allowed idle timeout for command (see symfony process component documentation)

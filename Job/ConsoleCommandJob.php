@@ -23,7 +23,18 @@ class ConsoleCommandJob extends Job
         $command = [];
 
         $command[] = $this->getConsolePath($parameterBag->get('markup_job_queue.console_dir'));
-        $command[] = $this->args['command'];
+
+        /**
+         * This is less than ideal, but trying to support legacy and v3 and v4 symfony
+         */
+        // If the command has been provided like `do:something "hello"` allow it through
+        if (stripos($this->args['command'], '"') !== false) {
+            $command[] = $this->args['command'];
+        } else {
+            // If the command has been provided like `do:something hello` split so the escaping is correct
+            $command = array_merge($command, explode(' ', $this->args['command']));
+        }
+
 
         $uuid = isset($this->args['uuid']) ? $this->args['uuid']: null;
         if($uuid) {
@@ -52,7 +63,7 @@ class ConsoleCommandJob extends Job
             if (!$process->isSuccessful()) {
                 $message = sprintf(
                     'A job `%s` failed with topic `%s` with output:%s and the error output: %s',
-                    $command,
+                    $this->args['command'],
                     $this->topic,
                     $process->getOutput(),
                     $process->getErrorOutput()

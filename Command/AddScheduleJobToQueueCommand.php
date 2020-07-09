@@ -2,6 +2,7 @@
 
 namespace Markup\JobQueueBundle\Command;
 
+use Markup\JobQueueBundle\Entity\ScheduledJob;
 use Markup\JobQueueBundle\Service\JobManager;
 use Markup\JobQueueBundle\Service\ScheduledJobService;
 use Psr\Log\LoggerInterface;
@@ -55,12 +56,18 @@ class AddScheduleJobToQueueCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        if ($jobs = $this->scheduledJobService->getUnqueuedJobs()) {
+        $jobs = $this->scheduledJobService->getUnqueuedJobs();
+
+        if ($jobs) {
             foreach ($jobs as $job) {
+                if (!$job instanceof ScheduledJob) {
+                    continue;
+                }
+
                 try {
                     $this->jobManager->addConsoleCommandJob(
                         $job->getJob(),
-                        [],
+                        $job->getArguments(),
                         $job->getTopic(),
                         3600,
                         3600

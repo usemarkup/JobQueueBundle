@@ -83,7 +83,7 @@ class JobPublisher implements ContainerAwareInterface
             // log the job as existing
             if ($job instanceof ConsoleCommandJob) {
                 $uuid = Uuid::uuid4()->toString();
-                $log = new JobLog($job->getCommand(), $uuid, $job->getTopic());
+                $log = new JobLog(trim(sprintf('%s %s', $job->getCommand(), implode(' ', $job->getArguments()))), $uuid, $job->getTopic());
 
                 $this->jobLogRepository->add($log);
 

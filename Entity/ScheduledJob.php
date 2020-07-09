@@ -41,13 +41,20 @@ class ScheduledJob
     private $updated;
 
     /**
-     * @param mixed $job
+     * @var array
+     */
+    private $arguments;
+
+    /**
+     * @param string $job
+     * @param array $arguments
      * @param mixed $scheduledTime
      * @param mixed $topic
      */
-    function __construct($job, $scheduledTime, $topic)
+    function __construct(string $job, array $arguments, $scheduledTime, $topic)
     {
         $this->job = $job;
+        $this->arguments = $arguments;
         $this->scheduledTime = $scheduledTime;
         $this->topic = $topic;
         $this->queued = false;
@@ -76,6 +83,11 @@ class ScheduledJob
     public function getJob()
     {
         return $this->job;
+    }
+
+    public function getArguments(): array
+    {
+        return $this->arguments;
     }
 
     /**

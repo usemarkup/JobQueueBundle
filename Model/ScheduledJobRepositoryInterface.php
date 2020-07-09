@@ -7,7 +7,7 @@ use Markup\JobQueueBundle\Entity\ScheduledJob;
 interface ScheduledJobRepositoryInterface
 {
     /**
-     * @return mixed
+     * @return iterable<ScheduledJob>
      */
     public function fetchUnqueuedJobs();
 

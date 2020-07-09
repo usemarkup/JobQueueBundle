@@ -21,7 +21,7 @@ abstract class Job
      * @param string $topic
      */
     final public function __construct(
-        array $args = array(),
+        array $args = [],
         $topic = 'default'
     ) {
         $this->args = $args;

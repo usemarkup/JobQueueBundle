@@ -16,6 +16,11 @@ class ScheduledJobServiceTest extends MockeryTestCase
 {
     private $doctrine;
 
+    /**
+     * @var ScheduledJobService
+     */
+    private $scheduledJobService;
+
     protected function setUp()
     {
         $scheduledJobRepository = m::mock(ScheduledJobRepositoryInterface::class);
@@ -39,7 +44,7 @@ class ScheduledJobServiceTest extends MockeryTestCase
 
         $this->assertEquals($args['command'], $job->getCommand());
 
-        $scheduledJob = new ScheduledJob($job->getCommand(), $scheduledTime, $topic);
+        $scheduledJob = new ScheduledJob($job->getCommand(), $job->getArguments(), $scheduledTime, $topic);
 
         $this->assertEquals($this->scheduledJobService->addScheduledJob($job, $scheduledTime), $scheduledJob);
     }

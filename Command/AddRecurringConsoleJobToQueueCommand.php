@@ -106,8 +106,9 @@ class AddRecurringConsoleJobToQueueCommand extends Command
                     continue;
                 }
             }
-            $this->jobManager->addCommandJob(
+            $this->jobManager->addConsoleCommandJob(
                 $configuration->getCommand(),
+                [],
                 $configuration->getTopic(),
                 $configuration->getTimeout(),
                 $configuration->getTimeout()
@@ -118,9 +119,8 @@ class AddRecurringConsoleJobToQueueCommand extends Command
                 $configuration->getCommand(),
                 $configuration->getTopic()
             );
-            if ($configuration->nextRun()) {
-                $message = sprintf('%s. Will next be added %s', $message, $configuration->nextRun()->format('r'));
-            }
+
+            $message = sprintf('%s. Will next be added %s', $message, $configuration->nextRun()->format('r'));
             $output->writeln(sprintf('<info>%s</info>', $message));
         }
 

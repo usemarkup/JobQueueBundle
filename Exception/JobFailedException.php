@@ -15,13 +15,13 @@ class JobFailedException extends \Exception
      * @param string         $message
      * @param null           $exitCode
      * @param int            $code
-     * @param \Exception|null $previous
+     * @param \Throwable|null $previous
      */
     public function __construct(
         $message = "",
         $exitCode = null,
         $code = 0,
-        \Exception $previous = null
+        \Throwable $previous = null
     ) {
         $this->exitCode = $exitCode;
         parent::__construct($message, $code, $previous);

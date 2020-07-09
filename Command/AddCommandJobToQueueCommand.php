@@ -14,6 +14,8 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class AddCommandJobToQueueCommand extends Command
 {
+    protected static $defaultName = 'markup:job_queue:add:command';
+
     /**
      * @var JobManager
      */
@@ -31,7 +33,6 @@ class AddCommandJobToQueueCommand extends Command
     protected function configure()
     {
         $this
-            ->setName('markup:job_queue:add:command')
             ->setDescription('Adds a single job that executes a command via the job queue')
             ->addArgument(
                 'cmd',
@@ -66,7 +67,7 @@ class AddCommandJobToQueueCommand extends Command
         $timeout = intval($input->getOption('timeout'));
         $idleTimeout = intval($input->getOption('idle_timeout'));
 
-        $this->jobby->addCommandJob($command, $topic, $timeout, $idleTimeout);
+        $this->jobby->addConsoleCommandJob($command, [], $topic, $timeout, $idleTimeout);
 
         $output->writeln('<info>Added command to job queue</info>');
     }

@@ -19,6 +19,10 @@ services:
 
     markup_job_queue.command.add_schedule_job_to_queue:
         class: Markup\JobQueueBundle\Command\AddScheduleJobToQueueCommand
+        arguments:
+            $jobManager: '@jobby'
+            $scheduledJobService: '@markup_job_queue.scheduled'
+            $logger: '@logger'
         tags:
             - { name: console.command, command: 'markup:scheduled_job:add' }
 

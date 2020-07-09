@@ -30,7 +30,7 @@ class SleepJob extends Job
      */
     public function run(ParameterBagInterface $parameterBag): string
     {
-        $process = new Process(sprintf('sleep %s', $this->args['time']));
+        $process = new Process(['sleep', $this->args['time']]);
         $process->run();
 
         return '';

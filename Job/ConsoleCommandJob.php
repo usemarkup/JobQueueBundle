@@ -24,17 +24,11 @@ class ConsoleCommandJob extends Job
 
         $command[] = $this->getConsolePath($parameterBag->get('markup_job_queue.console_dir'));
 
-        /**
-         * This is less than ideal, but trying to support legacy and v3 and v4 symfony
-         */
-        // If the command has been provided like `do:something "hello"` allow it through
-        if (stripos($this->args['command'], '"') !== false) {
-            $command[] = $this->args['command'];
-        } else {
-            // If the command has been provided like `do:something hello` split so the escaping is correct
-            $command = array_merge($command, explode(' ', $this->args['command']));
-        }
+        $command[] = $this->args['command'];
 
+        foreach ($this->args['arguments'] as $argument) {
+            $command[] = $argument;
+        };
 
         $uuid = isset($this->args['uuid']) ? $this->args['uuid']: null;
         if($uuid) {
@@ -84,16 +78,9 @@ class ConsoleCommandJob extends Job
         } catch (JobFailedException $e) {
             throw $e;
         }  catch (RuntimeException $e) {
-            // if process has been signalled then use the termSignal as the exit code
-            try {
-                $code = sprintf('SIGNAL %s', $process->getTermSignal());
-            } catch(\Exception $e) {
-                // RuntimeException may have been thrown for some other reason
-                $code = 'UNKNOWN';
-            }
-            throw new JobFailedException($e->getMessage(), $code);
-        } catch (\Exception $e) {
-            throw new JobFailedException($e->getMessage());
+            throw new JobFailedException($e->getMessage(), $process->getExitCode(), $e->getCode(), $e);
+        } catch (\Throwable $e) {
+            throw new JobFailedException($e->getMessage(), $process->getExitCode(), $e->getCode(), $e);
         }
     }
 

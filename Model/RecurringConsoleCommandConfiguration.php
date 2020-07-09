@@ -131,7 +131,7 @@ class RecurringConsoleCommandConfiguration
 
         if ($cron->isDue($time)) {
             $now = new \DateTime();
-            $now->setTime($now->format('H'), $now->format('i'));
+            $now->setTime(intval($now->format('H')), intval($now->format('i')));
             return $now;
         }
         return $cron->getPreviousRunDate($time);

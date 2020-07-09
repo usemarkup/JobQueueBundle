@@ -167,7 +167,7 @@ class JobLogRepository
     public function removeExpiredJobs(): void
     {
         $interval = new \DateInterval(sprintf('PT%sS', $this->ttl));
-        $before = (new \DateTime('now'))->sub($interval)->format('U');
+        $before = (new \DateTime('now'))->sub($interval);
 
         $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->delete(JobLog::class, 'j')

@@ -4,16 +4,28 @@ namespace Markup\JobQueueBundle\Command;
 
 use Markup\JobQueueBundle\Exception\InvalidConfigurationException;
 use Markup\JobQueueBundle\Service\RecurringConsoleCommandReader;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class CheckRecurringJobConfigurationCommand extends ContainerAwareCommand
+class CheckRecurringJobConfigurationCommand extends Command
 {
+    protected static $defaultName = 'markup:job_queue:recurring:check';
+
+    /**
+     * @var RecurringConsoleCommandReader
+     */
+    private $recurringConsoleCommandReader;
+
+    public function __construct(RecurringConsoleCommandReader $recurringConsoleCommandReader)
+    {
+        $this->recurringConsoleCommandReader = $recurringConsoleCommandReader;
+        parent::__construct(null);
+    }
+
     protected function configure()
     {
         $this
-            ->setName('markup:job_queue:recurring:check')
             ->setDescription('Checks the recurring job config files for validity.');
     }
 
@@ -23,14 +35,12 @@ class CheckRecurringJobConfigurationCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $reader = $this->getContainer()->get('markup_job_queue.reader.recurring_console_command');
-
         $message = '';
         /**
          * @var RecurringConsoleCommandReader $reader
          */
         try {
-            $reader->getConfigurations();
+            $this->recurringConsoleCommandReader->getConfigurations();
             $isGood = true;
         } catch (InvalidConfigurationException $e) {
             $isGood = false;

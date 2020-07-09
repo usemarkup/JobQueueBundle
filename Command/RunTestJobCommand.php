@@ -4,20 +4,22 @@ namespace Markup\JobQueueBundle\Command;
 
 use Markup\JobQueueBundle\Job\BadJob;
 use Markup\JobQueueBundle\Job\ExceptionJob;
-use Markup\JobQueueBundle\Job\MonologErrorJob;
 use Markup\JobQueueBundle\Job\SleepJob;
 use Markup\JobQueueBundle\Job\WorkJob;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 /**
  * This command can immediately runs a variety of test jobs
  * Exists for testing and development purposes of the job queue
  */
-class RunTestJobCommand extends ContainerAwareCommand
+class RunTestJobCommand extends Command
 {
+    protected static $defaultName = 'markup:job_queue:run:test';
+
     const TYPE_SLEEP = 'sleep';
     const TYPE_BAD = 'bad';
     const TYPE_ERROR = 'error';
@@ -25,17 +27,28 @@ class RunTestJobCommand extends ContainerAwareCommand
     const TYPE_WORK = 'work';
 
     /**
+     * @var ParameterBagInterface
+     */
+    private $parameterBag;
+
+    public function __construct(ParameterBagInterface $parameterBag)
+    {
+        $this->parameterBag = $parameterBag;
+
+        parent::__construct();
+    }
+
+    /**
      * @see Command
      */
     protected function configure()
     {
         $this
-            ->setName('markup:job_queue:run:test')
             ->setDescription('Adds a single job to allow testing of the job queue')
             ->addArgument(
                 'type',
                 InputArgument::REQUIRED,
-                'The type of job to add. Should be one of `sleep`, `bad` (fatal error), `error` (monolog error), `work` (cryptography) or `exception` (uncaught exception)'
+                'The type of job to add. Should be one of `sleep`, `bad` (fatal error), `work` (cryptography) or `exception` (uncaught exception)'
             )
             ->addArgument(
                 'topic',
@@ -57,9 +70,6 @@ class RunTestJobCommand extends ContainerAwareCommand
             case self::TYPE_BAD:
                 $job = new BadJob([], $topic);
                 break;
-            case self::TYPE_ERROR:
-                $job = new MonologErrorJob([], $topic);
-                break;
             case self::TYPE_EXCEPTION:
                 $job = new ExceptionJob([], $topic);
                 break;
@@ -72,6 +82,6 @@ class RunTestJobCommand extends ContainerAwareCommand
         }
 
         $job->validate();
-        $job->run($this->getContainer());
+        $job->run($this->parameterBag);
     }
 }

@@ -5,7 +5,7 @@ namespace Markup\JobQueueBundle\Job;
 use Markup\JobQueueBundle\Exception\JobFailedException;
 use Markup\JobQueueBundle\Exception\InvalidJobArgumentException;
 use Markup\JobQueueBundle\Model\Job;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Exception\RuntimeException;
@@ -17,30 +17,26 @@ use Symfony\Component\Process\Process;
  */
 class ConsoleCommandJob extends Job
 {
-    /**
-     * {inheritdoc}
-     */
-    public function run(ContainerInterface $container): string
+    public function run(ParameterBagInterface $parameterBag): string
     {
         ini_set('max_execution_time', 7200);
-        $command = $this->args['command'];
+        $command = [];
+
+        $command[] = $this->getConsolePath($parameterBag->get('markup_job_queue.console_dir'));
+        $command[] = $this->args['command'];
+
         $uuid = isset($this->args['uuid']) ? $this->args['uuid']: null;
         if($uuid) {
-            $command = sprintf('%s --uuid=%s', $command, $uuid);
+            $command[] = sprintf('--uuid=%s', $uuid);
         }
-        if ($container->get('kernel')->isDebug() !== true) {
-            $command = sprintf('%s --no-debug', $command);
+        if ($parameterBag->get('kernel.debug') !== true) {
+            $command[] = sprintf('--no-debug');
         }
 
-        // get the absolute path of the console and the environment
-        $command = sprintf(
-            '%s %s --env=%s',
-            $this->getConsolePath($container->getParameter('markup_job_queue.console_dir')),
-            $command,
-            $container->get('kernel')->getEnvironment()
-        );
+        $command[] = sprintf('--env=%s', $parameterBag->get('kernel.environment'));
 
         $process = new Process($command);
+
         if (!isset($this->args['timeout'])) {
             $this->args['timeout'] = 60;
         }

@@ -2,7 +2,8 @@
 
 namespace Markup\JobQueueBundle\Command;
 
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Markup\JobQueueBundle\Service\SupervisordConfigFileWriter;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -10,15 +11,27 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * This command writes a supervisord config file to monitor rabbitmq consumers
  */
-class WriteSupervisordConfigFileCommand extends ContainerAwareCommand
+class WriteSupervisordConfigFileCommand extends Command
 {
+    protected static $defaultName = 'markup:job_queue:supervisord_config:write';
+
+    /**
+     * @var SupervisordConfigFileWriter
+     */
+    private $configFileWriter;
+
+    public function __construct(SupervisordConfigFileWriter $configFileWriter)
+    {
+        parent::__construct();
+        $this->configFileWriter = $configFileWriter;
+    }
+
     /**
      * @see Command
      */
     protected function configure()
     {
         $this
-            ->setName('markup:job_queue:supervisord_config:write')
             ->setDescription('Writes a supervisord config file to monitor rabbitmq consumers')
             ->addArgument(
                 'unique_environment',
@@ -29,10 +42,9 @@ class WriteSupervisordConfigFileCommand extends ContainerAwareCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $writer = $this->getContainer()->get('markup_job_queue.writer.supervisord_config_file');
         $env = $input->getArgument('unique_environment');
         $output->writeln('Started writing queue configuration');
-        $writer->writeConfig($env);
+        $this->configFileWriter->writeConfig($env);
         $output->writeln('Finished writing queue configuration');
     }
 }

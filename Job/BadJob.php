@@ -3,7 +3,7 @@
 namespace Markup\JobQueueBundle\Job;
 
 use Markup\JobQueueBundle\Model\Job;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 /**
  * The expected behaviour of BadJob is to call an undefined function, causing a fatal error
@@ -14,7 +14,7 @@ class BadJob extends Job
     /**
      * {@inheritdoc}
      */
-    public function run(ContainerInterface $container): string
+    public function run(ParameterBagInterface $parameterBag): string
     {
         throw new \Exception('Error');
     }

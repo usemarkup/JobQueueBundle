@@ -8,8 +8,7 @@ services:
           - [ setContainer,[ '@service_container' ] ]
     markup_job_queue.consumer:
         class: Markup\JobQueueBundle\Consumer\JobConsumer
-        calls:
-          - [ setContainer,[ '@service_container' ] ]
+        autowire: true
     markup_job_queue.manager:
         class: Markup\JobQueueBundle\Service\JobManager
         arguments:
@@ -48,6 +47,10 @@ services:
         arguments:
             - '@markup_job_queue.rabbit_mq_api'
             - ~
+
+
+    Markup\JobQueueBundle\Repository\JobLogRepository: '@markup_job_queue.repository.job_log'
+
     markup_job_queue.repository.job_log:
         class: Markup\JobQueueBundle\Repository\JobLogRepository
         arguments:

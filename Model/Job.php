@@ -2,7 +2,7 @@
 
 namespace Markup\JobQueueBundle\Model;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 abstract class Job
 {
@@ -44,12 +44,7 @@ abstract class Job
         return $this->args;
     }
 
-    /**
-     * @param ContainerInterface $container
-     *
-     * @return string - output of command
-     */
-    abstract public function run(ContainerInterface $container): string;
+    abstract public function run(ParameterBagInterface $parameterBag): string;
 
     /**
      * To be run after job constructed to check arguments are correct

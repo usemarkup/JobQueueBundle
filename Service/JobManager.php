@@ -69,21 +69,29 @@ class JobManager
 
     /**
      * Adds a named command to the job queue at a specific datetime
-     * @param string    $command     A valid command for this application.
-     * @param \DateTime $dateTime    The DateTime to execute the command.
-     * @param string    $topic       The name of a valid topic.
-     * @param int       $timeout     The amount of time to allow the command to run.
-     * @param int       $idleTimeout The amount of idle time to allow the command to run. Default to the same as timeout.
+     *
+     * @param string $command A valid command for this application.
+     * @param \DateTime $dateTime The DateTime to execute the command.
+     * @param array $arguments
+     * @param string $topic The name of a valid topic.
+     * @param int $timeout The amount of time to allow the command to run.
+     * @param int $idleTimeout The amount of idle time to allow the command to run. Default to the same as timeout.
      */
-    public function addScheduledCommandJob(
+    public function addScheduledConsoleCommandJob(
         $command,
         \DateTime $dateTime,
+        array $arguments = [],
         $topic = 'default',
         $timeout = 60,
         $idleTimeout = null
     ) {
+        if (stripos($command, " ") !== false) {
+            throw new \InvalidArgumentException('Console command is not expected to have spaces within the name');
+        }
+
         $args = [];
         $args['command'] = $command;
+        $args['arguments'] = $arguments;
         $args['timeout'] = $timeout;
         $args['idleTimeout'] = $idleTimeout ?? $timeout;
         $job = new ConsoleCommandJob($args, $topic);

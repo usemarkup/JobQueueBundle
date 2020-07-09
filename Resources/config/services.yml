@@ -1,3 +1,6 @@
+parameters:
+    markup_job_queue.php_bin_path: '/usr/bin/php'
+
 services:
     markup_job_queue.publisher:
         class: Markup\JobQueueBundle\Publisher\JobPublisher

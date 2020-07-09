@@ -30,7 +30,7 @@ class ScheduledJobService
      */
     public function addScheduledJob(ConsoleCommandJob $job, $scheduledTime)
     {
-        $scheduledJob = new ScheduledJob($job->getCommand(), $scheduledTime, $job->getTopic());
+        $scheduledJob = new ScheduledJob($job->getCommand(), $job->getArguments(), $scheduledTime, $job->getTopic());
         $this->save($scheduledJob, true);
 
         return $scheduledJob;
@@ -49,7 +49,7 @@ class ScheduledJobService
     }
 
     /**
-     * @return mixed
+     * @return iterable<ScheduledJob>
      */
     public function getUnqueuedJobs()
     {

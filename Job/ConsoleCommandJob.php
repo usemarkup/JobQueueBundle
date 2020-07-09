@@ -22,11 +22,11 @@ class ConsoleCommandJob extends Job
         ini_set('max_execution_time', 7200);
         $command = [];
 
+        $command[] = $parameterBag->get('markup_job_queue.php_bin_path');
         $command[] = $this->getConsolePath($parameterBag->get('markup_job_queue.console_dir'));
+        $command[] = $this->getCommand();
 
-        $command[] = $this->args['command'];
-
-        foreach ($this->args['arguments'] as $argument) {
+        foreach ($this->getArguments() as $argument) {
             $command[] = $argument;
         };
 
@@ -57,7 +57,7 @@ class ConsoleCommandJob extends Job
             if (!$process->isSuccessful()) {
                 $message = sprintf(
                     'A job `%s` failed with topic `%s` with output:%s and the error output: %s',
-                    $this->args['command'],
+                    $this->getCommand(),
                     $this->topic,
                     $process->getOutput(),
                     $process->getErrorOutput()
@@ -100,6 +100,11 @@ class ConsoleCommandJob extends Job
     public function getCommand()
     {
         return $this->getArgs()['command'];
+    }
+
+    public function getArguments(): array
+    {
+        return $this->getArgs()['arguments'] ?? [];
     }
 
     /**

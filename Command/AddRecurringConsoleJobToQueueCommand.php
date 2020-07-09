@@ -106,9 +106,19 @@ class AddRecurringConsoleJobToQueueCommand extends Command
                     continue;
                 }
             }
+
+            $command = $configuration->getCommand();
+            $arguments = [];
+
+            // i.e. does the command already have options or arguments within the string
+            if (stripos($configuration->getCommand(), ' ') !== false) {
+                $command = trim(strstr($configuration->getCommand(), ' ', true));
+                $arguments = explode(' ', trim(strstr($configuration->getCommand(), ' ', false)));
+            }
+
             $this->jobManager->addConsoleCommandJob(
-                $configuration->getCommand(),
-                [],
+                $command,
+                $arguments,
                 $configuration->getTopic(),
                 $configuration->getTimeout(),
                 $configuration->getTimeout()

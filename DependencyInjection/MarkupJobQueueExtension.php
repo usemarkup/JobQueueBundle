@@ -137,10 +137,6 @@ class MarkupJobQueueExtension extends Extension
     private function configureConsoleDirectory(array $config, ContainerBuilder $container)
     {
         $parameter = 'markup_job_queue.console_dir';
-        $isUsingSymfony4OrGreater = Kernel::MAJOR_VERSION === 4;
-        if ($isUsingSymfony4OrGreater && $config['use_root_dir_for_symfony_console']) {
-            throw new \Exception('The `use_root_dir_for_symfony_console` option cannot be used with Symfony 4+.');
-        }
 
         if ($config['use_root_dir_for_symfony_console']) {
             $container->setParameter($parameter, $container->getParameter('kernel.root_dir'));

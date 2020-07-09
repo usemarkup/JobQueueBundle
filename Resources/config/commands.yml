@@ -5,42 +5,71 @@ services:
             - '@jobby'
         tags:
             - { name: console.command, command: 'markup:job_queue:add:command' }
+
     markup_job_queue.command.add_recurring_console_job_to_queue:
         class: Markup\JobQueueBundle\Command\AddRecurringConsoleJobToQueueCommand
+        arguments:
+            $recurringConsoleCommandReader: '@markup_job_queue.reader.recurring_console_command'
+            $jobManager: '@jobby'
+            $cronHealthRepository: '@markup_job_queue.repository.cron_health'
+            $jobLogRepository: '@markup_job_queue.repository.job_log'
+            $environment: '%kernel.environment%'
         tags:
             - { name: console.command, command: 'markup:job_queue:recurring:add' }
+
     markup_job_queue.command.add_schedule_job_to_queue:
         class: Markup\JobQueueBundle\Command\AddScheduleJobToQueueCommand
         tags:
             - { name: console.command, command: 'markup:scheduled_job:add' }
+
     markup_job_queue.command.add_test_job:
         class: Markup\JobQueueBundle\Command\AddTestJobCommand
+        arguments:
+            - '@jobby'
         tags:
             - { name: console.command, command: 'markup:job_queue:add:test' }
+
     markup_job_queue.command.check_recurring_job_configuration:
         class: Markup\JobQueueBundle\Command\CheckRecurringJobConfigurationCommand
+        arguments:
+            $recurringConsoleCommandReader: '@markup_job_queue.reader.recurring_console_command'
         tags:
             - { name: console.command, command: 'markup:job_queue:recurring:check' }
+
     markup_job_queue.command.consumer:
         class: Markup\JobQueueBundle\Command\ConsumerCommand
+        arguments:
+            $consumer: '@markup_job_queue.consumer'
         tags:
             - { name: console.command, command: 'markup:job_queue:consumer' }
+
     markup_job_queue.command.read_recurring_console_job_configuration:
         class: Markup\JobQueueBundle\Command\ReadRecurringConsoleJobConfigurationCommand
         tags:
             - { name: console.command, command: 'markup:job_queue:recurring:view' }
+
     markup_job_queue.command.run_test_job:
         class: Markup\JobQueueBundle\Command\RunTestJobCommand
+        autowire: true
         tags:
             - { name: console.command, command: 'markup:job_queue:run:test' }
+
     markup_job_queue.command.write_cli_consumer_config_file:
         class: Markup\JobQueueBundle\Command\WriteCliConsumerConfigFileCommand
+        arguments:
+            $cliConsumerConfigFileWriter: '@markup_job_queue.writer.cli_consumer_config_file'
         tags:
             - { name: console.command, command: 'markup:job_queue:cli_consumer_config:write' }
+
     markup_job_queue.command.write_supervisord_config_file:
         class: Markup\JobQueueBundle\Command\WriteSupervisordConfigFileCommand
+        arguments:
+            $configFileWriter: '@markup_job_queue.writer.supervisord_config_file'
         tags:
             - { name: console.command, command: 'markup:job_queue:supervisord_config:write' }
+
     Markup\JobQueueBundle\Command\RabbitMqConsumerCommand:
+        arguments:
+            $consumer: '@?simple_bus.rabbit_mq_bundle_bridge.commands_consumer'
         tags:
             - { name: console.command, command: 'markup:job_queue:rabbitmq_consumer' }

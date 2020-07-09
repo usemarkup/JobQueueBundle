@@ -4,7 +4,7 @@ namespace Markup\JobQueueBundle\Command;
 
 use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
 use PhpAmqpLib\Message\AMQPMessage;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -13,19 +13,31 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Consumes messages from the Go consumer
  */
-class ConsumerCommand extends ContainerAwareCommand
+class ConsumerCommand extends Command
 {
+    protected static $defaultName = 'markup:job_queue:consumer';
+
     const STRICT_CODE_ACK = 0;
     const STRICT_CODE_REJECT = 3;
     const STRICT_CODE_REJECT_REQUEUE = 4;
     const STRICT_CODE_NEG_ACK = 5;
     const STRICT_CODE_NEG_ACK_REQUEUE = 6;
 
+    /**
+     * @var ConsumerInterface
+     */
+    private $consumer;
+
+    public function __construct(ConsumerInterface $consumer)
+    {
+        parent::__construct(null);
+        $this->consumer = $consumer;
+    }
+
     protected function configure()
     {
         $this
             ->addArgument('event', InputArgument::REQUIRED)
-            ->setName('markup:job_queue:consumer')
             ->addOption(
                 'strict-exit-code',
                 null,
@@ -49,7 +61,7 @@ class ConsumerCommand extends ContainerAwareCommand
         }
 
         $strict = $input->getOption('strict-exit-code');
-        $consumerReturn = $this->getContainer()->get('markup_job_queue.consumer')->execute($message);
+        $consumerReturn = $this->consumer->execute($message);
 
         // if not running in strict mode - always acknowledge the message otherwise it will requeue forever
         if (!$strict) {

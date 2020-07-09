@@ -3,7 +3,11 @@
 namespace Markup\JobQueueBundle\Command;
 
 use Markup\JobQueueBundle\Model\RecurringConsoleCommandConfiguration;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Markup\JobQueueBundle\Repository\CronHealthRepository;
+use Markup\JobQueueBundle\Repository\JobLogRepository;
+use Markup\JobQueueBundle\Service\JobManager;
+use Markup\JobQueueBundle\Service\RecurringConsoleCommandReader;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -14,15 +18,57 @@ use Symfony\Component\Console\Output\OutputInterface;
  *
  * This command should be run every minute via crontab
  */
-class AddRecurringConsoleJobToQueueCommand extends ContainerAwareCommand
+class AddRecurringConsoleJobToQueueCommand extends Command
 {
+    protected static $defaultName = 'markup:job_queue:recurring:add';
+
+    /**
+     * @var RecurringConsoleCommandReader
+     */
+    private $recurringConsoleCommandReader;
+
+    /**
+     * @var JobManager
+     */
+    private $jobManager;
+
+    /**
+     * @var CronHealthRepository
+     */
+    private $cronHealthRepository;
+
+    /**
+     * @var JobLogRepository
+     */
+    private $jobLogRepository;
+
+    /**
+     * @var string
+     */
+    private $environment;
+
+    public function __construct(
+        RecurringConsoleCommandReader $recurringConsoleCommandReader,
+        JobManager $jobManager,
+        CronHealthRepository $cronHealthRepository,
+        JobLogRepository $jobLogRepository,
+        string $environment
+    ) {
+        $this->recurringConsoleCommandReader = $recurringConsoleCommandReader;
+        $this->jobManager = $jobManager;
+        $this->cronHealthRepository = $cronHealthRepository;
+        $this->jobLogRepository = $jobLogRepository;
+        $this->environment = $environment;
+
+        parent::__construct(null);
+    }
+
     /**
      * @see Command
      */
     protected function configure()
     {
         $this
-            ->setName('markup:job_queue:recurring:add')
             ->setDescription('Adds any configured recurring jobs, which are due NOW, to the specified job queue');
     }
 
@@ -40,9 +86,7 @@ class AddRecurringConsoleJobToQueueCommand extends ContainerAwareCommand
      */
     private function addRecurringJobs(OutputInterface $output)
     {
-        $recurringConsoleCommandReader = $this->getContainer()->get('markup_job_queue.reader.recurring_console_command');
-
-        $due = $recurringConsoleCommandReader->getDue();
+        $due = $this->recurringConsoleCommandReader->getDue();
 
         foreach ($due as $configuration) {
             if (!$configuration instanceof RecurringConsoleCommandConfiguration) {
@@ -50,7 +94,7 @@ class AddRecurringConsoleJobToQueueCommand extends ContainerAwareCommand
             }
 
             if ($configuration->getEnvs()) {
-                $env = $this->getContainer()->get('kernel')->getEnvironment();
+                $env = $this->environment;
 
                 if (!in_array($env, $configuration->getEnvs())) {
                     $output->writeln(
@@ -62,7 +106,7 @@ class AddRecurringConsoleJobToQueueCommand extends ContainerAwareCommand
                     continue;
                 }
             }
-            $this->getContainer()->get('jobby')->addCommandJob(
+            $this->jobManager->addCommandJob(
                 $configuration->getCommand(),
                 $configuration->getTopic(),
                 $configuration->getTimeout(),
@@ -80,11 +124,11 @@ class AddRecurringConsoleJobToQueueCommand extends ContainerAwareCommand
             $output->writeln(sprintf('<info>%s</info>', $message));
         }
 
-        $this->getContainer()->get('markup_job_queue.repository.cron_health')->set();
+        $this->cronHealthRepository->set();
     }
 
     private function maintainJobLogs()
     {
-        $this->getContainer()->get('markup_job_queue.repository.job_log')->removeExpiredJobs();
+        $this->jobLogRepository->removeExpiredJobs();
     }
 }

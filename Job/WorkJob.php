@@ -4,7 +4,7 @@ namespace Markup\JobQueueBundle\Job;
 
 use Markup\JobQueueBundle\Exception\InvalidJobArgumentException;
 use Markup\JobQueueBundle\Model\Job;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 /**
  * A job that simulates work - for testing message consumption rates
@@ -30,7 +30,7 @@ class WorkJob extends Job
     /**
      * {@inheritdoc}
      */
-    public function run(ContainerInterface $container): string
+    public function run(ParameterBagInterface $parameterBag): string
     {
         $garbage = '';
         $completed = 0;

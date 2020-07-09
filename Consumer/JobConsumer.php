@@ -9,15 +9,33 @@ use Markup\JobQueueBundle\Job\ConsoleCommandJob;
 use Markup\JobQueueBundle\Repository\JobLogRepository;
 use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
 use PhpAmqpLib\Message\AMQPMessage;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
-class JobConsumer implements ConsumerInterface, ContainerAwareInterface
+class JobConsumer implements ConsumerInterface
 {
     /**
-     * @var ContainerInterface
+     * @var JobLogRepository
      */
-    protected $container;
+    private $jobLogRepository;
+
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
+     * @var ParameterBagInterface
+     */
+    private $parameterBag;
+
+    public function __construct(JobLogRepository $jobLogRepository, ParameterBagInterface $parameterBag, ?LoggerInterface $logger = null)
+    {
+        $this->jobLogRepository = $jobLogRepository;
+        $this->parameterBag = $parameterBag;
+        $this->logger = $logger ?: new NullLogger();
+    }
 
     /**
      * {@inheritdoc}
@@ -38,11 +56,11 @@ class JobConsumer implements ConsumerInterface, ContainerAwareInterface
                 throw new \LogicException('This consumer can only consume instances of Markup\JobQueueBundle\Model\Job but job of following type was given: '.get_class($job));
             }
             $job->validate();
-            $output = $job->run($this->container);
+            $output = $job->run($this->parameterBag);
 
             if (isset($data['uuid'])) {
                 try {
-                    $this->getJobLogRepository()->saveOutput(
+                    $this->jobLogRepository->saveOutput(
                         $data['uuid'],
                         strval($output)
                     );
@@ -69,7 +87,7 @@ class JobConsumer implements ConsumerInterface, ContainerAwareInterface
             // save failure if job had uuid
             if (isset($data['uuid'])) {
                 try {
-                    $this->getJobLogRepository()->saveFailure(
+                    $this->jobLogRepository->saveFailure(
                         $data['uuid'],
                         strval($output),
                         $exitCode ?? 1
@@ -79,32 +97,18 @@ class JobConsumer implements ConsumerInterface, ContainerAwareInterface
                 }
             }
 
-            $this->container->get('logger')->error(sprintf('Job Failed: %s', $command), [
-                'exception' => get_class($e),
-                'message' => $e->getMessage(),
-                'line' => $e->getLine(),
-                'file' => $e->getFile(),
-                'trace' => $e->getTraceAsString(),
-            ]);
+            $this->logger->error(
+                sprintf('Job Failed: %s', $command),
+                [
+                    'exception' => get_class($e),
+                    'message' => $e->getMessage(),
+                    'line' => $e->getLine(),
+                    'file' => $e->getFile(),
+                    'trace' => $e->getTraceAsString(),
+                ]
+            );
 
             return ConsumerInterface::MSG_REJECT;
         }
     }
-
-    public function setContainer(ContainerInterface $container = null)
-    {
-        $this->container = $container;
-    }
-
-    private function getJobLogRepository(): JobLogRepository
-    {
-        $jobLogRepository = $this->container->get('markup_job_queue.repository.job_log');
-
-        if (!$jobLogRepository instanceof JobLogRepository) {
-            throw new \LogicException('Could not find the JobLogRepository in the container');
-        }
-
-        return $jobLogRepository;
-    }
-
 }

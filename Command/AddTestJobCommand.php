@@ -4,10 +4,10 @@ namespace Markup\JobQueueBundle\Command;
 
 use Markup\JobQueueBundle\Job\BadJob;
 use Markup\JobQueueBundle\Job\ExceptionJob;
-use Markup\JobQueueBundle\Job\MonologErrorJob;
 use Markup\JobQueueBundle\Job\SleepJob;
 use Markup\JobQueueBundle\Job\WorkJob;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Markup\JobQueueBundle\Service\JobManager;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -16,13 +16,26 @@ use Symfony\Component\Console\Output\OutputInterface;
  * This command can add a variety of test jobs
  * Exists for testing and development purposes of the job queue
  */
-class AddTestJobCommand extends ContainerAwareCommand
+class AddTestJobCommand extends Command
 {
+    protected static $defaultName = 'markup:job_queue:add:test';
+
     const TYPE_SLEEP = 'sleep';
     const TYPE_BAD = 'bad';
-    const TYPE_ERROR = 'error';
     const TYPE_EXCEPTION = 'exception';
     const TYPE_WORK = 'work';
+
+    /**
+     * @var JobManager
+     */
+    private $jobby;
+
+    public function __construct(JobManager $jobby)
+    {
+        $this->jobby = $jobby;
+
+        parent::__construct();
+    }
 
     /**
      * @see Command
@@ -30,12 +43,11 @@ class AddTestJobCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setName('markup:job_queue:add:test')
             ->setDescription('Adds a single job to allow testing of the job queue')
             ->addArgument(
                 'type',
                 InputArgument::REQUIRED,
-                'The type of job to add. Should be one of `sleep`, `bad` (fatal error), `error` (monolog error), `work` (cryptography) or `exception` (uncaught exception)'
+                'The type of job to add. Should be one of `sleep`, `bad` (fatal error), `work` (cryptography) or `exception` (uncaught exception)'
             )
             ->addArgument(
                 'quantity',
@@ -63,9 +75,6 @@ class AddTestJobCommand extends ContainerAwareCommand
             case self::TYPE_BAD:
                 $job = new BadJob([], $topic);
                 break;
-            case self::TYPE_ERROR:
-                $job = new MonologErrorJob([], $topic);
-                break;
             case self::TYPE_EXCEPTION:
                 $job = new ExceptionJob([], $topic);
                 break;
@@ -79,7 +88,7 @@ class AddTestJobCommand extends ContainerAwareCommand
 
         $quantity = $input->getArgument('quantity');
         for ($i = 0; $i < $quantity; $i++) {
-            $this->getContainer()->get('jobby')->addJob($job);
+            $this->jobby->addJob($job);
         }
         $output->writeln(sprintf('<info>Added %s job * %s</info>', $type, $quantity));
     }

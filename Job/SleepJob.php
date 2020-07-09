@@ -4,7 +4,7 @@ namespace Markup\JobQueueBundle\Job;
 
 use Markup\JobQueueBundle\Exception\InvalidJobArgumentException;
 use Markup\JobQueueBundle\Model\Job;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Process\Process;
 
 /**
@@ -28,7 +28,7 @@ class SleepJob extends Job
     /**
      * {@inheritdoc}
      */
-    public function run(ContainerInterface $container): string
+    public function run(ParameterBagInterface $parameterBag): string
     {
         $process = new Process(sprintf('sleep %s', $this->args['time']));
         $process->run();

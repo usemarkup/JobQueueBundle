@@ -4,7 +4,7 @@ namespace Markup\JobQueueBundle\Command;
 
 use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
 use PhpAmqpLib\Message\AMQPMessage;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -13,19 +13,32 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Consumes messages from the Go consumer
  */
-class RabbitMqConsumerCommand extends ContainerAwareCommand
+class RabbitMqConsumerCommand extends Command
 {
+    protected static $defaultName = 'markup:job_queue:rabbitmq_consumer';
+
     const STRICT_CODE_ACK = 0;
     const STRICT_CODE_REJECT = 3;
     const STRICT_CODE_REJECT_REQUEUE = 4;
     const STRICT_CODE_NEG_ACK = 5;
     const STRICT_CODE_NEG_ACK_REQUEUE = 6;
 
+    /**
+     * @var ConsumerInterface|null
+     */
+    private $consumer;
+
+    public function __construct(?ConsumerInterface $consumer = null)
+    {
+        $this->consumer = $consumer;
+
+        parent::__construct();
+    }
+
     protected function configure()
     {
         $this
             ->addArgument('event', InputArgument::REQUIRED)
-            ->setName('markup:job_queue:rabbitmq_consumer')
             ->addOption(
                 'strict-exit-code',
                 null,
@@ -39,18 +52,15 @@ class RabbitMqConsumerCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        if (!$this->consumer) {
+            return 0;
+        }
+
         $data = json_decode(base64_decode($input->getArgument('event')), true);
 
         $strict = $input->getOption('strict-exit-code');
 
-        /** @var ConsumerInterface $consumer */
-        $consumer = $this->getContainer()->get('simple_bus.rabbit_mq_bundle_bridge.commands_consumer');
-
-        if (!$consumer instanceof ConsumerInterface) {
-            return 0;
-        }
-
-        $consumerReturn = $consumer->execute(new AMQPMessage($data['body'], $data['properties']));
+        $consumerReturn = $this->consumer->execute(new AMQPMessage($data['body'], $data['properties']));
 
         // if not running in strict mode - always acknowledge the message otherwise it will requeue forever
         if (!$strict) {

@@ -2,7 +2,8 @@
 
 namespace Markup\JobQueueBundle\Command;
 
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Markup\JobQueueBundle\Service\CliConsumerConfigFileWriter;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -10,15 +11,28 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * This command writes a series of rabbitmq-cli-consumer config files (one per consumer)
  */
-class WriteCliConsumerConfigFileCommand extends ContainerAwareCommand
+class WriteCliConsumerConfigFileCommand extends Command
 {
+    protected static $defaultName = 'markup:job_queue:cli_consumer_config:write';
+
+    /**
+     * @var CliConsumerConfigFileWriter
+     */
+    private $cliConsumerConfigFileWriter;
+
+    public function __construct(CliConsumerConfigFileWriter $cliConsumerConfigFileWriter)
+    {
+        $this->cliConsumerConfigFileWriter = $cliConsumerConfigFileWriter;
+
+        parent::__construct();
+    }
+
     /**
      * @see Command
      */
     protected function configure()
     {
         $this
-            ->setName('markup:job_queue:cli_consumer_config:write')
             ->setDescription('Writes a series of rabbitmq-cli-consumer config files (one per consumer)')
             ->addArgument(
                 'unique_environment',
@@ -29,10 +43,9 @@ class WriteCliConsumerConfigFileCommand extends ContainerAwareCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $writer = $this->getContainer()->get('markup_job_queue.writer.cli_consumer_config_file');
         $env = $input->getArgument('unique_environment');
         $output->writeln('Started writing consumer configurations');
-        $writer->writeConfig($env);
+        $this->cliConsumerConfigFileWriter->writeConfig($env);
         $output->writeln('Finished writing consumer configurations');
     }
 }

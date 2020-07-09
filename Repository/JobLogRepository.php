@@ -162,11 +162,11 @@ class JobLogRepository
     }
 
     /**
-     * Removes all jobs older than ($this->ttl - 86400 seconds) from all secondary indexes
+     * Removes all jobs older than ($this->ttl) from all secondary indexes
      */
     public function removeExpiredJobs(): void
     {
-        $interval = new \DateInterval(sprintf('PT%sS', $this->ttl - 86400));
+        $interval = new \DateInterval(sprintf('PT%sS', $this->ttl));
         $before = (new \DateTime('now'))->sub($interval)->format('U');
 
         $qb = $this->getEntityManager()->createQueryBuilder();

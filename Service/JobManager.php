@@ -20,27 +20,19 @@ class JobManager
     /**
      * @var ScheduledJobService
      */
-    private $scheduledJob;
+    private $scheduledJobService;
 
     public function __construct(
         JobPublisher $publisher,
         ScheduledJobService $scheduledJobService
     ) {
         $this->publisher = $publisher;
-        $this->scheduledJob = $scheduledJobService;
+        $this->scheduledJobService = $scheduledJobService;
     }
 
-    /**
-     * Adds a job to the resque queue
-     * @param Job $job
-     */
-    public function addJob(Job $job, $dateTime = null)
+    public function addJob(Job $job, $supressLogging = false)
     {
-        if ($dateTime === null) {
-            $this->publisher->publish($job);
-        } elseif ($job instanceof ConsoleCommandJob) {
-            $this->scheduledJob->addScheduledJob($job, $dateTime);
-        }
+        $this->publisher->publish($job, $supressLogging);
     }
 
     /**
@@ -51,8 +43,9 @@ class JobManager
      * @param string $topic The name of a valid topic.
      * @param integer $timeout The amount of time to allow the command to run.
      * @param integer $idleTimeout The amount of idle time to allow the command to run. Defaults to the same as timeout.
+     * @param bool $supressLogging Stops the job from being logged by the database
      */
-    public function addConsoleCommandJob(string $command, array $arguments = [], $topic = 'default', $timeout = 60, $idleTimeout = null)
+    public function addConsoleCommandJob(string $command, array $arguments = [], $topic = 'default', $timeout = 60, $idleTimeout = null, $supressLogging = false)
     {
         if (stripos($command, " ") !== false) {
             throw new \InvalidArgumentException('Console command is not expected to have spaces within the name');
@@ -64,7 +57,8 @@ class JobManager
         $args['timeout'] = $timeout;
         $args['idleTimeout'] = $idleTimeout ?? $timeout;
         $job = new ConsoleCommandJob($args, $topic);
-        $this->addJob($job);
+
+        $this->addJob($job, $supressLogging);
     }
 
     /**
@@ -95,6 +89,7 @@ class JobManager
         $args['timeout'] = $timeout;
         $args['idleTimeout'] = $idleTimeout ?? $timeout;
         $job = new ConsoleCommandJob($args, $topic);
-        $this->addJob($job, $dateTime);
+
+        $this->scheduledJobService->addScheduledJob($job, $dateTime);
     }
 }

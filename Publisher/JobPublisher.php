@@ -59,7 +59,7 @@ class JobPublisher implements ContainerAwareInterface
      * @throws MissingTopicException
      * @throws UndefinedProducerException
      */
-    public function publish(Job $job)
+    public function publish(Job $job, $supressLogging = false)
     {
         $job->validate();
 
@@ -82,14 +82,16 @@ class JobPublisher implements ContainerAwareInterface
 
             // log the job as existing
             if ($job instanceof ConsoleCommandJob) {
-                $uuid = Uuid::uuid4()->toString();
-                $log = new JobLog(trim(sprintf('%s %s', $job->getCommand(), implode(' ', $job->getArguments()))), $uuid, $job->getTopic());
+                if (!$supressLogging) {
+                    $uuid = Uuid::uuid4()->toString();
+                    $log = new JobLog(trim(sprintf('%s %s', $job->getCommand(), implode(' ', $job->getArguments()))), $uuid, $job->getTopic());
 
-                $this->jobLogRepository->add($log);
+                    $this->jobLogRepository->add($log);
 
-                // adds the uuid to the published job
-                // which allows the consumer to specify the Uuid when running the command
-                $message['uuid'] = $uuid;
+                    // adds the uuid to the published job
+                    // which allows the consumer to specify the Uuid when running the command
+                    $message['uuid'] = $uuid;
+                }
             }
 
             $producer->publish(json_encode($message));

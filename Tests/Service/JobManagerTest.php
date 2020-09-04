@@ -51,10 +51,10 @@ class JobManagerTest extends MockeryTestCase
 
     public function testCanAddConsoleCommandJobWithDateTime(): void
     {
-        $job = new ConsoleCommandJob();
+        $job = 'muh:console:jerb';
         $scheduledTime = new \DateTime();
-        $this->jobManager->addJob($job, $scheduledTime);
-        $this->assertSame([$job], $this->scheduledJobService->getJobs());
+        $this->jobManager->addScheduledConsoleCommandJob($job, $scheduledTime);
+        $this->assertCount(1, $this->scheduledJobService->getJobs());
     }
 
     public function testCanAddCommandJob(): void
@@ -83,7 +83,7 @@ class JobManagerTest extends MockeryTestCase
                 $this->initializeJobs();
             }
 
-            public function publish(Job $job)
+            public function publish(Job $job, $supressLogging = false)
             {
                 $this->addJob($job);
             }

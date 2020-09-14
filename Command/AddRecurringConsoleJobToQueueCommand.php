@@ -108,17 +108,28 @@ class AddRecurringConsoleJobToQueueCommand extends Command
             }
 
             $command = $configuration->getCommand();
-            $arguments = [];
 
-            // i.e. does the command already have options or arguments within the string
             if (stripos($configuration->getCommand(), ' ') !== false) {
-                $command = trim(strstr($configuration->getCommand(), ' ', true));
-                $arguments = explode(' ', trim(strstr($configuration->getCommand(), ' ', false)));
+                throw new \LogicException(sprintf('%s Command cannot contain spaces', $configuration->getCommand()));
+            }
+
+            foreach ($configuration->getArguments() as $argument) {
+                if (!is_string($argument)) {
+                    throw new \Exception('Argument was expected to be a string');
+                }
+
+                $this->validateNoQuotes($argument, $configuration);
+
+                if (substr($argument, 0, 2) === '--') {
+                    $optionValue = ltrim(strstr($argument, '='), '=');
+
+                    $this->validateNoQuotes($optionValue, $configuration);
+                }
             }
 
             $this->jobManager->addConsoleCommandJob(
                 $command,
-                $arguments,
+                $configuration->getArguments(),
                 $configuration->getTopic(),
                 $configuration->getTimeout(),
                 $configuration->getTimeout()
@@ -140,5 +151,24 @@ class AddRecurringConsoleJobToQueueCommand extends Command
     private function maintainJobLogs()
     {
         $this->jobLogRepository->removeExpiredJobs();
+    }
+
+    /**
+     * @param string $argument
+     * @param RecurringConsoleCommandConfiguration $configuration
+     * @throws \Exception
+     */
+    private function validateNoQuotes(string $argument, RecurringConsoleCommandConfiguration $configuration): void
+    {
+        $firstCharacter = substr($argument, 0, 1);
+        $lastCharacter = substr($argument, strlen($argument)-1, 1);
+
+        if ($firstCharacter === '"' && $lastCharacter === '"') {
+            throw new \Exception(sprintf('remove quotes as they will be included as literal values on %s', $configuration->getCommand()));
+        }
+
+        if ($firstCharacter === "'" && $lastCharacter === "'") {
+            throw new \Exception(sprintf('remove quotes as they will be included as literal values on %s', $configuration->getCommand()));
+        }
     }
 }

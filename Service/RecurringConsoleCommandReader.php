@@ -129,8 +129,13 @@ class RecurringConsoleCommandReader
                 throw new InvalidConfigurationException('`envs` config key must be an array or null');
             }
 
+            if (isset($group['arguments']) && !is_array($group['arguments'])) {
+                throw new InvalidConfigurationException(sprintf('`arguments` config key must be an array for %s', $group['command']));
+            }
+
             $recurringConsoleCommandConfiguration = new RecurringConsoleCommandConfiguration(
                 $group['command'],
+                $group['arguments'] ?? [],
                 $group['topic'],
                 $group['schedule'],
                 isset($group['description']) ? $group['description'] : null,

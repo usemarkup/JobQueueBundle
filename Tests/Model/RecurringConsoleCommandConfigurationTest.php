@@ -9,7 +9,7 @@ class RecurringConsoleCommandConfigurationTest extends TestCase
 {
     public function testCanBeConstructed()
     {
-        $config = new RecurringConsoleCommandConfiguration('foo:bar', 'test', '30 1 * * *', 'a short description');
+        $config = new RecurringConsoleCommandConfiguration('foo:bar', [], 'test', '30 1 * * *', 'a short description');
         $this->assertEquals($config->getCommand(), 'foo:bar');
         $this->assertEquals($config->getTopic(), 'test');
         $this->assertEquals($config->getSchedule(), '30 1 * * *');

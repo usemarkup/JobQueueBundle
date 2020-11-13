@@ -13,6 +13,7 @@ services:
             $jobManager: '@jobby'
             $cronHealthRepository: '@markup_job_queue.repository.cron_health'
             $jobLogRepository: '@markup_job_queue.repository.job_log'
+            $jobStatusFactory: '@Markup\JobQueueBundle\Factory\JobStatusFactory'
             $environment: '%kernel.environment%'
         tags:
             - { name: console.command, command: 'markup:job_queue:recurring:add' }

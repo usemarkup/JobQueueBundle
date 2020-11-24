@@ -23,7 +23,7 @@ services:
         class: Markup\JobQueueBundle\Service\RecurringConsoleCommandReader
         arguments:
             - '%kernel.root_dir%'
-            - '@Markup\JobQueueBundle\Factory\JobStatusFactory'
+            - '@Markup\JobQueueBundle\Repository\JobStatusRepository'
     markup_job_queue.writer.supervisord_config_file:
         class: Markup\JobQueueBundle\Service\SupervisordConfigFileWriter
         arguments:
@@ -57,9 +57,7 @@ services:
 
     Markup\JobQueueBundle\Repository\JobStatusRepository:
         autowire: true
-
-    Markup\JobQueueBundle\Factory\JobStatusFactory:
-        autowire: true
+        public: false
 
     markup_job_queue.repository.job_log:
         class: Markup\JobQueueBundle\Repository\JobLogRepository

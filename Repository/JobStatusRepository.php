@@ -20,19 +20,18 @@ class JobStatusRepository
         $this->doctrine = $doctrine;
     }
 
-    public function isUserEnabled(string $command, array $arguments): bool
+    public function isStatusEnabled(string $command, ?string $arguments): bool
     {
-        /** @var JobStatus $jobStatus */
-        $jobStatus = $this->getEntityRepository()->findOneBy([
+        $jobStatus = $this->findBy([
             'command' => $command,
-            'arguments' => ($arguments) ? json_encode($arguments) : null
+            'arguments' => $arguments ?? '[]'
         ]);
 
-        if ($jobStatus instanceof JobStatus) {
-            return $jobStatus->getEnabled();
+        if (!$jobStatus) {
+            return true;
         }
 
-        return true;
+        return $jobStatus->getEnabled();
     }
 
     public function findBy(array $arguments): ?JobStatus
@@ -46,7 +45,17 @@ class JobStatusRepository
         return null;
     }
 
-    public function store(JobStatus $jobStatus): void
+    public function fetchOrCreateJobStatus(string $command, string $arguments): JobStatus
+    {
+        $jobStatus = $this->findBy([
+            'command' => $command,
+            'arguments' => ($arguments) ?? null
+        ]);
+
+        return $jobStatus ?? new JobStatus(null, $command, $arguments, true);
+    }
+
+    public function save(JobStatus $jobStatus): void
     {
         $this->getEntityManager()->persist($jobStatus);
         $this->getEntityManager()->flush($jobStatus);

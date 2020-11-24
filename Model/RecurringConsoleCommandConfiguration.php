@@ -45,7 +45,7 @@ class RecurringConsoleCommandConfiguration
      */
     private $arguments;
 
-    /** @var bool */
+    /** @var ?bool */
     private $userManaged;
 
     /** @var ?bool */
@@ -59,7 +59,7 @@ class RecurringConsoleCommandConfiguration
      * @param string|null $description
      * @param integer|null $timeout
      * @param array|null $envs
-     * @param bool $userManaged
+     * @param ?bool $userManaged
      * @param ?bool $jobStatusEnabled
      */
     public function __construct(
@@ -70,7 +70,7 @@ class RecurringConsoleCommandConfiguration
         $description = null,
         $timeout = 60,
         $envs = null,
-        $userManaged = false,
+        $userManaged = null,
         $jobStatusEnabled = null
     ) {
         $this->command = $command;
@@ -110,7 +110,7 @@ class RecurringConsoleCommandConfiguration
         return $this->arguments;
     }
 
-    public function getUserManaged(): ?bool
+    public function isUserManaged(): ?bool
     {
         return $this->userManaged;
     }

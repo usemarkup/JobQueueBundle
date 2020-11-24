@@ -10,8 +10,6 @@ Markup\JobQueueBundle\Entity\JobStatus:
   indexes:
     id:
       columns: [ id ]
-    enabled:
-      columns: [ enabled ]
   fields:
     command:
       type: string

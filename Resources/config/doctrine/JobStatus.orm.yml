@@ -1,0 +1,21 @@
+Markup\JobQueueBundle\Entity\JobStatus:
+  type: entity
+  table: job_status
+  id:
+    id:
+      type: guid
+      unique: true
+      generator:
+        strategy: AUTO
+  indexes:
+    id:
+      columns: [ id ]
+  fields:
+    command:
+      type: string
+      length: 60
+    arguments:
+      type: text
+    enabled:
+      type: boolean
+      defaultValue: '1'

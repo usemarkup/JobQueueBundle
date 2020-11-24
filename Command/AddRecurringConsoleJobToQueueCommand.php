@@ -2,6 +2,7 @@
 
 namespace Markup\JobQueueBundle\Command;
 
+use Markup\JobQueueBundle\Repository\JobStatusRepository;
 use Markup\JobQueueBundle\Model\RecurringConsoleCommandConfiguration;
 use Markup\JobQueueBundle\Repository\CronHealthRepository;
 use Markup\JobQueueBundle\Repository\JobLogRepository;
@@ -47,17 +48,22 @@ class AddRecurringConsoleJobToQueueCommand extends Command
      */
     private $environment;
 
+    /** @var JobStatusRepository */
+    private $jobStatusRepository;
+
     public function __construct(
         RecurringConsoleCommandReader $recurringConsoleCommandReader,
         JobManager $jobManager,
         CronHealthRepository $cronHealthRepository,
         JobLogRepository $jobLogRepository,
+        JobStatusRepository $jobStatusRepository,
         string $environment
     ) {
         $this->recurringConsoleCommandReader = $recurringConsoleCommandReader;
         $this->jobManager = $jobManager;
         $this->cronHealthRepository = $cronHealthRepository;
         $this->jobLogRepository = $jobLogRepository;
+        $this->jobStatusRepository = $jobStatusRepository;
         $this->environment = $environment;
 
         parent::__construct(null);
@@ -124,6 +130,14 @@ class AddRecurringConsoleJobToQueueCommand extends Command
                     $optionValue = ltrim(strstr($argument, '='), '=');
 
                     $this->validateNoQuotes($optionValue, $configuration);
+                }
+            }
+
+            if ($configuration->isUserManaged()) {
+                $arguments = $configuration->getArguments() ? json_encode($configuration->getArguments()) : null;
+
+                if (!$this->jobStatusRepository->isStatusEnabled($command, $arguments)) {
+                    continue;
                 }
             }
 

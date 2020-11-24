@@ -45,6 +45,12 @@ class RecurringConsoleCommandConfiguration
      */
     private $arguments;
 
+    /** @var ?bool */
+    private $userManaged;
+
+    /** @var ?bool */
+    private $jobStatusEnabled;
+
     /**
      * @param string $command
      * @param array $arguments
@@ -53,9 +59,20 @@ class RecurringConsoleCommandConfiguration
      * @param string|null $description
      * @param integer|null $timeout
      * @param array|null $envs
+     * @param ?bool $userManaged
+     * @param ?bool $jobStatusEnabled
      */
-    public function __construct($command, array $arguments, $topic, $schedule, $description = null, $timeout = 60, $envs = null)
-    {
+    public function __construct(
+        $command,
+        array $arguments,
+        $topic,
+        $schedule,
+        $description = null,
+        $timeout = 60,
+        $envs = null,
+        $userManaged = null,
+        $jobStatusEnabled = null
+    ) {
         $this->command = $command;
         $this->arguments = $arguments;
         $this->schedule = $schedule;
@@ -63,6 +80,8 @@ class RecurringConsoleCommandConfiguration
         $this->timeout = $timeout;
         $this->description = $description;
         $this->envs = $envs;
+        $this->userManaged = $userManaged;
+        $this->jobStatusEnabled = $jobStatusEnabled;
     }
 
     /**
@@ -89,6 +108,16 @@ class RecurringConsoleCommandConfiguration
     public function getArguments(): array
     {
         return $this->arguments;
+    }
+
+    public function isUserManaged(): ?bool
+    {
+        return $this->userManaged;
+    }
+
+    public function getJobStatusEnabled(): ?bool
+    {
+        return $this->jobStatusEnabled;
     }
 
     /**

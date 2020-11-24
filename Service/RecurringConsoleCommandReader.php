@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Markup\JobQueueBundle\Exception\InvalidConfigurationException;
 use Markup\JobQueueBundle\Exception\MissingScheduleException;
 use Markup\JobQueueBundle\Exception\MissingConfigurationException;
+use Markup\JobQueueBundle\Repository\JobStatusRepository;
 use Markup\JobQueueBundle\Model\RecurringConsoleCommandConfiguration;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
@@ -36,10 +37,16 @@ class RecurringConsoleCommandReader
     /**
      * @param string $kernelPath
      */
+
+    /** @var JobStatusRepository */
+    private $jobStatusRepository;
+
     public function __construct(
-        $kernelPath
+        string $kernelPath,
+        JobStatusRepository $jobStatusRepository
     ) {
         $this->kernelPath = $kernelPath;
+        $this->jobStatusRepository = $jobStatusRepository;
     }
 
     public function setConfigurationFileName($name)
@@ -140,13 +147,22 @@ class RecurringConsoleCommandReader
                 $group['schedule'],
                 isset($group['description']) ? $group['description'] : null,
                 isset($group['timeout']) ? $group['timeout'] : null,
-                isset($group['envs']) ? $group['envs'] : null
+                isset($group['envs']) ? $group['envs'] : null,
+                isset($group['user_managed']) ? $group['user_managed'] : null,
+                isset($group['user_managed']) ? $this->jobStatusEnabled($group) : null
             );
 
             $configurations->add($recurringConsoleCommandConfiguration);
         }
 
         return $configurations;
+    }
+
+    private function jobStatusEnabled(array $group): bool
+    {
+        $arguments = isset($group['arguments']) ? json_encode($group['arguments']) : null;
+
+        return $this->jobStatusRepository->isStatusEnabled($group['command'], $arguments);
     }
 
     /**

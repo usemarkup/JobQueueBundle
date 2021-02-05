@@ -24,6 +24,7 @@ services:
         arguments:
             - '%kernel.root_dir%'
             - '@Markup\JobQueueBundle\Repository\JobStatusRepository'
+            - '%kernel.environment%'
     markup_job_queue.writer.supervisord_config_file:
         class: Markup\JobQueueBundle\Service\SupervisordConfigFileWriter
         arguments:

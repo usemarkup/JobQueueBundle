@@ -41,12 +41,19 @@ class RecurringConsoleCommandReader
     /** @var JobStatusRepository */
     private $jobStatusRepository;
 
+    /**
+     * @var string
+     */
+    private $kernelEnv;
+
     public function __construct(
         string $kernelPath,
-        JobStatusRepository $jobStatusRepository
+        JobStatusRepository $jobStatusRepository,
+        string $kernelEnv
     ) {
         $this->kernelPath = $kernelPath;
         $this->jobStatusRepository = $jobStatusRepository;
+        $this->kernelEnv = $kernelEnv;
     }
 
     public function setConfigurationFileName($name)
@@ -138,6 +145,11 @@ class RecurringConsoleCommandReader
 
             if (isset($group['arguments']) && !is_array($group['arguments'])) {
                 throw new InvalidConfigurationException(sprintf('`arguments` config key must be an array for %s', $group['command']));
+            }
+
+            // user management by default when environment is not prod
+            if ($this->kernelEnv !== 'prod' && !isset($group['user_managed'])) {
+                $group['user_managed'] = true;
             }
 
             $recurringConsoleCommandConfiguration = new RecurringConsoleCommandConfiguration(

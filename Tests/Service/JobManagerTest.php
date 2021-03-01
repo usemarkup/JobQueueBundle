@@ -3,6 +3,8 @@
 namespace Markup\Bundle\JobQueueBundle\Tests\Service;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\EntityManager;
+use Markup\JobQueueBundle\Entity\Repository\ScheduledJobRepository;
 use Markup\JobQueueBundle\Entity\ScheduledJob;
 use Markup\JobQueueBundle\Job\ConsoleCommandJob;
 use Markup\JobQueueBundle\Job\SleepJob;
@@ -10,7 +12,6 @@ use Markup\JobQueueBundle\Model\Job;
 use Markup\JobQueueBundle\Publisher\JobPublisher;
 use Markup\JobQueueBundle\Repository\JobLogRepository;
 use Markup\JobQueueBundle\Service\JobManager;
-use Markup\JobQueueBundle\Service\ScheduledJobService;
 use Mockery as m;
 use Mockery\Adapter\Phpunit\MockeryTestCase;
 use PHPUnit\Framework\Error\Error;
@@ -23,22 +24,16 @@ class JobManagerTest extends MockeryTestCase
     private $jobPublisher;
 
     /**
-     * @var ScheduledJobService
-     */
-    private $scheduledJobService;
-
-    /**
      * @var JobManager
      */
     private $jobManager;
 
     protected function setUp()
     {
-        $this->jobPublisher = $this->createStoringJobPublisher();
-        $this->scheduledJobService = $this->createStoringJobScheduler();
-        $this->jobManager = new JobManager(
+        $this->jobPublisher = m::mock(JobPublisher::class);
+        $this->jobManager = $this->createJobManager(
             $this->jobPublisher,
-            $this->scheduledJobService
+            $this->createScheduledJobRepositoryMock()
         );
     }
 
@@ -46,7 +41,7 @@ class JobManagerTest extends MockeryTestCase
     {
         $job = new SleepJob();
         $this->jobManager->addJob($job);
-        $this->assertSame([$job], $this->jobPublisher->getJobs());
+        $this->assertSame([$job], $this->jobManager->getJobs());
     }
 
     public function testCanAddConsoleCommandJobWithDateTime(): void
@@ -54,13 +49,13 @@ class JobManagerTest extends MockeryTestCase
         $job = 'muh:console:jerb';
         $scheduledTime = new \DateTime();
         $this->jobManager->addScheduledConsoleCommandJob($job, $scheduledTime);
-        $this->assertCount(1, $this->scheduledJobService->getJobs());
+        $this->assertCount(1, $this->jobManager->getJobs());
     }
 
     public function testCanAddCommandJob(): void
     {
         $this->jobManager->addConsoleCommandJob('console:herp:derp', [], 'system', 60, 60);
-        $this->assertCount(1, $this->jobPublisher->getJobs());
+        $this->assertCount(1, $this->jobManager->getJobs());
     }
 
     public function testIdleTimeoutDefaultsToTimeout(): void
@@ -68,42 +63,32 @@ class JobManagerTest extends MockeryTestCase
         $timeout = 720;
         $this->jobManager->addConsoleCommandJob('command', [], 'topic', $timeout);
         /** @var Job $job */
-        $job = $this->jobPublisher->getJobs()[0];
+        $job = $this->jobManager->getJobs()[0];
         $this->assertEquals($timeout, $job->getArgs()['idleTimeout']);
     }
-
-    private function createStoringJobPublisher(): JobPublisher
+    
+    private function createScheduledJobRepositoryMock()
     {
-        return new class () extends JobPublisher {
-            use JobStore;
-
-            public function __construct()
-            {
-                parent::__construct(m::mock(JobLogRepository::class));
-                $this->initializeJobs();
-            }
-
-            public function publish(Job $job, $supressLogging = false)
-            {
-                $this->addJob($job);
-            }
-        };
+        return m::mock(ScheduledJobRepository::class)
+            ->shouldReceive('save')
+            ->andReturn(null)
+            ->getMock();
     }
-
-    private function createStoringJobScheduler()
+    
+    private function createJobManager($jobPublisher, $scheduledJobRepository)
     {
-        return new class () extends ScheduledJobService {
+        return new class ($jobPublisher, $scheduledJobRepository) extends JobManager {
             use JobStore;
 
-            public function __construct()
+            public function __construct(&$jobPublisher, $scheduledJobRepository)
             {
-                parent::__construct(m::mock(ManagerRegistry::class));
-                $this->initializeJobs();
+                parent::__construct($jobPublisher, $scheduledJobRepository);
             }
 
-            public function addScheduledJob(ConsoleCommandJob $job, $scheduledTime)
+            public function addScheduledJob(ConsoleCommandJob $job, $scheduledTime): ScheduledJob
             {
                 $this->addJob($job);
+                return parent::addScheduledJob($job, $scheduledTime);
             }
         };
     }
@@ -115,12 +100,7 @@ trait JobStore {
      */
     private $jobs;
 
-    private function initializeJobs(): void
-    {
-        $this->jobs = [];
-    }
-
-    private function addJob(Job $job): void
+    public function addJob(Job $job, $supressLogging = false)
     {
         $this->jobs[] = $job;
     }

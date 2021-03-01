@@ -2,9 +2,9 @@
 
 namespace Markup\JobQueueBundle\Command;
 
+use Markup\JobQueueBundle\Entity\Repository\ScheduledJobRepository;
 use Markup\JobQueueBundle\Entity\ScheduledJob;
 use Markup\JobQueueBundle\Service\JobManager;
-use Markup\JobQueueBundle\Service\ScheduledJobService;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -29,18 +29,18 @@ class AddScheduleJobToQueueCommand extends Command
     private $logger;
 
     /**
-     * @var ScheduledJobService
+     * @var ScheduledJobRepository
      */
-    private $scheduledJobService;
+    private $scheduledJobRepository;
 
     public function __construct(
         JobManager $jobManager,
-        ScheduledJobService $scheduledJobService,
+        ScheduledJobRepository $scheduledJobRepository,
         ?LoggerInterface $logger = null
     ) {
         $this->jobManager = $jobManager;
         $this->logger = $logger;
-        $this->scheduledJobService = $scheduledJobService;
+        $this->scheduledJobRepository = $scheduledJobRepository;
 
         parent::__construct(null);
     }
@@ -56,7 +56,7 @@ class AddScheduleJobToQueueCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $jobs = $this->scheduledJobService->getUnqueuedJobs();
+        $jobs = $this->scheduledJobRepository->fetchUnqueuedJobs();
 
         if ($jobs) {
             foreach ($jobs as $job) {
@@ -74,7 +74,7 @@ class AddScheduleJobToQueueCommand extends Command
                     );
                     $job->setQueued(true);
 
-                    $this->scheduledJobService->save($job, $flush = true);
+                    $this->scheduledJobRepository->save($job, $flush = true);
                 } catch (\Exception $e) {
                     $this->logger->error(
                         sprintf(

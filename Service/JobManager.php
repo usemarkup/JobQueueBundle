@@ -2,6 +2,8 @@
 
 namespace Markup\JobQueueBundle\Service;
 
+use Markup\JobQueueBundle\Entity\Repository\ScheduledJobRepository;
+use Markup\JobQueueBundle\Entity\ScheduledJob;
 use Markup\JobQueueBundle\Job\ConsoleCommandJob;
 use Markup\JobQueueBundle\Model\Job;
 use Markup\JobQueueBundle\Publisher\JobPublisher;
@@ -18,16 +20,16 @@ class JobManager
     private $publisher;
 
     /**
-     * @var ScheduledJobService
+     * @var ScheduledJobRepository
      */
-    private $scheduledJobService;
-
+    private $scheduledJobRepository;
+    
     public function __construct(
         JobPublisher $publisher,
-        ScheduledJobService $scheduledJobService
+        ScheduledJobRepository $scheduledJobRepository
     ) {
         $this->publisher = $publisher;
-        $this->scheduledJobService = $scheduledJobService;
+        $this->scheduledJobRepository = $scheduledJobRepository;
     }
 
     public function addJob(Job $job, $supressLogging = false)
@@ -90,6 +92,14 @@ class JobManager
         $args['idleTimeout'] = $idleTimeout ?? $timeout;
         $job = new ConsoleCommandJob($args, $topic);
 
-        $this->scheduledJobService->addScheduledJob($job, $dateTime);
+        $this->addScheduledJob($job, $dateTime);
+    }
+    
+    public function addScheduledJob(ConsoleCommandJob $job, $scheduledTime): ScheduledJob
+    {
+        $scheduledJob = new ScheduledJob($job->getCommand(), $job->getArguments(), $scheduledTime, $job->getTopic());
+        $this->scheduledJobRepository->save($scheduledJob, true);
+
+        return $scheduledJob;
     }
 }

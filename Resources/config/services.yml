@@ -13,10 +13,10 @@ services:
         class: Markup\JobQueueBundle\Consumer\JobConsumer
         autowire: true
     markup_job_queue.manager:
+        autowire: true
         class: Markup\JobQueueBundle\Service\JobManager
         arguments:
             - '@markup_job_queue.publisher'
-            - '@markup_job_queue.scheduled'
     jobby:
         alias: markup_job_queue.manager
     markup_job_queue.reader.recurring_console_command:
@@ -34,11 +34,7 @@ services:
             - ~
             - ~
             - ~
-    markup_job_queue.scheduled:
-        class: Markup\JobQueueBundle\Service\ScheduledJobService
-        arguments:
-            - '@doctrine'
-
+    
     markup_job_queue.writer.cli_consumer_config_file:
         class: Markup\JobQueueBundle\Service\CliConsumerConfigFileWriter
     markup_job_queue.rabbit_mq_api.client:
@@ -52,7 +48,9 @@ services:
         arguments:
             - '@markup_job_queue.rabbit_mq_api'
             - ~
-
+    Markup\JobQueueBundle\Entity\Repository\ScheduledJobRepository:
+        autowire: true
+        public: false
 
     Markup\JobQueueBundle\Repository\JobLogRepository: '@markup_job_queue.repository.job_log'
 

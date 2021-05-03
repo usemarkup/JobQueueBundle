@@ -121,7 +121,7 @@ class AddRecurringConsoleJobToQueueCommand extends Command
 
             foreach ($configuration->getArguments() as $argument) {
                 if (!is_string($argument)) {
-                    throw new \Exception('Argument was expected to be a string');
+                    throw new \Exception(sprintf('Argument in command %s was expected to be a string', $configuration->getCommand()));
                 }
 
                 $this->validateNoQuotes($argument, $configuration);

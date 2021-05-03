@@ -49,14 +49,14 @@ class AddCommandJobToQueueCommand extends Command
                 't',
                 InputOption::VALUE_OPTIONAL,
                 'The timeout time for the command. Defaults to 60 seconds',
-                60
+                '60'
             )
             ->addOption(
                 'idle_timeout',
                 'i',
                 InputOption::VALUE_OPTIONAL,
                 'The idle timeout time for the command. Defaults to 60 seconds',
-                60
+                '60'
             );
     }
 

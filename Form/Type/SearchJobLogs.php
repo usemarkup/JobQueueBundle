@@ -63,7 +63,6 @@ class SearchJobLogs extends AbstractType
                     'Failed' => JobLog::STATUS_FAILED,
                     'Complete' => JobLog::STATUS_COMPLETE,
                 ],
-                'choices_as_values' => true,
             ]
         )->add(
             'search',
